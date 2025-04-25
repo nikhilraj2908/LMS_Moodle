@@ -1,0 +1,608 @@
+/* Container for all progress cards */
+.progress-dashboard-container {
+    /* border: 1px solid rgb(240, 243, 247); Added border for better visibility */
+    /* border-radius: 8px; Rounded corners for the container */
+
+    background: rgb(255, 255, 255);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+   
+}
+/* Loader Styles */
+#loader {
+    text-align: center;
+}
+.svg-curve {
+    margin-top: -10%;
+    background: transparent;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 86, 179, 0.3);
+    border-radius: 50%;
+    border-top-color: #0056b3;
+    animation: spin 1s linear infinite;
+    margin: auto;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.welcome-text {
+    font-size: 26px;
+    font-weight: bold;
+    color: #2b1202; /* Soft Orange */
+    text-transform: capitalize;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Gradient Animation */
+@keyframes gradientText {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Style for the Subtitle (Animated Gradient) */
+.user-name p {
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, #1f0074, #02049e, #ffbb00, #0026ff);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientText 3s ease-in-out infinite;
+}
+
+
+.card-progress:hover {
+transform: translateY(-5px);
+box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+
+.dashboard-container {
+display: flex;
+justify-content: center;
+align-items: flex-start;
+gap: 30px;
+flex-wrap: wrap;
+margin-top: 30px;
+padding: 20px;
+
+}
+
+
+
+.user-info{
+margin-top: 35px;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+.user-name{
+padding: 15px;
+}
+/* Individual Card Styling */
+.card-progress {
+height: 19rem;
+/* background: white; */
+padding: 20px;
+/* border-radius: 12px; */
+box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+width: 280px;
+text-align: center;
+position: relative;
+border: 1px solid #ddd;
+/* transition: all 0.3s ease-in-out; */
+border-radius: 50px;
+background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+/* background: linear-gradient(135deg, rgb(0, 255, 214) 0%, rgb(8, 226, 96) 100%); */
+transition: all 0.3s ease-in-out;
+transform-style: preserve-3d;
+}
+.card-progress:hover  {
+transform: rotate3d(1, 1, 0, 30deg);
+box-shadow: rgba(4, 23, 63, 0.3) 30px 50px 25px -40px, rgba(5, 19, 66, 0.1) 0px 25px 30px 0px;
+}
+
+/* Card Hover Effect */
+/* .card-progress:hover {
+transform: translateY(-5px);
+box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+} */
+
+/* Headings in Cards */
+.card-progress h3 {
+    font-size: 20px; /* Increased font size for better readability */
+    color: #2b1202;
+    margin-bottom: 10px;
+    font-weight: bold;
+
+}
+
+/* Subtext Below Headings */
+.card-progress p {
+    font-size: 16px; /* Increased font size for better readability */
+    color: #666;
+    margin-bottom: 15px;
+
+}
+
+/* Circular Progress Bar Container */
+.progress-container {
+position: relative;
+width: 120px;
+height: 120px;
+margin: auto;
+}
+
+/* Canvas Size for Progress Bar */
+canvas {
+width: 120px;
+height: 120px;
+}
+
+/* Text Inside Progress Bar */
+.progress-text-new {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+font-size: 16px;
+font-weight: bold;
+color: #333;
+}
+
+/* Points Display */
+.points-display {
+font-size: 18px;
+font-weight: bold;
+color: #ffcc00;
+text-align: center;
+margin-top: 15px;
+z-index: 1;
+}
+
+
+.container-svg {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+font-size: 5em;
+font-weight: 900;
+color: #e10600;
+position: relative;
+transition: all 1s ease;
+text-align: center;
+margin-top: 20px;
+}
+.container__star {
+transition: all 0.7s ease-in-out;
+}
+
+/* .first {
+position: absolute;
+top: 20px;
+left: 50px;
+transition: all 0.7s ease-in-out;
+} */
+
+/* Star Shape */
+.svg-icon {
+position: absolute;
+fill: #e94822;
+z-index: 1;
+}
+
+/* Rotating Star */
+.star-eight {
+background: #efd510;
+width: 120px;
+height: 120px;
+position: relative;
+text-align: center;
+animation: rot 3s infinite;
+border-radius: 50%;
+}
+
+/* Star Before Rotation */
+.star-eight::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+height: 120px;
+width: 120px;
+background: #efd510;
+transform: rotate(135deg);
+border-radius: 50%;
+}
+
+/* Hover Effect */
+.container-svg:hover .container__star {
+transform: rotateX(70deg) translateY(250px);
+box-shadow: 0px 0px 120px -100px #e4e727;
+}
+
+/* Star Growth Animation */
+.container-svg:hover .svg-icon {
+animation: grow 1s linear infinite;
+}
+
+/* Rotating Effect */
+@keyframes rot {
+0% {
+    transform: rotate(0deg);
+}
+50% {
+    transform: rotate(340deg);
+}
+100% {
+    transform: rotate(0deg);
+}
+}
+
+/* Wobble Effect */
+@keyframes grow {
+0% {
+    transform: rotate(0deg);
+}
+25% {
+    transform: rotate(-5deg);
+}
+75% {
+    transform: rotate(5deg);
+}
+100% {
+    transform: scale(1) rotate(0deg);
+}
+}
+
+/* Global Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Container Styling */
+.custom-courses-container {
+    max-width: 90%;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+/* Section Title */
+.custom-section-title {
+    font-weight: bold;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, #1f0074, #02049e, #ffbb00, #0026ff);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientText 5s ease-in-out infinite;
+      
+}
+
+
+
+/* Course Grid - Horizontal Layout */
+.custom-course-grid {
+    display: grid;
+        grid-template-columns: 6fr 6fr;
+    gap: 40px;
+    margin: 5% 12% 0% 12%;
+}
+
+.main-inner{
+    background-image: url("../pix/bgmainfrontpage.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 90%;
+    height: 100%;
+}
+body#page-login-forgot_password {
+    background: none !important; /* Remove background */
+}
+
+#page-login-forgot_password .login-container {
+    background: none !important; /* Ensure container has no background */
+}
+
+#page-login-forgot_password .card {
+    background: white !important; /* Optional: Keep the form white for better visibility */
+}
+/* Popup Overlay *//* ✅ Initially hidden */
+.popup-overlay {
+    display: none; /* Hidden initially */
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    opacity: 0;
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* ✅ Popup Box Animation */
+.popup-content {
+    background: white;
+    padding: 20px;
+    max-width: 400px;
+    text-align: center;
+    border-radius: 10px;
+    position: relative;
+    transform: scale(0.7);
+    animation: scaleUp 0.3s ease-out forwards;
+}
+
+/* ✅ Close Button */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* ✅ Image */
+.popup-image {
+    width: 100px;
+    margin-bottom: 10px;
+}
+
+/* ✅ "Got It" Button */
+.got-it-btn {
+    background: #204070;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s ease-in-out;
+}
+
+.got-it-btn:hover {
+    background: #3060A0;
+    transform: scale(1.05);
+}
+
+/* ✅ Fade-in Effect */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* ✅ Scale-up Effect */
+@keyframes scaleUp {
+    from {
+        transform: scale(0.7);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+/* ✅ Fade-out Effect */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.7);
+    }
+}
+/* Course Card - Horizontal */
+
+.custom-course-card {
+    position: relative;
+    height: 300px; /* Ensuring all cards are the same height */
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2); /* Always show shadow */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    text-align: center;
+}
+
+/* Image inside the card (as background) */
+.custom-course-card-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0; /* Ensure image is not behind the content */
+}
+
+/* Ensure image is visible */
+.custom-course-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Makes sure image covers the whole background */
+    display: block;
+    transition: transform 0.6s ease-in-out;
+}
+
+/* Ensure text is always visible over the image */
+.custom-course-content {
+    align-content: center;
+    height: 100%;
+    position: relative;
+    background: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+    color: white;
+    padding: 20px;
+    border-radius: 0 0 10px 10px;
+    opacity: 0; /* Initially hidden */
+    transition: opacity 0.3s ease-in-out; /* Smooth fade-in */
+}
+
+/* Title */
+.custom-course-title {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: white;
+    z-index: 1; /* Ensure title is always visible */
+}
+
+/* Description */
+.custom-course-description {
+    font-size: 14px;
+    margin-bottom: 15px;
+    opacity: 0; /* Initially hidden */
+    transition: opacity 0.3s ease-in-out; /* Smooth fade-in */
+}
+
+/* Button */
+.custom-view-more {
+    display: inline-block;
+    padding: 10px 20px;
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+    border-radius: 5px;
+    opacity: 0; /* Initially hidden */
+    transition: opacity 0.3s ease-in-out; /* Smooth fade-in */
+}
+
+/* Button hover effect */
+.custom-view-more:hover {
+    background: white;
+    color: black;
+}
+
+/* On hover, make image zoom in and show title, description, and button */
+.custom-course-card:hover .custom-course-content {
+    opacity: 1; /* Make the content visible */
+}
+
+.custom-course-card:hover .custom-course-description {
+    opacity: 1; /* Show the description */
+}
+
+.custom-course-card:hover .custom-view-more {
+    opacity: 1; /* Show the button */
+}
+
+/* On hover, make image zoom in */
+.custom-course-card:hover .custom-course-card-image img {
+    transform: scale(1.1);
+}
+
+.custom-load-more {
+    text-align: center;
+}
+
+
+
+/* .custom-course-card {
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    text-align: center;
+}
+
+.custom-course-card-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0; 
+}
+
+.custom-course-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease-in-out; 
+}
+
+
+.custom-course-content {
+    align-content: center;
+    height: 100%;
+    position: relative;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 20px;
+    border-radius: 0 0 10px 10px;
+}
+
+.custom-course-title {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.custom-course-description {
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.custom-view-more {
+    display: inline-block;
+    padding: 10px 20px;
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+    border-radius: 5px;
+}
+
+
+.custom-view-more:hover {
+    background: white;
+    color: black;
+}
+
+.custom-course-card:hover .custom-course-card-image img {
+    transform: scale(1.1);
+}
+
+.custom-load-more{
+    text-align: center;
+}  */

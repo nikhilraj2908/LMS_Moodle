@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+      .dashboard-header {
+    background-color: #204070;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    position: relative; /* 🔥 Required for absolute positioning of child */
+    z-index: 1; /* Ensure it stacks above other content */
+}
+
+        .dashboard-header img {
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        .container {
+            padding: 20px;
+        }
+        .dashboard-row {
+            display: grid;
+            grid-template-columns: 8fr 4fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .dashboard-card {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            
+        }
+        .dashboard-card h3 {
+            font-size: 25px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .img-heading {
+            color: #204070;
+        }
+        .user-stats img {
+            width: 70%;
+            margin: 0 auto;
+        }
+        .user-stats-legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .bullet {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .excellent { background-color: #204070; }
+        .good { background-color: #3C6894; }
+        .keep-going { background-color: #808080; }
+        .course-enrolled {
+            position: relative;
+        }
+        .course-enrolled .dotted-line {
+            border-bottom: 3px dotted black;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+        }
+        .course-enrolled img {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 50px;
+        }
+        .course-enrolled h2 {
+            font-size: 36px;
+            color: #204070;
+            margin: 0;
+              filter: drop-shadow(3px 3px 8px rgba(0, 0, 0, 0.3)); /* Adds a smooth shadow */
+    border-radius: 50%; 
+        }
+        .learning-path {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2px;
+        }
+        .progress-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+        }
+        .progress-container canvas {
+            width: 150px !important;
+            height: 150px !important;
+        }
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            font-weight: bold;
+            color: #333333;
+        }
+        .learning-path-legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .learning-path-legend .bullet {
+            width: 12px;
+            height: 12px;
+        }
+        .points-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+        }
+        .points-bars {
+            width: 70%;
+        }
+        .points-bars .progress {
+            height: 10px;
+            background: lightgray;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .points-bars .bar {
+            height: 100%;
+            border-radius: 5px;
+        }
+        .points-bars .course-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        .points-total {
+            text-align: center;
+        }
+        .points-total img {
+            width: 40%;
+            margin-bottom: 10px;
+        }
+        .points-total h4 {
+            font-size: 18px;
+            margin: 0;
+        }
+        .hours-activity-section {
+            display: flex;
+            padding: 10px;
+            gap: 10px;
+        }
+        .hours-activity-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            text-align:center;
+                margin-left: 2rem;
+        }
+        .hours-activity-header .arrow {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            font-size: 12px;
+        }
+        .increase .arrow {
+            background-color: #90ee90;
+            color: green;
+        }
+        .decrease .arrow {
+            background-color: #ffcccb;
+            color: red;
+        }
+        .hours-activity-chart {
+            width: 70%;
+            height: 200px;
+            text-align:center;
+        }
+
+        .hours-total-section {
+    width: 30%;
+
+}
+.fade:not(.show) {
+  opacity: 1;
+}
+
+.total-hours {
+    margin-bottom: 15px;
+}
+
+.total-hours h5 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.hours-number {
+    font-size: 32px;
+    font-weight: bold;
+    color: #204070;
+}
+#course-carousel {
+    position: relative;
+    width: 100%;
+    /* Adjust height to your preference or match parent container */
+    height: 200px;
+    overflow: hidden;
+}
+
+/* Initially all items hidden; we show one at a time via JavaScript */
+#course-carousel .course-item {
+    display: none; 
+    width: 100%;
+    height: 100%;
+    background-size: cover;       /* Ensures the image covers entire div */
+    background-position: center;  /* Centers the image */
+    transition: transform 0.4s ease-in-out;
+    position: relative;
+}
+
+/* Zoom on hover */
+#course-carousel .course-item:hover {
+    transform: scale(1.05);
+}
+
+/* Text overlay container */
+.course-overlay {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    color: #fff;
+    background: rgba(0,0,0,0.5); /* Semi-transparent black background */
+    padding: 10px;
+}
+
+.course-overlay h4 {
+    margin: 0;
+}
+
+.course-overlay a {
+    color: #fff;
+    text-decoration: underline;
+}
+.recent-course {
+    position: relative;
+    width: 100%;
+    height: 200px;              /* Adjust height as needed */
+    border-radius: 5px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s ease;
+}
+
+.recent-course:hover {
+    transform: scale(1.05);    /* Slight zoom on hover */
+}
+
+.course-overlay {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+    color: #fff;
+    padding: 10px;
+}
+
+.course-overlay h4 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.course-overlay a {
+    color: #fff;
+    text-decoration: underline;
+    font-size: 14px;
+}
+
+        #course-results {
+            position: absolute;
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1001;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 0 0 5px 5px;
+        }
+        
+        #course-results a {
+            color: #333;
+            text-decoration: none;
+        }
+        
+        #course-results a:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .search-course-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .search-course-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        
+        .search-course-info {
+            flex-grow: 1;
+        }
+        
+        .search-course-name {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        
+        .search-course-summary {
+            font-size: 12px;
+            color: #666;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+   .course-search-container {
+    position: relative;
+    width: 100%; /* Or set a fixed width like 300px if preferred */
+    max-width: 300px;
+}
+
+#search-results-container {
+    position: absolute;
+    top: 100%; /* just below the input */
+    left: 0;
+    right: 0;
+    background-color: #204070;
+    color: white;
+    z-index: 999;
+    border-radius: 0 0 5px 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    display: none; /* shown dynamically */
+}
+
+.search-result-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-result-item:hover {
+    background-color: #3c6894;
+}
+.search-results {
+    position: absolute;
+    top: 100%;  /* below the input box */
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 9999;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.course-thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+.course-info h5 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+}
+
+.course-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.no-results {
+    padding: 10px;
+    color: #666;
+    text-align: center;
+}
+    </style>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<body>
+    <div class="bg-light"><div class="dashboard-header justify-content-between">
+            <div class="d-flex align-items-center">
+                {{{userpicture}}}
+                <span class="ms-2">Hey! {{username}}</span>
+            </div>
+            <div class="course-search-container">
+                <input type="text" id="course-search-input" class="form-control" placeholder="Search courses...">
+                <div id="search-results-container" class="search-results"></div>
+                
+            </div>
+    </div>
+
+
+
+
+        <div class="container">
+            <!-- First Row: User Stats, Course Enrolled, Learning Path -->
+            <div class="mb-4">
+    <!-- Row Header: "Continue Learning" on the left, "View All" on the right -->
+ 
+    <!-- Three Boxes -->
+    <div class="d-flex justify-content-between mt-3">
+        <!-- 1) Most Recent Course -->
+        <div class="dashboard-card flex-grow-1 me-3">
+    <h3>Continue <span class="img-heading">Learning</span></h3>
+    {{#recentCourse}}
+    <div class="recent-course" style="background-image: url('{{course_image_url}}');">
+        <div class="course-overlay">
+            <h4>{{coursename}}</h4>
+            <a href="{{courseurl}}">Go to Course</a>
+        </div>
+    </div>
+    {{/recentCourse}}
+    {{^recentCourse}}
+    <p>No recently accessed course found.</p>
+    {{/recentCourse}}
+</div>
+
+
+        <!-- 2) Recently Enrolled Courses (rotates every 3 seconds) -->
+       <div class="dashboard-card flex-grow-1 me-3">
+    <h3>Recent <span class="img-heading">Enrolled Courses</span></h3>
+    <div id="course-carousel">
+        {{#enrolledCourses}}
+        <div class="course-item" style="background-image: url('{{course_image_url}}');">
+            <div class="course-overlay">
+                <h4>{{coursename}}</h4>
+                <a href="{{courseurl}}">Go to Course</a>
+            </div>
+        </div>
+        {{/enrolledCourses}}
+    </div>
+</div>
+
+
+        <!-- 3) Total Courses Enrolled -->
+        <div class="dashboard-card flex-grow-1">
+                                    <h3 >Course <span class="img-heading">Enrolled</span> </h3>
+
+                   <div class="d-flex justify-content-center mt-4" style="border-bottom: 3px dotted black; ">
+                        <span class="text-left">
+                                <h1 class="coursecount  text-left text-center fw-bold" style="color:#204070; font-size:60px;" >{{totalCourses}}</h1>
+                        </span>
+                    </div>
+                     <span >
+                                <img src={{course_enrolled_url}} alt="User enrollments" width="90" class="mt-4  ">
+                        </span>
+                    
+        </div>
+        
+    </div>
+</div>
+            <div class="dashboard-row">
+                <div class="dashboard-card">
+                    <h2>Hours <span class="img-heading">Activity</span></h2>
+                  <div class="hours-activity-section d-flex justify-content-around align-items-center">
+
+                       
+                        <div class="hours-activity-chart">
+                             <div class="hours-activity-header">
+                                <span style="color: {{#isIncrease}}green{{/isIncrease}}{{^isIncrease}}red{{/isIncrease}};">
+                                    {{#isIncrease}}+{{/isIncrease}}{{^isIncrease}}-{{/isIncrease}}{{percentageChange}}% 
+                                    {{#isIncrease}}Increase than last week{{/isIncrease}}{{^isIncrease}}Decrease than last week{{/isIncrease}}
+                                </span>
+                            </div>
+                            <canvas id="hoursActivityChart"></canvas>
+                        </div>
+                        <div class="hours-total-section">
+                            <div class="total-hours">
+                                <div><h5>Current Week</h5></div>
+                                <div class="hours-number">{{currentWeekTotal}} hrs</div>
+                            </div>
+                            <div class="total-hours">
+                                <h5>Previous Week</h5>
+                                <div class="hours-number">{{previousWeekTotal}} hrs</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                 <div class="dashboard-card ">
+                    <h2>Learning <span class="img-heading">Path</span></h2>
+                     
+                    <div class="learning-path h-75">
+                        <div class="progress-container">
+                            <canvas id="learningPathChart"></canvas>
+                          <div class="progress-text" id="learningPathText">{{learningPathPercentage}}% completed</div>
+
+                        </div>
+                    </div>
+                    <div class="learning-path-legend mb-3">
+
+                        <div><span class="bullet excellent"></span>{{completedCourses}} Completed</div>
+                        <div><span class="bullet keep-going"></span>{{totalOverdue}} Overdue</div>
+                    </div>
+                   
+                </div>
+            </div>
+
+            <!-- Second Row: Total Earned Points -->
+            <div class="dashboard-card">
+                <h3>Total <span class="img-heading">Earned Points</span></h3>
+                <div class="points-section">
+                    <div class="points-bars">
+                        {{#courses}}
+                        <div class="course-info">
+                            <span>{{course_name}}</span>
+                            <span>{{points_display}}</span>
+                        </div>
+                        <div class="progress">
+                            <div class="bar" style="width: {{percentage}}%; background-color: {{bar_color}};"></div>
+                        </div>
+                        {{/courses}}
+                    </div>
+                    <div class="points-total">
+                        <img src="{{course_award_url}}" alt="Award">
+                        <h4><span class="img-heading">{{totalPoints}}</span>/{{totalPossiblePoints}}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="recent-enrolled-courses">
+   
+</div>
+        </div>
+    </div>
+    
+</body>
+<script>document.addEventListener("DOMContentLoaded", function () {
+   // Define default image URL
+    const searchInput = document.getElementById('course-search-input');
+    const searchResultsContainer = document.getElementById('search-results-container');
+    
+    if (searchInput && searchResultsContainer) {
+        searchInput.addEventListener('input', debounce(function(e) {
+            const query = e.target.value.trim();
+            
+            if (query.length >= 2) {
+                fetchSearchResults(query);
+            } else {
+                clearSearchResults();
+            }
+        }, 300));
+        
+        // Close results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchResultsContainer.contains(e.target) && e.target !== searchInput) {
+                clearSearchResults();
+            }
+        });
+    }
+    
+    // Debounce function to limit API calls
+    function debounce(func, wait) {
+        let timeout;
+        return function() {
+            const context = this, args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
+    
+    function fetchSearchResults(query) {
+        // Show loading indicator
+        searchResultsContainer.innerHTML = '<div class="text-center p-2">Searching...</div>';
+        searchResultsContainer.style.display = 'block';
+        
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: 'search=' + encodeURIComponent(query)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.success) {
+                displaySearchResults(data.searchResults);
+            } else {
+                displayError(data?.error || 'No results found');
+            }
+        })
+        .catch(error => {
+            console.error('Search error:', error);
+            displayError('Failed to complete search. Please try again.');
+        });
+    }
+    
+ function displaySearchResults(results) {
+    const container = document.getElementById('search-results-container');
+    container.innerHTML = '';
+
+    if (!results || results.length === 0) {
+        container.innerHTML = '<div class="search-result-item">No courses found</div>';
+        container.style.display = 'block';
+        return;
+    }
+
+    results.forEach(course => {
+        const item = document.createElement('div');
+        item.className = 'search-result-item';
+        item.textContent = course.coursename;
+        item.onclick = () => window.location.href = course.courseurl;
+        container.appendChild(item);
+    });
+
+    container.style.display = 'block';
+}
+
+    
+    function displayError(message) {
+        if (!searchResultsContainer) return;
+        searchResultsContainer.innerHTML = `<div class="alert alert-danger p-2">${escapeHtml(message)}</div>`;
+        searchResultsContainer.style.display = 'block';
+    }
+    
+    function clearSearchResults() {
+        if (searchResultsContainer) {
+            searchResultsContainer.innerHTML = '';
+            searchResultsContainer.style.display = 'none';
+        }
+    }
+    
+    // Helper function to escape HTML
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+
+     const courseItems = document.querySelectorAll("#course-carousel .course-item");
+    const carouselContainer = document.getElementById("course-carousel");
+    let currentIndex = 0;
+    let rotationInterval;
+
+    function showNextCourse() {
+        // Hide all courses
+        courseItems.forEach((item) => (item.style.display = "none"));
+        // Show the current course
+        courseItems[currentIndex].style.display = "block";
+        // Move to the next course
+        currentIndex = (currentIndex + 1) % courseItems.length;
+    }
+
+    // Start rotation
+    function startRotation() {
+        rotationInterval = setInterval(showNextCourse, 2500);
+    }
+
+    // Stop rotation
+    function stopRotation() {
+        clearInterval(rotationInterval);
+    }
+
+    // Show the first course immediately
+    showNextCourse();
+    // Then start auto-rotation
+    startRotation();
+
+    // Pause on hover
+    carouselContainer.addEventListener("mouseenter", stopRotation);
+    // Resume on mouse leave
+    carouselContainer.addEventListener("mouseleave", startRotation);
+
+    // ✅ Hours Activity Chart
+    var ctx = document.getElementById("hoursActivityChart").getContext("2d");
+    var hoursData = JSON.parse('{{{hoursActivity}}}');
+    console.log("Hours Activity Data:", hoursData); // Debug: Log the hours data
+
+    var data = {
+        labels: ["sun", "mon", "tue", "wed", "thr", "fri", "sat"],
+        datasets: [{
+            label: "Hours Spent",
+            data: hoursData,
+            backgroundColor: ["#000000", "#808080", "#204070", "#204070", "#204070", "#204070", "#204070"],
+            borderWidth: 0,
+            barThickness: 20
+        }]
+    };
+
+    var options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1 },
+                grid: { display: true, drawBorder: false },
+                max: 4
+            },
+            x: {
+                grid: { display: false, drawBorder: false },
+                ticks: { font: { size: 12 } }
+            }
+        },
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false }
+        },
+             animation: {
+                duration: 2000,     // 3-second animation
+               
+            },
+        
+    };
+
+    new Chart(ctx, { type: "bar", data: data, options: options });
+
+    // ✅ Learning Path Chart with Rounded Edges and Shadow
+    var learningPathCtx = document.getElementById("learningPathChart").getContext("2d");
+
+     const completedPercentage = {{learningPathPercentage}}; 
+    const overduePercentage = 100 - completedPercentage;
+
+    // 1) Start the chart at 100% (full circle)
+    let initialData = [100, 0];
+    // 2) Final data from your PHP
+    let finalData = [completedPercentage, overduePercentage];
+
+    // Create the doughnut chart with initialData
+    var learningPathChart = new Chart(document.getElementById("learningPathChart").getContext("2d"), {
+        type: "doughnut",
+        data: {
+            datasets: [{
+                data: initialData,
+                backgroundColor: ["#204070", "#808080"],
+                borderWidth: 0,
+                borderRadius: [5, 5],
+                hoverBorderWidth: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            cutout: "65%",
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false }
+            },
+            animation: {
+                duration: 1500,     // 3-second animation
+                animateRotate: true,
+                animateScale: true
+            },
+            elements: {
+                arc: {
+                    borderJoinStyle: "round",
+                    hoverBorderWidth: 6
+                }
+            }
+        }
+    });
+
+    // 3) After a short delay, animate from 100% to the final data
+    setTimeout(function() {
+        learningPathChart.data.datasets[0].data = finalData;
+        learningPathChart.update(); // triggers the animation
+    }, 1000); // 1-second delay before starting the "shrink" animationntById("learningPathText").innerText = "{{learningPathPercentage}}% completed";
+
+});
+
+document.getElementById("learningPathText").innerText = "{{learningPathPercentage}}% completed";
+
+</script>
+</html>
+
+
