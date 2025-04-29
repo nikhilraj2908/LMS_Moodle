@@ -279,41 +279,95 @@ body {
 }
 
 /* Container Styling */
+/* Container Styling */
 .custom-courses-container {
-    max-width: 90%;
-    margin: 40px auto;
-    padding: 20px;
+  /*  max-width: 1200px;  Proper size */
+    margin: auto;
+    padding: 40px 20px; /* More breathing space */
 }
 
 /* Section Title */
 .custom-section-title {
     font-weight: bold;
     text-transform: uppercase;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 30px;
     background: linear-gradient(90deg, #1f0074, #02049e, #ffbb00, #0026ff);
     background-size: 300% 300%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: gradientText 5s ease-in-out infinite;
-      
 }
 
+/* Animated Gradient Text */
+@keyframes gradientText {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
 
-
-/* Course Grid - Horizontal Layout */
+/* Course Grid */
 .custom-course-grid {
     display: grid;
-        grid-template-columns: 6fr 6fr;
-    gap: 40px;
-    margin: 5% 12% 0% 12%;
+    gap: 30px;
+    margin: 0 auto;
+    width: 98%;
 }
 
-.main-inner{
+/* Course Card (Optional - if you have card container) */
+.custom-course-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.2);
+}
+
+
+/* Desktop 1200px+ (4 cards) */
+@media (min-width: 1200px) {
+    .custom-course-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Laptop 992px–1199px (3 cards) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .custom-course-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Tablet 768px–991px (2 cards) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .custom-course-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile below 768px (1 card) */
+@media (max-width: 767px) {
+    .custom-course-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+
+/* Background */
+.main-inner {
     background-image: url("../pix/bgmainfrontpage.jpg");
     background-repeat: no-repeat;
     background-size: cover;
-    width: 90%;
-    height: 100%;
+    width: 100%; /* Fix */
+    height: auto; /* Auto for dynamic content */
 }
+
 body#page-login-forgot_password {
     background: none !important; /* Remove background */
 }
@@ -499,8 +553,9 @@ body#page-login-forgot_password {
 
 /* Button hover effect */
 .custom-view-more:hover {
-    background: white;
-    color: black;
+    background: #204070;
+    color: white;
+    box-shadow: 1px 2px 3px 3px #204070;
 }
 
 /* On hover, make image zoom in and show title, description, and button */

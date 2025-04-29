@@ -32,7 +32,34 @@
         "jumbotron": "false"
     }
 }}
+<style>
+    .container-services{
+        padding-right: 5%;
+        padding-left: 5%;
+        width: 100%;
+    }
+    #marketingspot {
+  width: 100%;
+}
 
+#marketingspot .container {
+  max-width: 1240px; /* nicely limit content */
+  margin: 0 auto; /* center it */
+  padding: 0 15px; /* add side padding */
+}
+
+    .col-lg-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        align-content:center;
+    }
+    @media (max-width: 800px) {
+    .col-lg-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+</style>
 {{#sitefeatures}}
     {{#isblockempty}}
         <div class="custom-alert-block alert alert-warning">
@@ -43,7 +70,7 @@
     {{#blockisempty}}
         <div class="site-features {{class}}" id="sitefeatures">
             <div class="custom-site-expo">
-                <div class="container">
+                <div class="container-services">
                     {{#blockstatus}}
                         <div class='sitefeature-block-title'>
                             {{#blocktitle}}
