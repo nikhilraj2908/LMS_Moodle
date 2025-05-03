@@ -43,7 +43,7 @@
     <div class="header-main">
         <div class="container-fluid">
             <nav class="navbar navbar-light bg-faded navbar-expand">
-                <a href="{{{ config.wwwroot }}}/?redirect=0" class="navbar-brand {{# logourl }}has-logo{{/ logourl }}
+                <a href="{{{ config.wwwroot }}}/?redirect=0" class="d-flex h-100 navbar-brand {{# logourl }}has-logo{{/ logourl }}
                 {{^ logourl }}
                     hidden-sm-down
                 {{/ logourl }}
@@ -58,9 +58,10 @@
                         <span class="site-name hidden-sm-down">{{{ sitename }}}</span>
                     {{/ logourl }}
                 {{/showlogo}}
-                {{#showsitename}}
-                    <span class="nav-site-name">{{{sitename}}}</span>
-                {{/showsitename}}
+                    <div class="course-search-container">
+                        <input type="text" id="course-search-input" class="form-control" placeholder="Search courses...">
+                        <div id="search-results-container" class="search-results"></div>
+                    </div>
                 </a>
 
                 {{#primarymoremenu}}
