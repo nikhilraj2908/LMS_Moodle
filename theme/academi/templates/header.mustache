@@ -36,8 +36,118 @@
     background-color: #fff; /* Optional: set a background so content underneath doesn’t show through */
 }
 
+   .course-search-container {
+    position: relative;
+    width: 100%; /* Or set a fixed width like 300px if preferred */
+    max-width: 300px;
+}
+
+#search-results-container {
+    position: absolute;
+    top: 100%; /* just below the input */
+    left: 0;
+    right: 0;
+    background-color: #204070;
+    color: white;
+    z-index: 999;
+    border-radius: 0 0 5px 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    display: none; /* shown dynamically */
+}
+
+.search-result-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-result-item:hover {
+    background-color: #3c6894;
+}
+.search-results {
+    position: absolute;
+    top: 100%;  /* below the input box */
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 9999;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.search-input-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+}
+
+.search-input-wrapper input {
+    padding-right: 40px; /* leave space for icon */
+    padding-left: 20px;
+    height: 42px;
+    border-radius: 999px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
+    background-color: #fff;
+    font-size: 14px;
+}
+
+.search-input-wrapper .search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #0a375f;
+    font-size: 16px;
+    pointer-events: none;
+}
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-icons .dropdown-toggle::after {
+    display: none;
+}
+
+.header-icons .icon {
+    font-size: 20px;
+    position: relative;
+}
+
+.header-icons .icon .badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: red;
+    color: white;
+    font-size: 10px;
+    border-radius: 50%;
+    padding: 2px 5px;
+}
+
+.btn:not(:disabled):not(.disabled) {
+     border-color: #ffffff;
+}
+
 </style>
-{{> theme_academi/navbar }}
+
 
 {{#themestyleheader}}
     <div class="header-main">
@@ -58,13 +168,16 @@
                         <span class="site-name hidden-sm-down">{{{ sitename }}}</span>
                     {{/ logourl }}
                 {{/showlogo}}
-                    <div class="course-search-container">
-                        <input type="text" id="course-search-input" class="form-control" placeholder="Search courses...">
-                        <div id="search-results-container" class="search-results"></div>
-                    </div>
+                   
                 </a>
 
                 {{#primarymoremenu}}
+                <div class="search-input-wrapper">
+                    <input type="text" id="course-search-input" class="form-control rounded-pill" placeholder="Search for latest courses...">
+                    <i class="fa fa-search search-icon"></i>
+                    <div id="search-results-container" class="search-results"></div>
+                </div>
+
                     <div class="primary-navigation">
                         {{> core/moremenu}}
                     </div>
@@ -74,6 +187,24 @@
                 <ul class="navbar-nav d-none d-md-flex my-1 px-1">
                     <!-- page_heading_menu -->
                     {{{ output.page_heading_menu }}}
+                    <div class="d-flex align-items-center ms-auto gap-3 px-3">
+    {{{ output.search_box }}}
+
+    <div class="header-icons d-flex align-items-center gap-3">
+        {{{ output.navbar_plugin_output }}}
+
+        <div class="usermenu-container" data-region="usermenu">
+            {{^isloginpage}}
+                {{#usermenu}}
+                    {{> core/user_menu }}
+                {{/usermenu}}
+            {{/isloginpage}}
+        </div>
+                 <div class="edit-toggle-wrapper">
+    {{{ output.edit_switch }}}
+</div>
+    </div>
+</div>
                 </ul>
 
             </nav>

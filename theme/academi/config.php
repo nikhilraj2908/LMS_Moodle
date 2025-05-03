@@ -25,7 +25,6 @@
 defined('MOODLE_INTERNAL') || die;
 
 $THEME->name = 'academi';
-
 $THEME->sheets = ['custom'];
 
 $THEME->editor_sheets = [];
@@ -66,6 +65,9 @@ $THEME->blockrtlmanipulations = [
     'side-pre' => 'side-post',
     'side-post' => 'side-pre',
 ];
+
+$THEME->javascripts_footer[] = 'search';
+
 
 $THEME->layouts = [
     // Most backwards compatible layout without the blocks.
