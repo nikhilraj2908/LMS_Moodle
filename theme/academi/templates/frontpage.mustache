@@ -80,6 +80,75 @@
 
 
 
+#heroCarousel {
+  position: relative;
+  height: 450px;
+  overflow: hidden;
+  margin-bottom: 40px;
+  width: 100vw; /* Full width */
+}
+
+.carousel-inner {
+  width: 100%;
+}
+
+.carousel-item {
+  width: 100%;
+  height: 450px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.carousel-overlay-box {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  transform: translateY(-50%);
+  max-width: 500px;
+  z-index: 2;
+}
+
+.carousel-overlay-box h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.carousel-overlay-box .brand-highlight {
+  color: #204070;
+}
+
+.carousel-overlay-box p {
+  color: #666;
+  margin-top: 10px;
+}
+
+.btn-learn-more {
+  margin-top: 15px;
+  background-color: #204070;
+  color: #fff;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 6px;
+  display: inline-block;
+}
+@media (max-width: 768px) {
+  .carousel-overlay-box {
+    padding: 20px;
+    left: 5%;
+    right: 5%;
+    max-width: 90%;
+  }
+
+  .carousel-overlay-box h2 {
+    font-size: 20px;
+  }
+}
 
 
     </style>
@@ -179,6 +248,31 @@
     <div class="sun3"></div>
 
                         </div>
+                    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    {{#banners}}
+    <div class="carousel-item {{#is_active}}active{{/is_active}}" style="background-image: url('{{image_url}}');">
+      <div class="carousel-overlay-box">
+        <h2>{{title}}<br><span class="brand-highlight">{{subtitle}}</span></h2>
+        <p>{{description}}</p>
+        <a href="{{cta_link}}" class="btn-learn-more">{{cta_text}}</a>
+      </div>
+    </div>
+    {{/banners}}
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+
+
+
     <div class="custom-courses-container bg-courses-section">
                             <div class="custom-courses-container">
                                 <h2 class="d-flex justify-content-center" ><span class="icon-mycourse">📚</span> <span class="custom-section-title ps-3 ">  My Courses</span> </h2>
@@ -257,6 +351,8 @@
             </div>
         </div>
     {{/showpopup}}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
     </body>

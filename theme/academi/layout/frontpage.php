@@ -192,6 +192,39 @@ if (isloggedin() && !isguestuser()) {
 }
 
 $templatecontext['sitefeatures'] = (new \theme_academi\academi_blocks())->sitefeatures();
+// Add banner image URLs
+
+$templatecontext['banners'] = [
+    [
+        'image_url' => $OUTPUT->image_url('banner1', 'theme_academi')->out(),
+        'title' => 'Transform your Learning Journey',
+        'subtitle' => 'With ALOGICDATA',
+        'description' => 'Bringing Education to Your Fingertips',
+        'cta_text' => 'Learn More',
+        'cta_link' => '#',
+        'is_active' => true // First slide active
+    ],
+    [
+        'image_url' => $OUTPUT->image_url('banner2', 'theme_academi')->out(),
+        'title' => 'Boost Your Skills',
+        'subtitle' => 'Anytime, Anywhere',
+        'description' => 'Courses tailored for your success.',
+        'cta_text' => 'Explore Now',
+        'cta_link' => '#',
+        'is_active' => false
+    ],
+    [
+        'image_url' => $OUTPUT->image_url('banner3', 'theme_academi')->out(),
+        'title' => 'Your Learning Partner',
+        'subtitle' => 'Built for You',
+        'description' => 'Start your journey today.',
+        'cta_text' => 'Get Started',
+        'cta_link' => '#',
+        'is_active' => false
+    ]
+];
+
+
 $templatecontext += $sliderconfig;
 $templatecontext += [
     'bodyattributes' => $bodyattributes,
