@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace core;
-
+use const SODIUM_CRYPTO_SECRETBOX_NONCEBYTES;
 /**
  * Class used to encrypt or decrypt data.
  *

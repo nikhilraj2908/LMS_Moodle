@@ -471,6 +471,9 @@
         margin-right: 315px;
     }
     .navbar {
+        justify-content: space-between;
+        display: flex;
+        font-size: larger;
         max-height: none;
         padding: 0px 16px;
         border-bottom: 0;

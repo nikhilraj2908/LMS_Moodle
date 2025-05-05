@@ -38,8 +38,8 @@
 
    .course-search-container {
     position: relative;
-    width: 100%; /* Or set a fixed width like 300px if preferred */
-    max-width: 300px;
+    width: 20%; /* Or set a fixed width like 300px if preferred */
+   
 }
 
 #search-results-container {
@@ -92,8 +92,8 @@
 
 .search-input-wrapper {
     position: relative;
-    width: 100%;
-    max-width: 350px;
+    width: 20%;
+    
 }
 
 .search-input-wrapper input {
@@ -146,6 +146,39 @@
      border-color: #ffffff;
 }
 
+.header-main .navbar.navbar-light .primary-navigation .navigation .nav-link.active {
+    color: #204070;
+    border-color: #204070;
+    font-weight:bold;
+}
+.primary-navigation .nav-link {
+    position: relative;
+    color: #000;
+    font-weight: normal;
+    padding: 0 10px;
+    transition: color 0.3s ease;
+}
+
+.primary-navigation .nav-link.active {
+    color: #204070;
+    font-weight: bold;
+}
+
+.primary-navigation .nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background-color: #204070;
+    transition: width 0.3s ease-in-out;
+}
+
+.primary-navigation .nav-link.active::after {
+    width: 100%;
+}
+
 </style>
 
 
@@ -170,14 +203,15 @@
                 {{/showlogo}}
                    
                 </a>
-
-                {{#primarymoremenu}}
-                <div class="search-input-wrapper">
+                  <div class="search-input-wrapper">
                     <input type="text" id="course-search-input" class="form-control rounded-pill" placeholder="Search for latest courses...">
                     <i class="fa fa-search search-icon"></i>
                     <div id="search-results-container" class="search-results"></div>
                 </div>
 
+
+                {{#primarymoremenu}}
+              
                     <div class="primary-navigation">
                         {{> core/moremenu}}
                     </div>
@@ -187,10 +221,10 @@
                 <ul class="navbar-nav d-none d-md-flex my-1 px-1">
                     <!-- page_heading_menu -->
                     {{{ output.page_heading_menu }}}
-                    <div class="d-flex align-items-center ms-auto gap-3 px-3">
+                    <div class="d-flex align-items-center ms-auto px-2" >
     {{{ output.search_box }}}
 
-    <div class="header-icons d-flex align-items-center gap-3">
+    <div class="header-icons d-flex align-items-center gap-1">
         {{{ output.navbar_plugin_output }}}
 
         <div class="usermenu-container" data-region="usermenu">
