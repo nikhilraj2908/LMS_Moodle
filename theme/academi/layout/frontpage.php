@@ -206,8 +206,8 @@ $templatecontext['banners'] = [
     ],
     [
         'image_url' => $OUTPUT->image_url('banner2', 'theme_academi')->out(),
-        'title' => 'Boost Your Skills',
-        'subtitle' => 'Anytime, Anywhere',
+        'title' => 'Boost Your Skills, Anytime',
+        'subtitle' => 'Anywhere',
         'description' => 'Courses tailored for your success.',
         'cta_text' => 'Explore Now',
         'cta_link' => '#',
@@ -215,8 +215,8 @@ $templatecontext['banners'] = [
     ],
     [
         'image_url' => $OUTPUT->image_url('banner3', 'theme_academi')->out(),
-        'title' => 'Your Learning Partner',
-        'subtitle' => 'Built for You',
+        'title' => 'Your Learning Partner Built',
+        'subtitle' => 'for You',
         'description' => 'Start your journey today.',
         'cta_text' => 'Get Started',
         'cta_link' => '#',
