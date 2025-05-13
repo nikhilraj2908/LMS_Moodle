@@ -465,7 +465,8 @@
 /* Header main */
 .header-main {
     background: $white;
-    border-bottom: 1px solid $color_whisper;
+    // border-bottom: 1px solid $color_whisper;
+
     // padding: 2px 0;
     &.show-drawer-right {
         margin-right: 315px;
