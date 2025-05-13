@@ -1,11 +1,14 @@
 {{> theme_boost/head }}
 
 <style>
-    .container-main {
-        display: grid;
-        grid-template-columns: 6fr 6fr;
-        min-height: 100vh;
-    }
+   .container-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
    .left-side {
     position: relative;
     background: url('{{config.wwwroot}}/theme/academi/pix/loginbg.png') no-repeat center center;
@@ -15,11 +18,22 @@
     align-items: center;
 }
 
-
+   .row {
+        display: flex;
+        flex-wrap: wrap;
+         margin-right: 0px !important; 
+        margin-left: -15px;
+    }
     .left-bg-box {
-        max-width: 400px;
+        max-width: 50%;
         padding: 2rem;
     }
+ @media (max-width: 1200px) {
+    .left-bg-box {
+        max-width: 100%;
+        
+    }
+ }
 
     .logo-div {
         text-align: center;
@@ -121,6 +135,7 @@
     @media (max-width: 768px) {
         .container-main {
             display: block;
+            align-content:center;
         }
 
         .left-side {
@@ -160,7 +175,14 @@
     color: #204070;
     font-size: 16px;
 }
-   
+   @media (max-width: 574px) {
+    form input[type="text"] {
+        max-width: 100%;
+    }
+        form input[type="password"] {
+        max-width: 100%;
+    }
+}
 </style>
 
 

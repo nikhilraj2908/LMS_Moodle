@@ -7,7 +7,7 @@
     .bg-courses-section h2 {
         color: #003366;
     }
-
+  
     .bg-courses-section {
         background-position: center center;
         background-repeat: repeat;
@@ -26,19 +26,16 @@
         100% { background-position: 50px 50px; }
     }
 
+
     #heroCarousel {
-        position: relative;
-        height: 60vh; /* Reduced from 80vh */
-        min-height: 400px; /* Reduced from 500px */
-        max-height: 600px; /* Reduced from 800px */
-        overflow: hidden;
-        margin-bottom: 40px;
-        width: 100vw;
-        left: 50%;
-        right: 50%;
-        margin-left: -50vw;
-        margin-right: -50vw;
-    }
+    position: relative;
+    
+   height:68vh;
+    overflow: hidden;
+
+
+}
+
 
     .carousel-inner, 
     .carousel-item {
@@ -161,6 +158,47 @@
             padding: 8px 15px;
         }
     }
+    .carousel-text-left {
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    transform: translateY(-50%);
+    z-index: 10;
+    color: #000;
+    max-width: 40%;
+}
+
+.carousel-heading {
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.highlight-text {
+    color: #204070;
+}
+
+.carousel-subtext {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.carousel-btn {
+    background-color: #204070;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.carousel-btn:hover {
+    background-color: #0f2f58;
+}
+
     </style>
 </head>
 <body {{{ bodyattributes }}}>
@@ -255,11 +293,12 @@
                         <div class="carousel-inner">
                             {{#banners}}
                             <div class="carousel-item {{#is_active}}active{{/is_active}}" style="background-image: url('{{image_url}}');">
-                                <div class="carousel-overlay-box">
-                                    <h2>{{title}}<br><span class="brand-highlight">{{subtitle}}</span></h2>
-                                    <p>{{description}}</p>
-                                    <a href="{{cta_link}}" class="btn-learn-more">{{cta_text}}</a>
-                                </div>
+                                <div class="carousel-text-left">
+    <h2 class="carousel-heading">Transform your Learning Journey<br>With <span class="highlight-text">ALOGICDATA</span></h2>
+    <p class="carousel-subtext">Bringing Education to Your Fingertips</p>
+    <a href="#" class="carousel-btn">Explore top Courses</a>
+</div>
+
                             </div>
                             {{/banners}}
                         </div>
