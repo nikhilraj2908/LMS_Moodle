@@ -472,114 +472,77 @@ body#page-login-forgot_password {
     }
 }
 /* Course Card - Horizontal */
-
 .custom-course-card {
     position: relative;
-    height: 300px; /* Ensuring all cards are the same height */
+    height: 29vh; /* Reduced height for simpler design */
     overflow: hidden;
     border-radius: 10px;
-    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2); /* Always show shadow */
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    text-align: center;
+    background: white; /* Solid white background */
+    border: 1px solid #e0e0e0;
 }
 
-/* Image inside the card (as background) */
-.custom-course-card-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+/* Rest of your existing card styles */
+.custom-course-card {
+    position: relative;
+    height: 28vh;
     overflow: hidden;
-    z-index: 0; /* Ensure image is not behind the content */
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border: 1px solid #e0e0e0;
 }
 
-/* Ensure image is visible */
+.custom-course-card-image {
+    height: 70%;
+    overflow: hidden;
+    padding: 10px;
+    border-radius:38px;
+}
+
 .custom-course-card-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Makes sure image covers the whole background */
-    display: block;
+    object-fit: cover;
     transition: transform 0.6s ease-in-out;
 }
 
-/* Ensure text is always visible over the image */
 .custom-course-content {
-    align-content: center;
-    height: 100%;
-    position: relative;
-    background: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
-    color: white;
-    padding: 20px;
-    border-radius: 0 0 10px 10px;
-    opacity: 0; /* Initially hidden */
-    transition: opacity 0.3s ease-in-out; /* Smooth fade-in */
+    padding: 10px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: white;
 }
 
-/* Title */
 .custom-course-title {
-    font-size: 30px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: white;
-    z-index: 1; /* Ensure title is always visible */
+    font-size: 18px;
+    font-weight: 600;
+    color: #003366;
+    margin-bottom: 8px;
+    line-height: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-/* Description */
-.custom-course-description {
-    font-size: 14px;
-    margin-bottom: 15px;
-    opacity: 0; /* Initially hidden */
-    transition: opacity 0.3s ease-in-out; /* Smooth fade-in */
+/* Hover effects */
+.custom-course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Button */
-.custom-view-more {
-    display: inline-block;
-    padding: 10px 20px;
-    background: transparent;
-    border: 2px solid white;
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
-    border-radius: 5px;
-    opacity: 0; /* Initially hidden */
-    transition: opacity 0.3s ease-in-out; /* Smooth fade-in */
-}
-
-/* Button hover effect */
-.custom-view-more:hover {
-    background: #204070;
-    color: white;
-    box-shadow: 1px 2px 3px 3px #204070;
-}
-
-/* On hover, make image zoom in and show title, description, and button */
-.custom-course-card:hover .custom-course-content {
-    opacity: 1; /* Make the content visible */
-}
-
-.custom-course-card:hover .custom-course-description {
-    opacity: 1; /* Show the description */
-}
-
-.custom-course-card:hover .custom-view-more {
-    opacity: 1; /* Show the button */
-}
-
-/* On hover, make image zoom in */
 .custom-course-card:hover .custom-course-card-image img {
-    transform: scale(1.1);
+    transform: scale(1.01);
 }
-
-.custom-load-more {
-    text-align: center;
-}
-
 
 
 /* .custom-course-card {

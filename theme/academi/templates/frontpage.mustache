@@ -9,12 +9,21 @@
         position: relative;
         height: 68vh;
         overflow: hidden;
+             border-bottom-right-radius: 60px;
+    border-bottom-left-radius: 60px;
+    box-shadow: 3px 5px 3vh 8px rgb(180, 191, 207);
+        
     }
-
+.main-container{
+       
+        background: linear-gradient(#ffffff,  #f0f6ff);
+        padding-bottom: 5vh;
+}
     .carousel-inner, 
     .carousel-item {
         height: 100%;
         width: 100%;
+       
     }
 
     .carousel-item {
@@ -22,6 +31,7 @@
         background-position: center;
         background-repeat: no-repeat;
         position: relative;
+       
     }
 
     .carousel-overlay-box {
@@ -31,17 +41,18 @@
         border-radius: 15px;
         position: absolute;
         top: 50%;
-        left: 5%;
+        left: 3%;
         transform: translateY(-50%);
         max-width: 50%; 
         z-index: 2;
         width:32%;
+         
     }
 
     /* Course Cards Overlay */
     .course-cards-overlay {
         position: relative;
-        margin-top: -100px; /* Negative margin to pull up over carousel */
+        margin-top: -130px; /* Negative margin to pull up over carousel */
         z-index: 10;
         padding: 0 20px;
     }
@@ -51,8 +62,9 @@
         flex-wrap: wrap;
         justify-content: space-between;
         gap: 20px;
-        max-width: 1200px;
-        margin: 0 auto;
+        max-width: 100%;
+     margin: 0 auto;
+    
     }
 
     .course-category {
@@ -175,16 +187,97 @@ body.has-admin-menu .btn-user {
 .btn-user {
     display: inline-block !important;
 }
+.custom-course-grid{
+    margin:20px 40px;
+}
+.carousel-course-btn {
+    display: flex;
+    margin-left:3%;
+    gap: 16px;
+    margin-bottom:20px;
+   
+}
+
+.carousel-course-btn button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    background: white;
+    color: black;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.carousel-course-btn button:hover {
+    background: #e0e0e0;
+}
+
+.carousel-course-btn button.active {
+    background: #b0b0b0;
+    color: #fff;
+    font-weight: bold;
+}
+/* Fix drawer starting from the top */
+#theme_boost-drawers-blocks.drawer-right {
+    top: 0 !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    z-index: 1050;
+}
+
+/* Prevent outer containers from pushing it down */
+body, #page-wrapper {
+    margin-top: 0 !important;
+}
+
     </style>
 </head>
+{{> theme_academi/header }}
+
+{{#courseindex}}
+  {{< theme_boost/drawer }}
+    {{$id}}theme_boost-drawers-courseindex{{/id}}
+    {{$drawerclasses}}drawer drawer-left {{#courseindexopen}}show{{/courseindexopen}}{{/drawerclasses}}
+    {{$drawercontent}} {{{courseindex}}} {{/drawercontent}}
+    {{$drawerpreferencename}}drawer-open-index{{/drawerpreferencename}}
+    {{$drawerstate}}show-drawer-left{{/drawerstate}}
+    {{$tooltipplacement}}right{{/tooltipplacement}}
+    {{$closebuttontext}}{{#str}}closecourseindex, core{{/str}}{{/closebuttontext}}
+  {{/ theme_boost/drawer}}
+{{/courseindex}}
+
+{{#hasblocks}}
+  {{< theme_boost/drawer }}
+    {{$id}}theme_boost-drawers-blocks{{/id}}
+    {{$drawerclasses}}drawer drawer-right {{#blockdraweropen}}show{{/blockdraweropen}}{{/drawerclasses}}
+    {{$drawercontent}}
+      <section class="d-print-none" aria-label="{{#str}}blocks{{/str}}">
+        {{{ addblockbutton }}}
+        {{{ sidepreblocks }}}
+      </section>
+    {{/drawercontent}}
+    {{$drawerpreferencename}}drawer-open-block{{/drawerpreferencename}}
+    {{$forceopen}}{{#forceblockdraweropen}}1{{/forceblockdraweropen}}{{/forceopen}}
+    {{$drawerstate}}show-drawer-right{{/drawerstate}}
+    {{$tooltipplacement}}left{{/tooltipplacement}}
+    {{$drawercloseonresize}}1{{/drawercloseonresize}}
+    {{$closebuttontext}}{{#str}}closeblockdrawer, core{{/str}}{{/closebuttontext}}
+  {{/ theme_boost/drawer}}
+{{/hasblocks}}
+
 <body {{{ bodyattributes }}}>
     {{> core/local/toast/wrapper}}
     <div id="page-wrapper" class="d-print-block">
         {{{ output.standard_top_of_body_html }}}
-        {{> theme_academi/header }}
-
+        
+        
         <!-- Carousel Section -->
-        <div id="heroCarousel" class="carousel slide" data-ride="carousel" data-interval="3000">
+       <div class="main-container">
+
+                 <div id="heroCarousel" class="carousel slide" data-ride="carousel" data-interval="3000">
             <div class="carousel-inner">
                 {{#banners}}
                 <div class="carousel-item {{#is_active}}active{{/is_active}}" style="background-image: url('{{image_url}}');">
@@ -218,44 +311,32 @@ body.has-admin-menu .btn-user {
 
         <!-- Course Cards Overlay -->
         <div class="course-cards-overlay">
-            <div class="course-cards-container">
-                <!-- Create Course Card -->
-                <div class="course-category">
-                    <h3>Create Course</h3>
-                    <ul class="course-category-list">
-                        <li><a href="#">Manage Course</a></li>   
-                        <li><a href="#">Explore AI Course</a></li>
-                        <li><a href="#">Reports</a></li>
-                    </ul>
+    <div class="carousel-course-btn">
+        <button class="active">New</button>
+        <button>Continue Learning</button>
+        <button>Closing Soon</button> 
+    </div>
+    <div class="course-cards-container">
+        <div class="custom-course-grid" id="courseGrid">
+            {{#courses}}
+                <div class="custom-course-card">
+                    <div class="custom-course-card-image">
+                        <img src="{{course_image_url}}" alt="{{course_name}}">
+                    </div>
+                    <div class="custom-course-content">
+                        <h3 class="custom-course-title">{{course_name}}</h3>
+                        <a href="{{course_url}}" class="course-card-link">
+                            <span>Explore Course</span>
+                        </a>
+                    </div>
                 </div>
-                
-                <!-- New Card -->
-                <div class="course-category">
-                    <h3>New</h3>
-                    <ul class="course-category-list">
-                        <li><a href="#">Continue Learning</a></li>
-                        <li><a href="#">Closing Soon</a></li>
-                    </ul>
-                </div>
-                
-                <!-- Sample Course Cards -->
-                <div class="course-category">
-                    <h3>Sample Course</h3>
-                    <ul class="course-category-list">
-                        <li><a href="#">Transform Your Learning Journey</a></li>
-                        <li><a href="#">Sample Course</a></li>
-                    </ul>
-                </div>
-                
-                <div class="course-category">
-                    <h3>Sample Course</h3>
-                    <ul class="course-category-list">
-                        <li><a href="#">Transform Your Learning Journey</a></li>
-                        <li><a href="#">Sample Course</a></li>
-                    </ul>
-                </div>
-            </div>
+            {{/courses}}
         </div>
+       
+    </div>
+</div>
+
+       </div>
 
       <div id="page" data-region="mainpage" data-usertour="scroller" class="drawers {{#courseindexopen}}show-drawer-left{{/courseindexopen}} {{#blockdraweropen}}show-drawer-right{{/blockdraweropen}} drag-container {{jumbotronclass}}">
             <div id="topofscroll" class="main-inner">
@@ -302,35 +383,10 @@ body.has-admin-menu .btn-user {
                 {{/secondarymoremenu}}
 
                 {{#isloggedin}}
-                    <div class="w-100">
-                        <div class="sun"></div>
-                        <div class="sun2"></div>
-                        <div class="sun3"></div>
-                    </div>
+                 
                     
 
-                    <div class="custom-courses-container bg-courses-section">
-                        <div class="custom-courses-container">
-                            <h2 class="d-flex justify-content-center"><span class="icon-mycourse">📚</span> <span class="custom-section-title ps-3">My Courses</span></h2>
-                            <div class="custom-course-grid" id="courseGrid">
-                                {{#courses}}
-                                    <div class="custom-course-card">
-                                        <div class="custom-course-card-image">
-                                            <img src="{{course_image_url}}" alt="{{course_name}}">
-                                        </div>
-                                        <div class="custom-course-content">
-                                            <h2 class="custom-course-title">{{course_name}}</h2>
-                                            <p class="custom-course-description">{{course_summary}}</p>
-                                            <a href="{{course_url}}" class="custom-view-more">Continue Learning →</a>
-                                        </div>
-                                    </div>
-                                {{/courses}}
-                            </div>
-                        </div>
-                        <div class="custom-load-more">
-                            <button id="loadMoreBtn">Load More</button>
-                        </div>
-                    </div>
+                    
                 {{/isloggedin}}
 
                 <div id="page-content" class="pb-3 d-print-block">
@@ -366,9 +422,66 @@ body.has-admin-menu .btn-user {
         </div>
         {{{ output.standard_after_main_region_html }}}
     </div>
+{{#showpopup}}
+<div id="customPopup" class="popup-overlay" style="display: none;">
+  <div class="popup-content" style="
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: auto;
+      position: relative;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  ">
+    <button class="btn-close" onclick="closePopup()" style="
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+    ">&times;</button>
+    <img src="{{alert_gif}}" alt="Alert" style="max-width: 100%; margin-bottom: 20px;" />
+    <h3>Important Notice</h3>
+    <p>{{popupmessage}}</p>
+    <button onclick="redirectToCreateCourse()" style="
+        background: #003366;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        margin-top: 10px;
+        cursor: pointer;
+    ">Create Course</button>
+  </div>
+</div>
+{{/showpopup}}
 
      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+    document.querySelectorAll('[data-toggler="drawers"]').forEach(button => {
+    button.addEventListener('click', function () {
+        const targetId = this.getAttribute('data-target');
+        const drawer = document.getElementById(targetId);
+        if (drawer) {
+            drawer.classList.toggle('show');
+        }
+    });
+});
+
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('[data-toggler="drawers"]').forEach(button => {
+        button.addEventListener('click', function () {
+            const targetId = this.getAttribute('data-target');
+            const drawer = document.getElementById(targetId);
+            if (drawer) {
+                drawer.classList.toggle('show');
+            }
+        });
+    });
+});
+
    document.addEventListener("DOMContentLoaded", function() {
     // Check if admin menu exists
     const isAdmin = document.querySelector('[data-key="siteadminnode"]') !== null;
@@ -381,12 +494,13 @@ body.has-admin-menu .btn-user {
     }
 });
     function closePopup() {
-        let popup = document.getElementById("customPopup");
-        popup.style.animation = "fadeOut 0.5s ease-out forwards";
-        setTimeout(() => {
-            popup.style.display = "none";
-        }, 500);
-    }
+    let popup = document.getElementById("customPopup");
+    popup.style.animation = "fadeOut 0.5s ease-out forwards";
+    setTimeout(() => {
+        popup.style.display = "none";
+    }, 500);
+}
+
 
     function redirectToCreateCourse() {
         window.location.href = window.location.origin + "/moodle/course/edit.php";
@@ -462,6 +576,15 @@ body.has-admin-menu .btn-user {
             }
         });
     });
+ 
+    document.querySelectorAll('.carousel-course-btn button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.carousel-course-btn button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
+
     </script>
 </body>
 </html>
