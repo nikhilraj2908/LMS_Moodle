@@ -32,7 +32,37 @@
         "iscalendarblock": false
     }
 }}
-<div id="calendar-month-{{uniqid}}-{{calendarinstanceid}}" data-template="core_calendar/month_detailed">
+<style>
+.calendar-container{
+    max-width:1200px;
+    
+}
+#page.drawers .main-inner{
+    max-width: 100%;
+    width: 100%;
+    margin: 0 auto;
+    border-radius: .5rem;
+    background-color: #fff;
+    padding: 1.5rem .5rem;
+    margin-top: .5rem;
+    margin-bottom: 0rem; 
+    flex: 1 0 auto;
+}
+#page.drawers {
+    margin-top: 0px; 
+    scrollbar-width: thin;
+    scrollbar-color: #6a737b #f8f9fa;
+}
+.maincalendar .heightcontainer{
+    height: 100%;
+    position: relative;
+    display:flex;
+    justify-content:center;
+    background:#f0f6ff;
+     padding: 1.5rem .5rem;
+}
+</style>
+<div class="calendar-container" id="calendar-month-{{uniqid}}-{{calendarinstanceid}}" data-template="core_calendar/month_detailed">
     {{> core_calendar/header}}
     {{> core_calendar/month_detailed}}
 </div>
