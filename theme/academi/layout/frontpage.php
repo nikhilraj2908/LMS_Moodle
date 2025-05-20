@@ -20,43 +20,72 @@ $default_image_url = $CFG->wwwroot . '/theme/academi/pix/defaultcourse.jpg';
 require_login();
 global $DB, $USER, $OUTPUT;
 
-if (isloggedin() && !isguestuser()) {
+// ── 1. Fetch the top 5 users by points ─────────────────────────────────────
+$top5 = $DB->get_records_sql("
+    SELECT 
+        g.userid,
+        u.firstname,
+        u.lastname,
+        u.picture,
+        u.imagealt,
+        u.email,
+        COALESCE(SUM(g.finalgrade), 0) AS total_points
+    FROM {grade_grades} g
+    JOIN {user} u ON u.id = g.userid
+    WHERE u.deleted = 0
+    GROUP BY g.userid, u.firstname, u.lastname, u.picture, u.imagealt, u.email
+    ORDER BY total_points DESC
+    LIMIT 5
+");
 
+// ── 2. Massage them into Mustache context ─────────────────────────────────
+$templatecontext['topperformers'] = [];
+foreach ($top5 as $tp) {
+    $user = core_user::get_user($tp->userid);
+    if ($user) {
+        $pictureHtml = $OUTPUT->user_picture($user, ['size'=>100, 'link'=>false, 'alttext'=>true]);
+        $templatecontext['topperformers'][] = [
+            'fullname' => fullname($user),
+            'points' => (int)$tp->total_points,
+            'picture' => $pictureHtml, 
+            'profileurl' => (new moodle_url('/user/profile.php', ['id'=>$tp->userid]))->out(),
+        ];
+    }
+}
+
+if (isloggedin() && !isguestuser()) {
     $userid = $USER->id;
-    // We can use the username from the current user
-    // If you specifically want 'nikhilraj', replace $USER->username with 'nikhilraj'
     $username = $USER->username; 
     $displayname = fullname($USER);
     $userpicture = $OUTPUT->user_picture($USER, ['size' => 100]);
 
     // -- NEW QUERY WITH CTE -----------------------------------------------
-    // Using the logged-in user's username as parameter:
     $userData = $DB->get_record_sql("
         WITH UserID AS (
-            SELECT id AS userid FROM mdl_user WHERE username = ?
+            SELECT id AS userid FROM {user} WHERE username = ?
         ),
         TotalCourses AS (
             SELECT COUNT(c.id) AS total_assigned_courses
-            FROM mdl_course c
-            JOIN mdl_enrol e ON c.id = e.courseid
-            JOIN mdl_user_enrolments ue ON e.id = ue.enrolid
+            FROM {course} c
+            JOIN {enrol} e ON c.id = e.courseid
+            JOIN {user_enrolments} ue ON e.id = ue.enrolid
             WHERE ue.userid = (SELECT userid FROM UserID)
         ),
         CompletedCourses AS (
             SELECT COUNT(DISTINCT cm.course) AS total_completed_courses
-            FROM mdl_course_modules_completion cmc
-            JOIN mdl_course_modules cm ON cmc.coursemoduleid = cm.id
+            FROM {course_modules_completion} cmc
+            JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id
             WHERE cmc.userid = (SELECT userid FROM UserID) 
               AND cmc.completionstate = 1
         ),
         TotalPoints AS (
             SELECT COALESCE(SUM(g.finalgrade), 0) AS total_points_earned
-            FROM mdl_grade_grades g
+            FROM {grade_grades} g
             WHERE g.userid = (SELECT userid FROM UserID)
         ),
         MaxPoints AS (
             SELECT COALESCE(SUM(g.rawgrademax), 0) AS max_total_points
-            FROM mdl_grade_grades g
+            FROM {grade_grades} g
             WHERE g.userid = (SELECT userid FROM UserID)
         )
         SELECT 
@@ -68,39 +97,33 @@ if (isloggedin() && !isguestuser()) {
             (SELECT max_total_points FROM MaxPoints) AS total_possible_points
         FROM dual
     ", [$username]);
-    // ---------------------------------------------------------------------
 
-    // Map the returned columns to local PHP variables.
-    // (Use null coalescing to handle possible NULL values.)
-     // Map the returned columns to local PHP variables.
-     $totalCourses = $userData->total_courses_assigned ?? 0;
-     $completedCourses = $userData->total_courses_completed ?? 0;
-     $totalOverdue = $userData->total_courses_overdue ?? 0;
-     $totalPoints = $userData->total_points_earned ?? 0;
-     $totalPossiblePoints = $userData->total_possible_points ?? 0;
+    $totalCourses = $userData->total_courses_assigned ?? 0;
+    $completedCourses = $userData->total_courses_completed ?? 0;
+    $totalOverdue = $userData->total_courses_overdue ?? 0;
+    $totalPoints = $userData->total_points_earned ?? 0;
+    $totalPossiblePoints = $userData->total_possible_points ?? 0;
  
-     // Format the points to remove trailing zeros and decimal if whole number
-     $formattedTotalPoints = rtrim(rtrim(number_format($totalPoints, 2, '.', ''), '0'), '.');
-     $formattedTotalPossiblePoints = rtrim(rtrim(number_format($totalPossiblePoints, 2, '.', ''), '0'), '.');
+    $formattedTotalPoints = rtrim(rtrim(number_format($totalPoints, 2, '.', ''), '0'), '.');
+    $formattedTotalPossiblePoints = rtrim(rtrim(number_format($totalPossiblePoints, 2, '.', ''), '0'), '.');
  
-     $learningPathPercentage = ($totalCourses > 0)
-         ? round(($completedCourses / $totalCourses) * 100, 2)
-         : 0;
+    $learningPathPercentage = ($totalCourses > 0)
+        ? round(($completedCourses / $totalCourses) * 100, 2)
+        : 0;
  
-     // Prepare data for the Mustache template context
-     $formattedUsername = ucfirst(strtolower($displayname));
-     $templatecontext += [
-         'isloggedin' => true,
-         'username' => $formattedUsername,
-         'userpicture' => $userpicture,
-         'completedCourses' => $completedCourses,
-         'totalCourses' => $totalCourses,
-         'totalPoints' => $formattedTotalPoints, // Use formatted value
-         'learningPathPercentage' => $learningPathPercentage,
-         'curriculumPercentage' => $learningPathPercentage,
-         'totalPossiblePoints' => $formattedTotalPossiblePoints, // Use formatted value
-         'totalOverdue' => $totalOverdue,
-     ];
+    $formattedUsername = ucfirst(strtolower($displayname));
+    $templatecontext += [
+        'isloggedin' => true,
+        'username' => $formattedUsername,
+        'userpicture' => $userpicture,
+        'completedCourses' => $completedCourses,
+        'totalCourses' => $totalCourses,
+        'totalPoints' => $formattedTotalPoints,
+        'learningPathPercentage' => $learningPathPercentage,
+        'curriculumPercentage' => $learningPathPercentage,
+        'totalPossiblePoints' => $formattedTotalPossiblePoints,
+        'totalOverdue' => $totalOverdue,
+    ];
      
     $courses = $DB->get_records_sql("
         SELECT 
@@ -116,12 +139,12 @@ if (isloggedin() && !isguestuser()) {
             f.filepath AS course_image_filepath,
             f.mimetype AS course_image_mimetype,
             CONCAT('/pluginfile.php/', ctx.id, '/course/overviewfiles/', f.filename) AS course_image_url
-        FROM mdl_course c
-        JOIN mdl_enrol e ON e.courseid = c.id
-        JOIN mdl_user_enrolments ue ON ue.enrolid = e.id
-        LEFT JOIN mdl_course_categories cc ON c.category = cc.id
-        LEFT JOIN mdl_context ctx ON c.id = ctx.instanceid AND ctx.contextlevel = 50
-        LEFT JOIN mdl_files f ON ctx.id = f.contextid 
+        FROM {course} c
+        JOIN {enrol} e ON e.courseid = c.id
+        JOIN {user_enrolments} ue ON ue.enrolid = e.id
+        LEFT JOIN {course_categories} cc ON c.category = cc.id
+        LEFT JOIN {context} ctx ON c.id = ctx.instanceid AND ctx.contextlevel = 50
+        LEFT JOIN {files} f ON ctx.id = f.contextid 
                    AND f.component = 'course' 
                    AND f.filearea = 'overviewfiles' 
                    AND f.filename <> '.'
@@ -130,10 +153,8 @@ if (isloggedin() && !isguestuser()) {
         ORDER BY c.fullname ASC
     ", [$userid]);
 
-    // Prepare courses data to be passed to the template
     $courses_data = [];
     foreach ($courses as $course) {
-        // Check if course image exists; otherwise, use the default image
         $course_image_url = (!empty($course->course_image_filename))
             ? $CFG->wwwroot . $course->course_image_url
             : $default_image_url;
@@ -161,19 +182,17 @@ if (isloggedin() && !isguestuser()) {
     
     $templatecontext['alert_gif'] = $OUTPUT->image_url('alert', 'theme_academi')->out(false);
 
-
     $is_admin = is_siteadmin($USER->id);
     $showpopup = false;
     $popupmessage = "";
     
     if ($is_admin) {
-        // ✅ Fetch last uploaded course
         $last_course = $DB->get_record_sql("SELECT id, fullname, timecreated FROM {course} ORDER BY timecreated DESC LIMIT 1");
     
         if ($last_course) {
             $last_upload_time = $last_course->timecreated;
             $current_time = time();
-            $one_week = 7 * 24 * 60 * 60; // 1 week in seconds
+            $one_week = 7 * 24 * 60 * 60;
     
             if (($current_time - $last_upload_time) >= $one_week) {
                 $showpopup = true;
@@ -182,7 +201,6 @@ if (isloggedin() && !isguestuser()) {
         }
     }
     
-    // ✅ Pass the popup variables to Mustache
     $templatecontext['bodyattributes'] = $bodyattributes;
     $templatecontext['jumbotronclass'] = $jumbotronclass;
     $templatecontext['showpopup'] = $showpopup;
@@ -192,7 +210,6 @@ if (isloggedin() && !isguestuser()) {
 }
 
 $templatecontext['sitefeatures'] = (new \theme_academi\academi_blocks())->sitefeatures();
-// Add banner image URLs
 
 $templatecontext['banners'] = [
     [
@@ -202,7 +219,7 @@ $templatecontext['banners'] = [
         'description' => 'Bringing Education to Your Fingertips',
         'cta_text' => 'Learn More',
         'cta_link' => '#',
-        'is_active' => true // First slide active
+        'is_active' => true
     ],
     [
         'image_url' => $OUTPUT->image_url('banner2', 'theme_academi')->out(),
@@ -224,12 +241,10 @@ $templatecontext['banners'] = [
     ]
 ];
 
-
 $templatecontext += $sliderconfig;
 $templatecontext += [
     'bodyattributes' => $bodyattributes,
     'jumbotronclass' => $jumbotronclass,
 ];
 
-// Render the template with the context data
 echo $OUTPUT->render_from_template('theme_academi/frontpage', $templatecontext);
