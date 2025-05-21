@@ -243,50 +243,38 @@ echo $OUTPUT->heading($pagedesc);
 
 $editform->display();
 
+echo '<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const titleInput = document.getElementById("id_fullname");
+    if (!titleInput) return;
 
-// echo '<script>
-// document.addEventListener("DOMContentLoaded", function () {
-//     const titleInput = document.getElementById("id_fullname");
-    
-//     if (!titleInput) {
-//         console.error("Title field not found!");
-//         return;
-//     }
+    titleInput.addEventListener("blur", async function () {
+        const title = titleInput.value.trim();
+        if (title.length < 3) return;
 
-//     titleInput.addEventListener("blur", async function () {
-//         const title = titleInput.value.trim();
-//         if (title.length < 3) return;
+        const editor = tinyMCE.get("id_summary_editor");
+        if (!editor) return;
 
-//         // ✅ Correct TinyMCE Summary Handling
-//         const editor = tinyMCE.get("id_summary_editor");
-//         if (!editor) {
-//             console.error("TinyMCE editor not found!");
-//             return;
-//         }
+        editor.setContent("Generating AI summary...");
 
-//         editor.setContent("Generating AI-powered course summary...");
+        try {
+            const response = await fetch("/moodle/local/geminiapi/gemini_summary.php?title=" + encodeURIComponent(title));
+            const data = await response.json();
 
-//         try {
-//             const response = await fetch("http://localhost/moodle/local/geminiapi/generate_summary.php", {
-//                 method: "POST",
-//                 headers: { "Content-Type": "application/json" },
-//                 body: JSON.stringify({ title: title })
-//             });
+            if (data.description) {
+                editor.setContent(data.description);
+            } else {
+                editor.setContent("Could not generate summary.");
+                console.error(data.error || "Unknown error");
+            }
+        } catch (e) {
+            editor.setContent("Error generating summary.");
+            console.error("Fetch error:", e);
+        }
+    });
+});
+</script>';
 
-//             const data = await response.json();
-
-//             if (data.error) {
-//                 editor.setContent("Error: " + data.error);
-//             } else {
-//                 editor.setContent(data.description);
-//             }
-//         } catch (error) {
-//             console.error("Error fetching AI summary:", error);
-//             editor.setContent("Error fetching AI-generated summary.");
-//         }
-//     });
-// });
-// </script>';
 
 
 echo $OUTPUT->footer();
