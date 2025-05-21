@@ -33,55 +33,11 @@ class mod_scorm_mod_form extends moodleform_mod {
             $mform->addElement('static', '', '', $OUTPUT->notification(get_string('slashargs', 'scorm'), 'notifyproblem'));
         }
 
-        $mform->addElement('header', 'general', get_string('general', 'form'));
-
-        // Name.
-        $mform->addElement('text', 'name', get_string('name'));
-        if (!empty($CFG->formatstringstriptags)) {
-            $mform->setType('name', PARAM_TEXT);
-        } else {
-            $mform->setType('name', PARAM_CLEANHTML);
-        }
-        $mform->addRule('name', null, 'required', null, 'client');
-        $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-
-        // Summary.
-        $this->standard_intro_elements();
-
-        // Package.
+        // Package section at top after general header
         $mform->addElement('header', 'packagehdr', get_string('packagehdr', 'scorm'));
+        
         $mform->setExpanded('packagehdr', true);
 
-        // Scorm types.
-        $scormtypes = array(SCORM_TYPE_LOCAL => get_string('typelocal', 'scorm'));
-
-        if ($cfgscorm->allowtypeexternal) {
-            $scormtypes[SCORM_TYPE_EXTERNAL] = get_string('typeexternal', 'scorm');
-        }
-
-        if ($cfgscorm->allowtypelocalsync) {
-            $scormtypes[SCORM_TYPE_LOCALSYNC] = get_string('typelocalsync', 'scorm');
-        }
-
-        if ($cfgscorm->allowtypeexternalaicc) {
-            $scormtypes[SCORM_TYPE_AICCURL] = get_string('typeaiccurl', 'scorm');
-        }
-
-        // Reference.
-        if (count($scormtypes) > 1) {
-            $mform->addElement('select', 'scormtype', get_string('scormtype', 'scorm'), $scormtypes);
-            $mform->setType('scormtype', PARAM_ALPHA);
-            $mform->addHelpButton('scormtype', 'scormtype', 'scorm');
-            $mform->addElement('text', 'packageurl', get_string('packageurl', 'scorm'), array('size' => 60));
-            $mform->setType('packageurl', PARAM_RAW);
-            $mform->addHelpButton('packageurl', 'packageurl', 'scorm');
-            $mform->hideIf('packageurl', 'scormtype', 'eq', SCORM_TYPE_LOCAL);
-        } else {
-            $mform->addElement('hidden', 'scormtype', SCORM_TYPE_LOCAL);
-            $mform->setType('scormtype', PARAM_ALPHA);
-        }
-
-        // New local package upload.
         $filemanageroptions = array();
         $filemanageroptions['accepted_types'] = array('.zip', '.xml');
         $filemanageroptions['maxbytes'] = 0;
@@ -91,6 +47,19 @@ class mod_scorm_mod_form extends moodleform_mod {
         $mform->addElement('filemanager', 'packagefile', get_string('package', 'scorm'), null, $filemanageroptions);
         $mform->addHelpButton('packagefile', 'package', 'scorm');
         $mform->hideIf('packagefile', 'scormtype', 'noteq', SCORM_TYPE_LOCAL);
+
+        // Now add Name
+        $mform->addElement('text', 'name', get_string('name'));
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('name', PARAM_TEXT);
+        } else {
+            $mform->setType('name', PARAM_CLEANHTML);
+        }
+        $mform->addRule('name', null, 'required', null, 'client');
+        $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+
+        // Summary (Description)
+        $this->standard_intro_elements();
 
         // Update packages timing.
         $mform->addElement('select', 'updatefreq', get_string('updatefreq', 'scorm'), scorm_get_updatefreq_array());
@@ -209,7 +178,7 @@ class mod_scorm_mod_form extends moodleform_mod {
         $mform->hideIf('maxgrade', 'grademethod', 'eq', GRADESCOES);
 
         // Attempts management.
-        $mform->addElement('header', 'attemptsmanagementhdr', get_string('attemptsmanagement', 'scorm'));
+        // $mform->addElement('header', 'attemptsmanagementhdr', get_string('attemptsmanagement', 'scorm'));
 
         // Max Attempts.
         $mform->addElement('select', 'maxattempt', get_string('maximumattempts', 'scorm'), scorm_get_attempts_array());
@@ -234,30 +203,10 @@ class mod_scorm_mod_form extends moodleform_mod {
         $mform->setDefault('lastattemptlock', $cfgscorm->lastattemptlock);
 
         // Compatibility settings.
-        $mform->addElement('header', 'compatibilitysettingshdr', get_string('compatibilitysettings', 'scorm'));
-
-        // Force completed.
-        $mform->addElement('selectyesno', 'forcecompleted', get_string('forcecompleted', 'scorm'));
-        $mform->addHelpButton('forcecompleted', 'forcecompleted', 'scorm');
-        $mform->setDefault('forcecompleted', $cfgscorm->forcecompleted);
-
-        // Autocontinue.
-        $mform->addElement('selectyesno', 'auto', get_string('autocontinue', 'scorm'));
-        $mform->addHelpButton('auto', 'autocontinue', 'scorm');
-        $mform->setDefault('auto', $cfgscorm->auto);
-
-        // Autocommit.
-        $mform->addElement('selectyesno', 'autocommit', get_string('autocommit', 'scorm'));
-        $mform->addHelpButton('autocommit', 'autocommit', 'scorm');
-        $mform->setDefault('autocommit', $cfgscorm->autocommit);
-
-        // Mastery score overrides status.
-        $mform->addElement('selectyesno', 'masteryoverride', get_string('masteryoverride', 'scorm'));
-        $mform->addHelpButton('masteryoverride', 'masteryoverride', 'scorm');
-        $mform->setDefault('masteryoverride', $cfgscorm->masteryoverride);
+        // $mform->addElement('header', 'compatibilitysettingshdr', get_string('compatibilitysettings', 'scorm'));
 
         // Hidden Settings.
-        $mform->addElement('hidden', 'datadir', null);
+         $mform->addElement('hidden', 'datadir', null);
         $mform->setType('datadir', PARAM_RAW);
         $mform->addElement('hidden', 'pkgtype', null);
         $mform->setType('pkgtype', PARAM_RAW);
@@ -412,19 +361,6 @@ class mod_scorm_mod_form extends moodleform_mod {
             $reference = $data['packageurl'];
             // Syntax check.
             if (!preg_match('/(http:\/\/|https:\/\/|www).*\/imsmanifest.xml$/i', $reference)) {
-                $errors['packageurl'] = get_string('invalidurl', 'scorm');
-            } else {
-                // Availability check.
-                $result = scorm_check_url($reference);
-                if (is_string($result)) {
-                    $errors['packageurl'] = $result;
-                }
-            }
-
-        } else if ($type === 'packageurl') {
-            $reference = $data['reference'];
-            // Syntax check.
-            if (!preg_match('/(http:\/\/|https:\/\/|www).*(\.zip|\.pif)$/i', $reference)) {
                 $errors['packageurl'] = get_string('invalidurl', 'scorm');
             } else {
                 // Availability check.
