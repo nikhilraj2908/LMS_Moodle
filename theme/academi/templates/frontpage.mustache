@@ -235,6 +235,74 @@ body, #page-wrapper {
 
 
 
+.section-top-performers {
+    background-image: url('/moodle/theme/academi/pix/topperformers-bg.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    padding: 0px 20px 40px 20px;
+    position: relative;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
+}
+
+.performer-container-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    position: relative;
+}
+
+.performers-carousel {
+    display: flex;
+    gap: 2rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 20px 30px;
+    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    width: 90%;
+}
+
+.performers-carousel::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.performer-card {
+    background: #d3f4ff;  /* light blue */
+    border-radius: 15px;
+    border: 1px solid #27408b;
+    flex: 0 0 32%;
+    position: relative;
+    padding: 40px 30px 30px 80px;
+    box-sizing: border-box;
+    box-shadow: 2px 2px 8px rgb(0 0 0 / 0.1);
+    min-width: 350px;
+}
+
+.carousel-nav {
+    background: none;
+    border: none;
+    font-weight: 600;
+    color: #27408b;
+    cursor: pointer;
+    font-size: 2rem;
+    padding: 0.5rem 1rem;
+    transition: color 0.3s ease;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.carousel-nav:hover {
+    color: #003366;
+    background-color: rgba(255, 255, 255, 0.9);
+}
 
 .section-top-performers {
  background-image: url('/moodle/theme/academi/pix/topperformers-bg.png');
@@ -247,129 +315,13 @@ body, #page-wrapper {
   position: relative;
   box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
 }
-
-.performers-carousel {
-  display: flex;
-  gap: 2rem;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  padding: 20px 10px;
-  scrollbar-width: none;  /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-}
-.performers-carousel::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
-}
-
-.performer-card {
-  background: #a5c1f7;  /* light blue */
-  border-radius: 15px;
-  border: 1px solid #27408b;
-  flex: 0 0 300px;
-  position: relative;
-  padding: 40px 30px 30px 80px;
-  box-sizing: border-box;
-  box-shadow: 2px 2px 8px rgb(0 0 0 / 0.1);
-}
-
-.performer-pic {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  overflow: hidden;
-  position: absolute;
-  left: -40px;
-  top: 40px;
-  border: 4px solid #fff;
-  box-shadow: 0 0 8px rgba(0,0,0,0.15);
-  background: white;
-}
-
-.performer-pic img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.performer-content {
-  margin-left: 10px;
-}
-
-.performer-name {
-  font-weight: 600;
-  font-size: 1.3rem;
-  margin-bottom: 0.7rem;
-  color: #102a59;
-}
-
-.testimonial-text {
-  font-size: 0.9rem;
-  line-height: 1.4;
-  color: #17213a;
-  margin-bottom: 15px;
-  min-height: 80px; /* maintain consistent card height */
-}
-
-.points {
-  color: #f4c150;
-  font-size: 1.1rem;
-  margin-bottom: 10px;
-}
-
-.view-profile-link {
-  color: #102a59;
-  font-size: 0.85rem;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.quote-mark {
-  position: absolute;
-  font-size: 2.5rem;
-  color: rgba(255, 255, 255, 0.4);
-  font-family: serif;
-  user-select: none;
-}
-
-.left-quote {
-  top: 10px;
-  left: 10px;
-}
-
-.right-quote {
-  bottom: 10px;
-  right: 10px;
-}
-
-/* Carousel nav buttons styling */
-.carousel-nav {
-  display: flex;
-  justify-content: center;
-  gap: 3rem;
-  margin-top: 20px;
-}
-
-.carousel-nav button {
-  background: none;
-  border: none;
-  font-weight: 600;
-  color: #27408b;
-  cursor: pointer;
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  transition: color 0.3s ease;
-}
-
-.carousel-nav button:hover {
-  color: #003366;
-}
-
 .top-performer-heading{
     background: linear-gradient(to top, #ffffff 0%, rgb(204 242 255) 100%);
     padding:30px;
     border-bottom-right-radius: 45px 45px;
     border-bottom-left-radius: 45px 45px;
 }
+/* Rest of your existing performer card styles remain the same */
     </style>
 </head>
 {{> theme_academi/header }}
@@ -474,16 +426,19 @@ body, #page-wrapper {
 </div>
 
        </div>
-                <div class="section-top-performers  ">
-                    <div class="top-performer d-flex justify-content-center">
+                <div class="section-top-performers">
+    <div class="top-performer d-flex justify-content-center">
                             <h2  class="top-performer-heading">
                                 Our Top <span style="color:#204070;">Performers</span> <span style="color: gold;">⭐</span>
                             </h2>
                     </div>
 
-                    <div class="performers-carousel">
-                        {{#topperformers}}
-                        <div class="performer-card">
+    <div class="performer-container-wrapper">
+        <button class="carousel-nav prev-slide">&larr;</button>
+        
+        <div class="performers-carousel">
+            {{#topperformers}}
+            <div class="performer-card">
                             <div class="quote-mark left-quote">“</div>
                             <div class="performer-pic">
                             {{{picture}}}
@@ -491,6 +446,9 @@ body, #page-wrapper {
                             <div class="performer-content">
                             <h4 class="performer-name">{{fullname}}</h4>
                             <p class="testimonial-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. <!-- You can replace with actual testimonials --></p>
+                              <div class="points mb-1 text-dark  ">
+                                Total Points: <strong>{{points}}</strong>
+                            </div>
                             <div class="points">
                                 ★★★★
                             </div>
@@ -498,14 +456,12 @@ body, #page-wrapper {
                             </div>
                             <div class="quote-mark right-quote">”</div>
                         </div>
-                        {{/topperformers}}
-                    </div>
-
-                    <div class="carousel-nav">
-                        <button class="prev-slide">&larr; Prev</button>
-                        <button class="next-slide">Next &rarr;</button>
-                    </div>
-            </div>
+            {{/topperformers}}
+        </div>
+        
+        <button class="carousel-nav next-slide">&rarr;</button>
+    </div>
+</div>
 
 
 
