@@ -34,213 +34,28 @@
        
     }
 
-  .carousel-overlay-box {
-    background-color: #fff;
-    padding: 30px;
-    border: 2px solid #204070;
-    border-radius: 15px;
-    position: absolute;
-    top: 50%;
-    left: 3%;
-    transform: translateY(-50%);
-    max-width: 50%; 
-    width: 32%;
-    z-index: 2;
-}
-
-/* 2XL screens and above (1536px+) - original styling */
-@media (min-width: 1536px) {
     .carousel-overlay-box {
-        width: 32%;
-        max-width: 50%;
-        left: 3%;
+        background-color: #fff;
         padding: 30px;
+        border: 2px solid #204070;
+        border-radius: 15px;
+        position: absolute;
+        top: 50%;
+        left: 3%;
+        transform: translateY(-50%);
+        max-width: 50%; 
+        z-index: 2;
+        width:32%;
+         
     }
-}
-
-/* XL screens (1280px to 1535px) */
-@media (min-width: 1280px) and (max-width: 1535px) {
-    .carousel-overlay-box {
-        width: 38%;
-        max-width: 35%;
-        left: 4%;
-        padding: 20px;
-        top: 40%;
-    }
-}
-
-/* LG screens (1024px to 1279px) */
-@media (min-width: 1024px) and (max-width: 1279px) {
-    .carousel-overlay-box {
-        width: 45%;
-        max-width: 60%;
-        left: 5%;
-        padding: 20px;
-        border-radius: 12px;
-    }
-}
-
-/* MD screens (768px to 1023px) */
-@media (min-width: 768px) and (max-width: 1023px) {
-    .carousel-overlay-box {
-        position: relative;
-        top: auto;
-        left: auto;
-        transform: none;
-        width: 80%;
-        max-width: 90%;
-        margin: 20px auto;
-        padding: 18px;
-        border-radius: 10px;
-        border-width: 1.5px;
-    }
-}
-
-/* SM screens (below 768px) */
-@media (max-width: 767px) {
-    .carousel-overlay-box {
-        position: relative;
-        top: auto;
-        left: auto;
-        transform: none;
-        width: 90%;
-        max-width: 95%;
-        margin: 15px auto;
-        padding: 15px;
-        border-radius: 8px;
-        border-width: 1px;
-    }
-}
-
-.carousel-overlay-box h2 {
-  font-size: 2.5rem;
-  line-height: 1.2;
- 
-  margin-bottom: 0.5rem;
-}
-
-.carousel-overlay-box h2 span {
-  color: #003366;
-  font-weight: 700;
-}
-
-.carousel-overlay-box p {
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
-}
-
-@media (max-width: 1535px) {
-  .carousel-overlay-box h2 {
-    font-size: 1.3rem;
-    line-height: 1;
-     margin-bottom: 0.2rem;
-  }
-  .carousel-overlay-box p {
-    font-size: 1rem;
-  }
-
-  .carousel-overlay-box h2 span {
-  color: #003366;
-  font-weight: 400;
-  font-size: 1.3rem;
-  line-height: 1;
-}
-}
-
-@media (max-width: 1279px) {
-  .carousel-overlay-box h2 {
-    font-size: 1.9rem;
-  }
-  .carousel-overlay-box p {
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 1023px) {
-  .carousel-overlay-box {
-    padding: 20px;
-  }
-  .carousel-overlay-box h2 {
-    font-size: 1.6rem;
-  }
-  .carousel-overlay-box p {
-    font-size: 0.9rem;
-  }
-}
-
-@media (max-width: 767px) {
-  .carousel-overlay-box {
-    padding: 15px;
-  }
-  .carousel-overlay-box h2 {
-    font-size: 1.3rem;
-  }
-  .carousel-overlay-box p {
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 479px) {
-  .carousel-overlay-box h2 {
-    font-size: 1.1rem;
-  }
-  .carousel-overlay-box p {
-    font-size: 0.8rem;
-  }
-}
-
-
-
-
 
     /* Course Cards Overlay */
-  .course-cards-overlay {
-    position: relative;
-    margin-top: -130px; /* Default for 2xl and above */
-    z-index: 10;
-    padding: 0 20px;
-}
-
-/* 2XL screens and above (1536px+) */
-@media (min-width: 1536px) {
     .course-cards-overlay {
-        margin-top: -130px;
+        position: relative;
+        margin-top: -130px; /* Negative margin to pull up over carousel */
+        z-index: 10;
         padding: 0 20px;
     }
-}
-
-/* XL screens (1280px - 1535px) */
-@media (min-width: 1280px) and (max-width: 1535px) {
-    .course-cards-overlay {
-        margin-top: -120px;
-        padding: 0 18px;
-    }
-}
-
-/* LG screens (1024px - 1279px) */
-@media (min-width: 1024px) and (max-width: 1279px) {
-    .course-cards-overlay {
-        margin-top: -90px;
-        padding: 0 15px;
-    }
-}
-
-/* MD screens (768px - 1023px) */
-@media (min-width: 768px) and (max-width: 1023px) {
-    .course-cards-overlay {
-        margin-top: -60px;
-        padding: 0 12px;
-    }
-}
-
-/* SM screens (below 768px) */
-@media (max-width: 767px) {
-    .course-cards-overlay {
-        margin-top: -40px;
-        padding: 0 10px;
-    }
-}
-
 
     .course-cards-container {
         display: flex;
@@ -304,71 +119,16 @@
     }
 
     /* Buttons from Figma */
-  .btn-figma {
-    display: inline-block;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.3s;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    font-size: 16px; /* Base font size */
-}
-
-/* 2XL screens and above (1536px+) - original styling */
-@media (min-width: 1536px) {
     .btn-figma {
+        display: inline-block;
         padding: 10px 20px;
-        font-size: 16px;
+        border-radius: 6px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s;
         margin-right: 10px;
-        margin-bottom: 1px;
+        margin-bottom: 10px;
     }
-}
-
-/* XL screens (1280px - 1535px) */
-@media (min-width: 1280px) and (max-width: 1535px) {
-    .btn-figma {
-        padding: 4px 8px;
-        font-size: 12px;
-        margin-right: 7px;
-        margin-bottom: 9px;
-    }
-}
-
-/* LG screens (1024px - 1279px) */
-@media (min-width: 1024px) and (max-width: 1279px) {
-    .btn-figma {
-        padding: 8px 16px;
-        font-size: 14px;
-        margin-right: 8px;
-        margin-bottom: 8px;
-    }
-}
-
-/* MD screens (768px - 1023px) */
-@media (min-width: 768px) and (max-width: 1023px) {
-    .btn-figma {
-        padding: 7px 14px;
-        font-size: 13px;
-        margin-right: 7px;
-        margin-bottom: 7px;
-    }
-}
-
-/* SM screens (below 768px) */
-@media (max-width: 767px) {
-    .btn-figma {
-        padding: 6px 12px;
-        font-size: 12px;
-        margin-right: 6px;
-        margin-bottom: 6px;
-        display: block;      /* Stack buttons vertically on small screens */
-        width: 100%;         /* Full width */
-        box-sizing: border-box;
-    }
-}
-
 
     .btn-primary-figma {
         background-color: #003366;
@@ -432,63 +192,11 @@ body.has-admin-menu .btn-user {
 }
 .carousel-course-btn {
     display: flex;
-    margin-left: 3%;
+    margin-left:3%;
     gap: 16px;
-    margin-bottom: 20px;
+    margin-bottom:20px;
+   
 }
-
-/* 2XL screens and above (1536px+) - original */
-@media (min-width: 1536px) {
-    .carousel-course-btn {
-        margin-left: 3%;
-        gap: 16px;
-        margin-bottom: 0px;
-        flex-wrap: nowrap;
-    }
-}
-
-/* XL screens (1280px - 1535px) */
-@media (min-width: 1280px) and (max-width: 1535px) {
-    .carousel-course-btn {
-        margin-left: 2.5%;
-        gap: 14px;
-        margin-bottom: -1px;
-        flex-wrap: nowrap;
-    }
-}
-
-/* LG screens (1024px - 1279px) */
-@media (min-width: 1024px) and (max-width: 1279px) {
-    .carousel-course-btn {
-        margin-left: 2%;
-        gap: 12px;
-        margin-bottom: 16px;
-        flex-wrap: wrap; /* Wrap to next line if needed */
-    }
-}
-
-/* MD screens (768px - 1023px) */
-@media (min-width: 768px) and (max-width: 1023px) {
-    .carousel-course-btn {
-        margin-left: 1.5%;
-        gap: 10px;
-        margin-bottom: 14px;
-        flex-wrap: wrap;
-    }
-}
-
-/* SM screens (below 768px) */
-@media (max-width: 767px) {
-    .carousel-course-btn {
-        margin-left: 1%;
-        gap: 8px;
-        margin-bottom: 12px;
-        flex-direction: column; /* Stack buttons vertically */
-        margin-left: 0; /* Remove left margin for full width */
-        align-items: stretch;
-    }
-}
-
 
 .carousel-course-btn button {
     padding: 10px 20px;
@@ -547,10 +255,10 @@ body, #page-wrapper {
 
 .performers-carousel {
     display: flex;
-    gap: 2rem;
+    gap: 9rem;
     overflow-x: auto;
     scroll-behavior: smooth;
-    padding: 20px 30px;
+    padding: 80px 120px;
     scrollbar-width: none;  /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
     width: 90%;
@@ -562,16 +270,47 @@ body, #page-wrapper {
 
 .performer-card {
     background: #d3f4ff;  /* light blue */
-    border-radius: 15px;
-    border: 1px solid #27408b;
-    flex: 0 0 32%;
+    border-radius: 20px;
+    border: none; /* remove main border */
+    flex: 0 0 28%;
     position: relative;
     padding: 40px 30px 30px 80px;
     box-sizing: border-box;
-    box-shadow: 2px 2px 8px rgb(0 0 0 / 0.1);
-    min-width: 350px;
+    box-shadow:
+      inset 0 4px 6px rgba(0, 0, 0, 0.15), /* inner shadow */
+      2px 2px 8px rgba(0, 0, 0, 0.1); /* subtle outer shadow */
+    min-width: 320px;
+ 
 }
 
+
+/* Add inner border using pseudo-element */
+.performer-card::before {
+    content: "";
+    position: absolute;
+    top: 15px;             /* align with top */
+    left: -16px;        /* shift 10px left outside */
+    right: 16px;       /* keep right edge inside */
+    bottom: -16px;      /* shift 10px down outside */
+    border: 1.75px solid #204070;  /* semi-transparent blue border */
+    border-radius: 20px;  /* same radius as card */
+    pointer-events: none;
+    box-sizing: border-box;
+    z-index: 0;       /* behind main card */
+}
+
+.quote-mark.single-quote {
+    position: absolute;
+    top: -100px;
+    right: 20px;
+    font-size: 100px; /* adjust size as needed */
+    color: #204070; /* subtle color */
+    font-family: 'Arial', sans-serif;
+    font-weight: 700;
+    pointer-events: none; /* so it doesn't block clicks */
+    user-select: none;
+  transform: scaleX(-1) scaleY(-1);
+}
 .carousel-nav {
     background: none;
     border: none;
@@ -701,6 +440,113 @@ body, #page-wrapper {
     box-shadow: 0 4px 8px rgba(32,64,112,0.3);
 }
 
+.block_news_items,
+.block_calendar_month {
+    max-height: 400px !important;
+    overflow-y: auto;
+}
+
+.block_news_items .card-body,
+.block_calendar_month .card-body {
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.block_news_items::-webkit-scrollbar,
+.block_calendar_month::-webkit-scrollbar {
+    width: 6px;
+}
+.block_news_items::-webkit-scrollbar-thumb,
+.block_calendar_month::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+.block_news_items .bg-announcements {
+    background: url("https://cdn.pixabay.com/photo/2020/04/10/19/17/notification-5024558_960_720.png") no-repeat center;
+    background-size: cover;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.announcement-card {
+    background: #fff;
+    border-left: 5px solid #204070;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    padding: 15px 20px;
+    position: relative;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.announcement-icon {
+    width: 40px;
+    height: 40px;
+    background: url("https://cdn-icons-png.flaticon.com/512/1827/1827392.png") no-repeat center;
+    background-size: contain;
+    position: relative;
+}
+
+.announcement-icon::after {
+    content: "";
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: red;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+
+.announcement-content {
+    flex: 1;
+}
+
+.announcement-title {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #333;
+    text-decoration: none;
+}
+
+.announcement-title:hover {
+    text-decoration: underline;
+}
+
+.announcement-meta {
+    font-size: 0.85em;
+    color: #777;
+    margin-top: 4px;
+}
+
+/* Wrapper for the two blocks */
+#block-region-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: space-around;
+    margin:20px
+}
+
+/* Left block (calendar) */
+.block_calendar_month {
+    flex: 1 1 48%;
+    max-width: 600px;
+}
+
+/* Right block (announcements) */
+.block_news_items {
+    flex: 1 1 48%;
+    max-width: 600px;
+}
+#region-main .maincalendar .calendarwrapper td>div {
+    height: 2em;
+    overflow: hidden;
+}
+
     </style>
 </head>
 {{> theme_academi/header }}
@@ -780,7 +626,7 @@ body, #page-wrapper {
         <!-- Course Cards Overlay -->
         <div class="course-cards-overlay">
     <div class="carousel-course-btn">
-        <button class="active">New Course</button>
+        <button class="active">New</button>
         <button>Continue Learning</button>
         <button>Closing Soon</button> 
     </div>
@@ -818,7 +664,7 @@ body, #page-wrapper {
         <div class="performers-carousel">
             {{#topperformers}}
             <div class="performer-card">
-                            <div class="quote-mark left-quote">“</div>
+                            <div class="quote-mark single-quote">“</div>
                             <div class="performer-pic">
                             {{{picture}}}
                             </div>
@@ -833,7 +679,7 @@ body, #page-wrapper {
                             </div>
                             <a href="{{profileurl}}" class="view-profile-link">View Profile</a>
                             </div>
-                            <div class="quote-mark right-quote">”</div>
+                     
                         </div>
             {{/topperformers}}
         </div>
@@ -842,10 +688,9 @@ body, #page-wrapper {
     </div>
 </div>
 
-<div class="news-section-container mt-5">
-  {{{newsitems_html}}}
+<div class="block_news_items">
+    {{{newsitems_html}}}
 </div>
-
 
 
       <div id="page" data-region="mainpage" data-usertour="scroller" class="drawers {{#courseindexopen}}show-drawer-left{{/courseindexopen}} {{#blockdraweropen}}show-drawer-right{{/blockdraweropen}} drag-container {{jumbotronclass}}">
