@@ -54,6 +54,82 @@ class course_renderer extends \core_course_renderer {
      *
      * @return string
      */
+
+     //newsletter
+public function render_news_items_html() {
+    global $CFG, $SITE;
+
+    require_once($CFG->dirroot.'/mod/forum/lib.php');
+
+    if (!$forum = forum_get_course_forum($SITE->id, 'news')) {
+        return '<p>No news items available.</p>';
+    }
+
+    $modinfo = get_fast_modinfo($SITE);
+    if (empty($modinfo->instances['forum'][$forum->id])) {
+        return '<p>No news items available.</p>';
+    }
+    $cm = $modinfo->instances['forum'][$forum->id];
+
+    if (!$cm->uservisible) {
+        return '<p>No news items available.</p>';
+    }
+
+    $context = \context_module::instance($cm->id);
+    if (!has_capability('mod/forum:viewdiscussion', $context)) {
+        return '<p>No news items available.</p>';
+    }
+
+    $text = '<div class="bg-announcements">';
+
+    if (forum_user_can_post_discussion($forum, groups_get_activity_group($cm, true), groups_get_activity_groupmode($cm), $cm, $context)) {
+        $text .= '<div class="newlink"><a href="' . $CFG->wwwroot . '/mod/forum/post.php?forum=' . $forum->id . '">'
+            . get_string('addanewtopic', 'forum') . '</a>...</div>';
+    }
+
+    $sort = 'p.modified DESC';
+    $discussions = forum_get_discussions($cm, $sort, false, -1, $SITE->newsitems, false, -1, 0, FORUM_POSTS_ALL_USER_GROUPS);
+
+    if (!$discussions) {
+        $text .= '(' . get_string('nonews', 'forum') . ')';
+        $text .= '</div>';
+        return $text;
+    }
+
+    $strposttimeformat = get_string('strftimedatetime', 'core_langconfig');
+
+    $text .= '<ul class="unlist">';
+    foreach ($discussions as $discussion) {
+       $discussion->subject = format_string($discussion->name, true, ['context' => $context]);
+
+
+        $posttime = $discussion->modified;
+        if (!empty($CFG->forum_enabletimedposts) && ($discussion->timestart > $posttime)) {
+            $posttime = $discussion->timestart;
+        }
+
+        $userfullname = $discussion->userdeleted
+            ? get_string('deleteduser', 'mod_forum')
+            : fullname($discussion, has_capability('moodle/site:viewfullnames', $context));
+
+        $text .= '<li class="post announcement-card">';
+        $text .= '<div class="announcement-icon"></div>';
+        $text .= '<div class="announcement-content">';
+        $text .= '<a href="' . $CFG->wwwroot . '/mod/forum/discuss.php?d=' . $discussion->discussion . '" class="announcement-title">'
+            . $discussion->subject . '</a>';
+        $text .= '<div class="announcement-meta">' . userdate($posttime, $strposttimeformat) . ' &mdash; ' . $userfullname . '</div>';
+        $text .= '</div></li>';
+    }
+    $text .= '</ul></div>';
+
+    $text .= '<div class="news-footer">';
+    $text .= '<a href="' . $CFG->wwwroot . '/mod/forum/view.php?f=' . $forum->id . '">' . get_string('oldertopics', 'forum') . '</a> ...';
+    $text .= '</div>';
+
+    return $text;
+}
+
+
     public function frontpage_available_courses() {
         global $CFG;
         $displayoption = theme_academi_get_setting('availablecoursetype');
@@ -452,5 +528,7 @@ class course_renderer extends \core_course_renderer {
         // Pass the course data to the Mustache template
         return $this->output->render_from_template('theme_academi/my_courses_home', ['courses' => $coursedata]);
     }
+
+
     
 }

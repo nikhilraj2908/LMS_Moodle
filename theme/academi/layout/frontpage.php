@@ -246,5 +246,7 @@ $templatecontext += [
     'bodyattributes' => $bodyattributes,
     'jumbotronclass' => $jumbotronclass,
 ];
+$renderer = $PAGE->get_renderer('core', 'course');
+$templatecontext['newsitems_html'] = $renderer->render_news_items_html();
 
 echo $OUTPUT->render_from_template('theme_academi/frontpage', $templatecontext);
