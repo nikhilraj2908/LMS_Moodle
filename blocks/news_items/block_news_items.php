@@ -230,6 +230,7 @@ $text="";
                     </div>
                 </li>';
             }
+
             $text .= "</ul>\n</div>";
 
             $this->content->text = $text;

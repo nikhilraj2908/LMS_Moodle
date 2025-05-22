@@ -9,12 +9,15 @@ require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->libdir . '/pdflib.php');
 
+
+
 /**
  * The form for handling editing a course.
  */
 class course_edit_form extends moodleform {
     protected $course;
     protected $context;
+
 
     /**
      * Form definition.
@@ -233,6 +236,8 @@ class course_edit_form extends moodleform {
 
         // Course format.
         $mform->addElement('header', 'courseformathdr', get_string('type_format', 'plugin'));
+
+        
 
         $courseformats = get_sorted_course_formats(true);
         $formcourseformats = new core\output\choicelist();

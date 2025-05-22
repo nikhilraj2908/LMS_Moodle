@@ -1,3 +1,18 @@
+
+<style>
+
+    #page.drawers .main-inner {
+    max-width: 100%;
+    width: 100%;
+    
+    border-radius: .5rem;
+    background-color: #fff;
+    padding: 3.5rem 2.5rem !important;
+    margin-top: -2rem !important;
+    margin-bottom: 0rem !important;
+    flex: 1 0 auto;
+}
+</style>
 <?php
 // This file is part of Moodle - http://moodle.org/
 //
