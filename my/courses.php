@@ -1,3 +1,16 @@
+<style>
+#page.drawers .main-inner {
+    max-width: 100%;
+    /* width: 100%; */
+    /* margin: 0 auto; */
+    /* border-radius: .5rem; */
+    background-color: #ffffff;
+    /* padding: 1.5rem .5rem; */
+    margin-top: -1.5rem !important;
+    margin-bottom: 0rem !important;
+    /* flex: 1 0 auto; */
+}
+</style>
 <?php
 // Moodle My Courses Page
 
