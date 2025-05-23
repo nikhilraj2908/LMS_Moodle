@@ -34,28 +34,216 @@
        
     }
 
+      .carousel-overlay-box {
+    background-color: #fff;
+    padding: 30px;
+    border: 2px solid #204070;
+    border-radius: 15px;
+    position: absolute;
+    top: 50%;
+    left: 3%;
+    transform: translateY(-50%);
+    max-width: 50%; 
+    width: 32%;
+    z-index: 2;
+}
+
+/* 2XL screens and above (1536px+) - original styling */
+@media (min-width: 1536px) {
     .carousel-overlay-box {
-        background-color: #fff;
-        padding: 30px;
-        border: 2px solid #204070;
-        border-radius: 15px;
-        position: absolute;
-        top: 50%;
+        width: 32%;
+        max-width: 50%;
         left: 3%;
-        transform: translateY(-50%);
-        max-width: 50%; 
-        z-index: 2;
-        width:32%;
-         
+        padding: 30px;
     }
+}
+
+/* XL screens (1280px to 1535px) */
+@media (min-width: 1280px) and (max-width: 1535px) {
+    .carousel-overlay-box {
+        width: 38%;
+        max-width: 35%;
+        left: 4%;
+        padding: 20px;
+        top: 40%;
+    }
+}
+
+/* LG screens (1024px to 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .carousel-overlay-box {
+        width: 45%;
+        max-width: 60%;
+        left: 5%;
+        padding: 20px;
+        border-radius: 12px;
+    }
+}
+
+/* MD screens (768px to 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .carousel-overlay-box {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: 80%;
+        max-width: 90%;
+        margin: 20px auto;
+        padding: 18px;
+        border-radius: 10px;
+        border-width: 1.5px;
+    }
+}
+
+/* SM screens (below 768px) */
+@media (max-width: 767px) {
+    .carousel-overlay-box {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: 90%;
+        max-width: 95%;
+        margin: 15px auto;
+        padding: 15px;
+        border-radius: 8px;
+        border-width: 1px;
+    }
+}
+
+.carousel-overlay-box h2 {
+  font-size: 2.5rem;
+  line-height: 1.2;
+ 
+  margin-bottom: 0.5rem;
+}
+
+.carousel-overlay-box h2 span {
+  color: #003366;
+  font-weight: 700;
+}
+
+.carousel-overlay-box p {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 1535px) {
+  .carousel-overlay-box h2 {
+    font-size: 1.3rem;
+    line-height: 1;
+     margin-bottom: 0.2rem;
+  }
+  .carousel-overlay-box p {
+    font-size: 1rem;
+  }
+
+  .carousel-overlay-box h2 span {
+  color: #003366;
+  font-weight: 400;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+}
+
+@media (max-width: 1279px) {
+  .carousel-overlay-box h2 {
+    font-size: 1.9rem;
+  }
+  .carousel-overlay-box p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .carousel-overlay-box {
+    padding: 20px;
+  }
+  .carousel-overlay-box h2 {
+    font-size: 1.6rem;
+  }
+  .carousel-overlay-box p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .carousel-overlay-box {
+    padding: 15px;
+  }
+  .carousel-overlay-box h2 {
+    font-size: 1.3rem;
+  }
+  .carousel-overlay-box p {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .carousel-overlay-box h2 {
+    font-size: 1.1rem;
+  }
+  .carousel-overlay-box p {
+    font-size: 0.8rem;
+  }
+}
+
+
+
+
+
+
+
 
     /* Course Cards Overlay */
+  .course-cards-overlay {
+    position: relative;
+    margin-top: -130px; /* Default for 2xl and above */
+    z-index: 10;
+    padding: 0 20px;
+}
+
+/* 2XL screens and above (1536px+) */
+@media (min-width: 1536px) {
     .course-cards-overlay {
-        position: relative;
-        margin-top: -130px; /* Negative margin to pull up over carousel */
-        z-index: 10;
+        margin-top: -130px;
         padding: 0 20px;
     }
+}
+
+/* XL screens (1280px - 1535px) */
+@media (min-width: 1280px) and (max-width: 1535px) {
+    .course-cards-overlay {
+        margin-top: -120px;
+        padding: 0 18px;
+    }
+}
+
+/* LG screens (1024px - 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .course-cards-overlay {
+        margin-top: -90px;
+        padding: 0 15px;
+    }
+}
+
+/* MD screens (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .course-cards-overlay {
+        margin-top: -60px;
+        padding: 0 12px;
+    }
+}
+
+/* SM screens (below 768px) */
+@media (max-width: 767px) {
+    .course-cards-overlay {
+        margin-top: -40px;
+        padding: 0 10px;
+    }
+}
+
 
     .course-cards-container {
         display: flex;
@@ -120,15 +308,69 @@
 
     /* Buttons from Figma */
     .btn-figma {
-        display: inline-block;
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    font-size: 16px; /* Base font size */
+}
+
+/* 2XL screens and above (1536px+) - original styling */
+@media (min-width: 1536px) {
+    .btn-figma {
         padding: 10px 20px;
-        border-radius: 6px;
-        font-weight: 500;
-        text-decoration: none;
-        transition: all 0.3s;
+        font-size: 16px;
         margin-right: 10px;
-        margin-bottom: 10px;
+        margin-bottom: 1px;
     }
+}
+
+/* XL screens (1280px - 1535px) */
+@media (min-width: 1280px) and (max-width: 1535px) {
+    .btn-figma {
+        padding: 4px 8px;
+        font-size: 12px;
+        margin-right: 7px;
+        margin-bottom: 9px;
+    }
+}
+
+/* LG screens (1024px - 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .btn-figma {
+        padding: 8px 16px;
+        font-size: 14px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+}
+
+/* MD screens (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .btn-figma {
+        padding: 7px 14px;
+        font-size: 13px;
+        margin-right: 7px;
+        margin-bottom: 7px;
+    }
+}
+
+/* SM screens (below 768px) */
+@media (max-width: 767px) {
+    .btn-figma {
+        padding: 6px 12px;
+        font-size: 12px;
+        margin-right: 6px;
+        margin-bottom: 6px;
+        display: block;      /* Stack buttons vertically on small screens */
+        width: 100%;         /* Full width */
+        box-sizing: border-box;
+    }
+}
 
     .btn-primary-figma {
         background-color: #003366;
@@ -198,6 +440,61 @@ body.has-admin-menu .btn-user {
    
 }
 
+/* 2XL screens and above (1536px+) - original */
+@media (min-width: 1536px) {
+    .carousel-course-btn {
+        margin-left: 3%;
+        gap: 16px;
+        margin-bottom: 0px;
+        flex-wrap: nowrap;
+    }
+}
+
+/* XL screens (1280px - 1535px) */
+@media (min-width: 1280px) and (max-width: 1535px) {
+    .carousel-course-btn {
+        margin-left: 2.5%;
+        gap: 14px;
+        margin-bottom: -1px;
+        flex-wrap: nowrap;
+    }
+}
+
+/* LG screens (1024px - 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .carousel-course-btn {
+        margin-left: 2%;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap; /* Wrap to next line if needed */
+    }
+}
+
+/* MD screens (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .carousel-course-btn {
+        margin-left: 1.5%;
+        gap: 10px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+    }
+}
+
+/* SM screens (below 768px) */
+@media (max-width: 767px) {
+    .carousel-course-btn {
+        margin-left: 1%;
+        gap: 8px;
+        margin-bottom: 12px;
+        flex-direction: column; /* Stack buttons vertically */
+        margin-left: 0; /* Remove left margin for full width */
+        align-items: stretch;
+    }
+}
+
+
+
+
 .carousel-course-btn button {
     padding: 10px 20px;
     border: none;
@@ -265,24 +562,102 @@ body, #page-wrapper {
     width: 90%;
 }
 
+/* Hide scrollbar for Chrome, Safari and Opera */
 .performers-carousel::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
 }
 
-.performer-card {
-    background: #d3f4ff;  /* light blue */
-    border-radius: 20px;
-    border: none; /* remove main border */
-    flex: 0 0 28%;
-    position: relative;
-    padding: 40px 30px 30px 80px;
-    box-sizing: border-box;
-    box-shadow:
-      inset 0 4px 6px rgba(0, 0, 0, 0.15), /* inner shadow */
-      2px 2px 8px rgba(0, 0, 0, 0.1); /* subtle outer shadow */
-    min-width: 320px;
- 
+/* Responsive adjustments */
+@media (max-width: 1536px) { /* <= 2xl */
+    .performers-carousel {
+        gap: 6rem;
+        padding: 60px 80px;
+        width: 95%;
+    }
 }
+
+@media (max-width: 1280px) { /* <= xl */
+    .performers-carousel {
+        gap: 5rem;
+        padding: 50px 60px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 1024px) { /* <= lg */
+    .performers-carousel {
+        gap: 3rem;
+        padding: 40px 40px;
+    }
+}
+
+@media (max-width: 768px) { /* <= md */
+    .performers-carousel {
+        gap: 2rem;
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 640px) { /* <= sm */
+    .performers-carousel {
+        gap: 1rem;
+        padding: 20px 10px;
+    }
+}
+
+
+.performer-card {
+  background: #d3f4ff;  /* light blue */
+  border-radius: 20px;
+  border: none; /* remove main border */
+  flex: 0 0 28%;
+  position: relative;
+  padding: 40px 30px 30px 80px;
+  box-sizing: border-box;
+  box-shadow:
+    inset 0 4px 6px rgba(0, 0, 0, 0.15), /* inner shadow */
+    2px 2px 8px rgba(0, 0, 0, 0.1); /* subtle outer shadow */
+  min-width: 320px;
+}
+
+/* Large screens (lg and xl) */
+@media (max-width: 1535px) {
+  .performer-card {
+    flex: 0 0 20%;
+    padding: 10px 15px 15px 10px;
+    min-width: 290px;
+  }
+}
+
+/* Medium screens (tablets) */
+@media (max-width: 1023px) {
+  .performer-card {
+    flex: 0 0 60%;
+    padding: 25px 20px 20px 40px;
+    min-width: 250px;
+  }
+}
+
+/* Small screens (mobile landscape) */
+@media (max-width: 639px) {
+  .performer-card {
+    flex: 0 0 80%;
+    padding: 20px 15px 15px 30px;
+    min-width: auto;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Extra small screens (mobile portrait) */
+@media (max-width: 479px) {
+  .performer-card {
+    flex: 0 0 95%;
+    padding: 15px 10px 10px 20px;
+    border-radius: 15px;
+  }
+}
+
 
 
 /* Add inner border using pseudo-element */
@@ -375,17 +750,57 @@ body, #page-wrapper {
 
 /* Profile Image Overlap */
 .performer-pic {
-    position: absolute;
-    top: 100px; /* move a bit down */
-    left: -80px; /* slightly more outside the card */
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    overflow: hidden;
-  
-    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-    background: white;
+  position: absolute;
+  top: 100px;    /* position relative to the card */
+  left: -80px;   /* outside the card */
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  background: white;
 }
+
+/* Large screens (lg and xl) */
+@media (max-width: 1535px) {
+  .performer-pic {
+    top: 90px;
+    left: -65px;
+    width: 90px;
+    height: 90px;
+  }
+}
+
+/* Medium screens (tablets) */
+@media (max-width: 1023px) {
+  .performer-pic {
+    top: 75px;
+    left: -50px;
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* Small screens (mobile landscape) */
+@media (max-width: 639px) {
+  .performer-pic {
+    top: 60px;
+    left: -40px;
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* Extra small screens (mobile portrait) */
+@media (max-width: 479px) {
+  .performer-pic {
+    top: 50px;
+    left: -30px;
+    width: 70px;
+    height: 70px;
+  }
+}
+
 
 /* Image inside the profile */
 .performer-pic img {
