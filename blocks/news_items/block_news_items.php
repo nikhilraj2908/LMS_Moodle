@@ -29,7 +29,8 @@
  * @copyright  1999 onwards Martin Dougiamas (http://dougiamas.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_news_items extends block_base {
+
+ class block_news_items extends block_base {
     function init() {
         $this->title = get_string('pluginname', 'block_news_items');
     }
@@ -220,8 +221,8 @@ $text="";
                                ? get_string('deleteduser', 'mod_forum')
                                : fullname($discussion, has_capability('moodle/site:viewfullnames', $context));
 
-                $text .= '<li class="post ">
-                    <div class="announcement-card ">
+                $text .= '<li class="post">
+                    <div class="announcement-card">
                         <div class="announcement-icon"></div>
                         <div class="announcement-content">
                             <a href="'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$discussion->discussion.'" class="announcement-title">'.$discussion->subject.'</a>

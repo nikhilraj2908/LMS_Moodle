@@ -469,24 +469,24 @@ body, #page-wrapper {
 }
 
 .announcement-card {
-    background: #fff;
-    border-left: 5px solid #204070;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-    padding: 15px 20px;
-    position: relative;
-    display: flex;
-    gap: 15px;
-    align-items: center;
+    font-size: 1rem;
+    padding: 20px;
+    height: 130px;
+     border-left: 5px solid #204070;
+        padding: 15px 20px;
+    margin-bottom: 20px; /* More space between announcements */
+    border-radius: 15px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12); /* More visible shadow */
 }
 
 .announcement-icon {
     width: 40px;
     height: 40px;
-    background: url("https://cdn-icons-png.flaticon.com/512/1827/1827392.png") no-repeat center;
+    background: url(https://cdn-icons-png.flaticon.com/512/1827/1827392.png) no-repeat center;
     background-size: contain;
     position: relative;
+    margin-bottom: 20px;
+    margin-left: 10px;
 }
 
 .announcement-icon::after {
@@ -510,6 +510,7 @@ body, #page-wrapper {
     font-size: 1rem;
     color: #333;
     text-decoration: none;
+    margin-left: 10px;
 }
 
 .announcement-title:hover {
@@ -520,8 +521,13 @@ body, #page-wrapper {
     font-size: 0.85em;
     color: #777;
     margin-top: 4px;
+    margin-left: 10px;
+    margin-bottom: 10px;
 }
-
+.unlist, .unlist li, .inline-list, .inline-list li, .block .list, .block .list li, .section li.movehere, .tabtree li {
+    margin-bottom:20px;
+  
+}
 /* Wrapper for the two blocks */
 #block-region-content {
     display: flex;
@@ -539,14 +545,19 @@ body, #page-wrapper {
 
 /* Right block (announcements) */
 .block_news_items {
-    flex: 1 1 48%;
-    max-width: 600px;
+    width: 50% !important;
+    margin-left: auto !important; /* Push it to the right */
+   
+    padding: 20px;
 }
 #region-main .maincalendar .calendarwrapper td>div {
     height: 2em;
     overflow: hidden;
 }
-
+.block_news_items, .block_calendar_month {
+    max-height: 500px !important;
+    overflow-y: auto;
+}
     </style>
 </head>
 {{> theme_academi/header }}
@@ -689,6 +700,7 @@ body, #page-wrapper {
 </div>
 
 <div class="block_news_items">
+
     {{{newsitems_html}}}
 </div>
 
