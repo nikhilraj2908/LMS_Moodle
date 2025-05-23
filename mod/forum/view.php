@@ -218,6 +218,7 @@ switch ($forum->get_type()) {
                 echo $OUTPUT->render_from_template('mod_forum/grades/view_grade_button', $gradeobj);
             }
         }
+        
         $discussion = $discussionvault->get_last_discussion_in_forum($forum);
         $discussioncount = $discussionvault->get_count_discussions_in_forum($forum);
         $hasmultiplediscussions = $discussioncount > 1;
