@@ -974,6 +974,66 @@ body, #page-wrapper {
     max-height: 500px !important;
     overflow-y: auto;
 }
+
+
+
+
+
+
+
+
+
+
+.newsletter-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  margin:2%;
+  align-items: stretch;
+}
+
+.newsletter-box {
+  background-color: rgba(255, 255, 255, 0.95);
+  position: relative;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  height:100%;
+}
+
+.newsletter-box .bg-texture {
+  background-image: url('/moodle/theme/academi/pix/newsletterbanner.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.9;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 16px;
+}
+
+.newsletter-box h2 {
+  color: #003366;
+}
+
+.newsletter-posts {
+  background-color: rgba(255, 255, 255, 0.75);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Make sure announcements don't overflow */
+.newsletter-posts .card {
+  margin-bottom: 1rem;
+  border-radius: 12px;
+}
+    .col-md-5 {
+        height: 59vh;
+        flex: 0 0 41.66666667%;
+        max-width: 41.66666667%;
+    }
+
+
     </style>
 </head>
 {{> theme_academi/header }}
@@ -1113,12 +1173,51 @@ body, #page-wrapper {
         
         <button class="carousel-nav next-slide">&rarr;</button>
     </div>
+    </div>
+    <div class="container my-5">
+  <div class="row align-items-start newsletter-wrapper">
+    
+    <!-- Left Side: Subscribe Box -->
+    <div class="col-md-5">
+      <div class="newsletter-box text-center p-4 rounded-4 shadow">
+        <div class="bg-texture rounded-4"></div>
+        <div class="position-relative z-2">
+          <h5 class="mb-2 fw-semibold">Subscribe To</h5>
+          <h2 class="fw-bold mb-4 text-primary">Our Newsletter!</h2>
+          {{#forumsubscription}}
+            <div class="forum-subscription-btn mb-3">
+              {{#subscribed}}
+                <form action="{{config.wwwroot}}/mod/forum/subscribe.php" method="post">
+                  <input type="hidden" name="id" value="{{cmid}}">
+                  <input type="hidden" name="sesskey" value="{{sesskey}}">
+                  <input type="hidden" name="returnurl" value="{{config.wwwroot}}/">
+                  <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill">Unsubscribe</button>
+                </form>
+              {{/subscribed}}
+              {{^subscribed}}
+                <form action="{{config.wwwroot}}/mod/forum/subscribe.php" method="post">
+                  <input type="hidden" name="id" value="{{cmid}}">
+                  <input type="hidden" name="sesskey" value="{{sesskey}}">
+                  <input type="hidden" name="returnurl" value="{{config.wwwroot}}/">
+                  <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill">Subscribe to forum</button>
+                </form>
+              {{/subscribed}}
+            </div>
+          {{/forumsubscription}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side: Forum Newsletter Items -->
+    <div class="col-md-7">
+      <div class="newsletter-posts px-2">
+        {{{newsitems_html}}}
+      </div>
+    </div>
+
+  </div>
 </div>
 
-<div class="block_news_items">
-
-    {{{newsitems_html}}}
-</div>
 
 
       <div id="page" data-region="mainpage" data-usertour="scroller" class="drawers {{#courseindexopen}}show-drawer-left{{/courseindexopen}} {{#blockdraweropen}}show-drawer-right{{/blockdraweropen}} drag-container {{jumbotronclass}}">

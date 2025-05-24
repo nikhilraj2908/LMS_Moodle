@@ -53,6 +53,39 @@ foreach ($top5 as $tp) {
     }
 }
 
+// ── Forum Subscription Data ─────────────────────────────────────────────
+$templatecontext['forumsubscription'] = false;
+if (isloggedin() && !isguestuser()) {
+    require_once($CFG->dirroot . '/mod/forum/lib.php');
+    
+    // Get the site course
+    $course = get_site();
+    
+    // Get all forum instances in the course
+    if ($forums = get_all_instances_in_course('forum', $course, $USER->id)) {
+        foreach ($forums as $forum) {
+            // Get the course module
+            if ($cm = get_coursemodule_from_instance('forum', $forum->id, $course->id)) {
+                $context = context_module::instance($cm->id);
+                
+                // Check basic view capability
+                if (has_capability('mod/forum:viewdiscussion', $context)) {
+                    // Check subscription status using modern API
+                    $subscription = \mod_forum\subscriptions::is_subscribed($USER->id, $forum);
+                    
+                    $templatecontext['forumsubscription'] = [
+                        'forumid' => $forum->id,
+                        'cmid' => $cm->id,
+                        'courseid' => $course->id,
+                        'subscribed' => $subscription,
+                        'sesskey' => sesskey()
+                    ];
+                    break; // Use first valid forum
+                }
+            }
+        }
+    }
+}
 if (isloggedin() && !isguestuser()) {
     $userid = $USER->id;
     $username = $USER->username; 
