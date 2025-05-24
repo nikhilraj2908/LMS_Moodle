@@ -1184,26 +1184,20 @@ body, #page-wrapper {
         <div class="position-relative z-2">
           <h5 class="mb-2 fw-semibold">Subscribe To</h5>
           <h2 class="fw-bold mb-4 text-primary">Our Newsletter!</h2>
-          {{#forumsubscription}}
-            <div class="forum-subscription-btn mb-3">
-              {{#subscribed}}
-                <form action="{{config.wwwroot}}/mod/forum/subscribe.php" method="post">
-                  <input type="hidden" name="id" value="{{cmid}}">
-                  <input type="hidden" name="sesskey" value="{{sesskey}}">
-                  <input type="hidden" name="returnurl" value="{{config.wwwroot}}/">
-                  <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill">Unsubscribe</button>
-                </form>
-              {{/subscribed}}
-              {{^subscribed}}
-                <form action="{{config.wwwroot}}/mod/forum/subscribe.php" method="post">
-                  <input type="hidden" name="id" value="{{cmid}}">
-                  <input type="hidden" name="sesskey" value="{{sesskey}}">
-                  <input type="hidden" name="returnurl" value="{{config.wwwroot}}/">
-                  <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill">Subscribe to forum</button>
-                </form>
-              {{/subscribed}}
-            </div>
-          {{/forumsubscription}}
+     <div class="forum-subscription-btn mb-3">
+  {{#forumsubscription}}
+    <form class="forum-subscription-form" data-cmid="{{cmid}}">
+      <input type="hidden" name="id" value="{{cmid}}">
+      <input type="hidden" name="sesskey" value="{{sesskey}}">
+      <input type="hidden" name="returnurl" value="{{config.wwwroot}}/">
+      <button type="button" class="btn btn-primary px-4 py-2 rounded-pill subscription-toggle-btn"
+              data-action="{{#subscribed}}unsubscribe{{/subscribed}}{{^subscribed}}subscribe{{/subscribed}}">
+        {{#subscribed}}{{#str}}unsubscribe, mod_forum{{/str}}{{/subscribed}}
+        {{^subscribed}}{{#str}}subscribe, mod_forum{{/str}}{{/subscribed}}
+      </button>
+    </form>
+  {{/forumsubscription}}
+</div>
         </div>
       </div>
     </div>
@@ -1217,7 +1211,6 @@ body, #page-wrapper {
 
   </div>
 </div>
-
 
 
       <div id="page" data-region="mainpage" data-usertour="scroller" class="drawers {{#courseindexopen}}show-drawer-left{{/courseindexopen}} {{#blockdraweropen}}show-drawer-right{{/blockdraweropen}} drag-container {{jumbotronclass}}">
@@ -1342,6 +1335,61 @@ body, #page-wrapper {
 
      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+   document.addEventListener('DOMContentLoaded', function() {
+  // Handle forum subscription toggles
+  document.querySelectorAll('.subscription-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const form = this.closest('form');
+      const cmid = form.dataset.cmid;
+      const action = this.dataset.action;
+      const formData = new FormData(form);
+      
+      // Show loading state
+      this.disabled = true;
+      this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+      
+      // Send AJAX request
+      fetch(M.cfg.wwwroot + '/mod/forum/subscribe.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.text())
+      .then(data => {
+        // Toggle button state
+        const newAction = action === 'subscribe' ? 'unsubscribe' : 'subscribe';
+        this.dataset.action = newAction;
+        this.innerHTML = newAction === 'subscribe' ? 
+          '{{#str}}subscribe, mod_forum{{/str}}' : 
+          '{{#str}}unsubscribe, mod_forum{{/str}}';
+          
+        // Update UI classes if needed
+        if(newAction === 'subscribe') {
+          this.classList.remove('btn-danger');
+          this.classList.add('btn-primary');
+        } else {
+          this.classList.remove('btn-primary');
+          this.classList.add('btn-danger');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Show error message
+        require(['core/notification'], function(Notification) {
+          Notification.addNotification({
+            message: 'Failed to update subscription',
+            type: 'error'
+          });
+        });
+      })
+      .finally(() => {
+        this.disabled = false;
+      });
+    });
+  });
+});
+
+
     document.querySelectorAll('[data-toggler="drawers"]').forEach(button => {
     button.addEventListener('click', function () {
         const targetId = this.getAttribute('data-target');
