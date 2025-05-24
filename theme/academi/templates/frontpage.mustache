@@ -1004,7 +1004,7 @@ body, #page-wrapper {
   background-image: url('/moodle/theme/academi/pix/newsletterbanner.png');
   background-size: cover;
   background-position: center;
-  opacity: 0.9;
+  opacity: 0.2;
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -1032,6 +1032,27 @@ body, #page-wrapper {
         flex: 0 0 41.66666667%;
         max-width: 41.66666667%;
     }
+.newsletter-img-wrapper {
+  width: 100%;
+  max-width: 300px;
+  height: 220px; /* adjust height as needed */
+  overflow: hidden;
+  border-radius: 20px;
+  margin: 0 auto;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.newsletter-img {
+  transition: transform 0.3s ease;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+}
+
+.newsletter-img:hover {
+  transform: translateY(-10px);
+}
 
 
     </style>
@@ -1182,6 +1203,10 @@ body, #page-wrapper {
       <div class="newsletter-box text-center p-4 rounded-4 shadow">
         <div class="bg-texture rounded-4"></div>
         <div class="position-relative z-2">
+        <img src="{{config.wwwroot}}/theme/academi/pix/Newsletter.png" alt="Newsletter Icon" 
+     class=" newsletter-img top-0 start-50  mb-3" 
+     style="z-index: 2; max-width: 400px;">
+
           <h5 class="mb-2 fw-semibold">Subscribe To</h5>
           <h2 class="fw-bold mb-4 text-primary">Our Newsletter!</h2>
           {{#forumsubscription}}
