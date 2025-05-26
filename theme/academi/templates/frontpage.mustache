@@ -883,8 +883,13 @@ body, #page-wrapper {
     padding: 20px;
     border-radius: 10px;
 }
+.newlink{
+    margin-bottom:10px;
+}
 
 .announcement-card {
+     display: flex;
+    align-items: center;
     font-size: 1rem;
     padding: 20px;
     height: 130px;
@@ -893,6 +898,10 @@ body, #page-wrapper {
     margin-bottom: 20px; /* More space between announcements */
     border-radius: 15px;
     box-shadow: 0 6px 16px rgba(0,0,0,0.12); /* More visible shadow */
+     background: linear-gradient(to right, #ffffff 0%, rgb(204 242 255) 100%);
+    padding:30px;
+    border-bottom-right-radius: 45px 45px;
+    border-bottom-left-radius: 45px 45px;
 }
 
 .announcement-icon {
@@ -938,7 +947,13 @@ body, #page-wrapper {
     color: #777;
     margin-top: 4px;
     margin-left: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 10px;   
+}
+
+.bg-announcements ul{
+    overflow: scroll;
+    scrollbar-width: none;
+    height: 46vh;
 }
 .unlist, .unlist li, .inline-list, .inline-list li, .block .list, .block .list li, .section li.movehere, .tabtree li {
     margin-bottom:20px;
@@ -1205,7 +1220,7 @@ body, #page-wrapper {
         <div class="position-relative z-2">
         <img src="{{config.wwwroot}}/theme/academi/pix/Newsletter.png" alt="Newsletter Icon" 
      class=" newsletter-img top-0 start-50  mb-3" 
-     style="z-index: 2; max-width: 400px;">
+     style="z-index: 2; height:30vh; max-width: 100%;">
 
           <h5 class="mb-2 fw-semibold">Subscribe To</h5>
           <h2 class="fw-bold mb-4 text-primary">Our Newsletter!</h2>
