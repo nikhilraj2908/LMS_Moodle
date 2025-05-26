@@ -535,12 +535,12 @@ body, #page-wrapper {
 
 .section-top-performers {
     background-image: url('/moodle/theme/academi/pix/topperformers-bg.png');
+
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
-    padding: 0px 20px 40px 20px;
-    position: relative;
-    box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
+      position: relative;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
 }
 
 .performer-container-wrapper {
@@ -711,17 +711,7 @@ body, #page-wrapper {
     background-color: rgba(255, 255, 255, 0.9);
 }
 
-.section-top-performers {
- background-image: url('/moodle/theme/academi/pix/topperformers-bg.png');
- 
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-  padding: 0px 20px 40px 20px;
 
-  position: relative;
-  box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
-}
 .top-performer-heading{
     background: linear-gradient(to top, #ffffff 0%, rgb(204 242 255) 100%);
     padding:30px;
@@ -1072,7 +1062,6 @@ body, #page-wrapper {
 
     </style>
 </head>
-{{> theme_academi/header }}
 
 {{#courseindex}}
   {{< theme_boost/drawer }}
@@ -1106,11 +1095,13 @@ body, #page-wrapper {
 {{/hasblocks}}
 
 <body {{{ bodyattributes }}}>
+
     {{> core/local/toast/wrapper}}
     <div id="page-wrapper" class="d-print-block">
         {{{ output.standard_top_of_body_html }}}
         
-        
+        {{> theme_academi/header }}
+
         <!-- Carousel Section -->
        <div class="main-container">
 
@@ -1173,7 +1164,7 @@ body, #page-wrapper {
     </div>
 </div>
 
-       </div>
+</div>
                 <div class="section-top-performers">
     <div class="top-performer d-flex justify-content-center">
                             <h2  class="top-performer-heading">
