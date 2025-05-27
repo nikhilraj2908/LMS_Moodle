@@ -624,8 +624,8 @@ body, #page-wrapper {
 @media (max-width: 1535px) {
   .performer-card {
     flex: 0 0 20%;
-    padding: 10px 15px 15px 10px;
-    min-width: 290px;
+    padding: 10px 10px 10px 10px;
+    min-width: 280px;
   }
 }
 
@@ -816,24 +816,123 @@ body, #page-wrapper {
 
 /* Name styling */
 .performer-name {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #204070;
-    margin-top: 10px;
+  font-size: 2rem;  /* Default font size for large screens */
+  font-weight: 700;
+  color: #204070;
+  margin-top: 10px;
 }
+
+/* Medium devices (tablets, 768px and up) */
+@media (max-width: 1535px) {
+  .performer-name {
+    font-size: 1.2rem;  /* Slightly smaller font size */
+    margin-top: 8px;
+  }
+}
+
+/* Small devices (phones landscape, 1024px and down) */
+@media (max-width: 1023px) {
+  .performer-name {
+    font-size: 1.6rem;  /* Smaller font size */
+    margin-top: 6px;
+  }
+}
+
+/* Extra small devices (phones portrait, 768px and down) */
+@media (max-width: 767px) {
+  .performer-name {
+    font-size: 1.4rem;  /* Even smaller font size */
+    margin-top: 5px;
+  }
+}
+
+/* Very small devices (small phones, 480px and down) */
+@media (max-width: 479px) {
+  .performer-name {
+    font-size: 1.2rem;  /* Smaller font size */
+    margin-top: 4px;
+  }
+}
+
 /* Testimonial text */
 .testimonial-text {
-    font-style: italic;
-    margin: 12px 0;
-    color: #444;
+  font-style: italic;
+  margin: 12px 0;
+  color: #444;
+  font-size: 1.25rem;  /* Default font size for large screens */
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (max-width: 1535px) {
+  .testimonial-text {
+    font-size: 1rem;  /* Slightly smaller font size */
+    margin: 8px 0;  /* Reduced margin */
+  }
+}
+
+/* Small devices (phones landscape, 1024px and down) */
+@media (max-width: 1023px) {
+  .testimonial-text {
+    font-size: 1rem;  /* Smaller font size */
+    margin: 8px 0;  /* Smaller margin */
+  }
+}
+
+/* Extra small devices (phones portrait, 768px and down) */
+@media (max-width: 767px) {
+  .testimonial-text {
+    font-size: 0.95rem;  /* Even smaller font size */
+    margin: 6px 0;  /* Reduced margin */
+  }
+}
+
+/* Very small devices (small phones, 480px and down) */
+@media (max-width: 479px) {
+  .testimonial-text {
+    font-size: 0.85rem;  /* Smallest font size */
+    margin: 4px 0;  /* Smallest margin */
+  }
 }
 
 /* Rating Stars */
 .points {
-    margin-top: 10px;
-    font-size: 18px;
-    color: gold;
+  margin-top: 10px;
+  font-size: 18px;  /* Default font size */
+  color: gold;
 }
+
+/* Medium devices (tablets, 768px and up) */
+@media (max-width: 1535px) {
+  .points {
+    font-size: 16px;  /* Slightly smaller font size */
+    margin-top: 0px;  /* Adjusted margin */
+  }
+}
+
+/* Small devices (phones landscape, 1024px and down) */
+@media (max-width: 1023px) {
+  .points {
+    font-size: 14px;  /* Smaller font size */
+    margin-top: 6px;  /* Adjusted margin */
+  }
+}
+
+/* Extra small devices (phones portrait, 768px and down) */
+@media (max-width: 767px) {
+  .points {
+    font-size: 12px;  /* Even smaller font size */
+    margin-top: 5px;  /* Reduced margin */
+  }
+}
+
+/* Very small devices (small phones, 480px and down) */
+@media (max-width: 479px) {
+  .points {
+    font-size: 11px;  /* Smallest font size */
+    margin-top: 4px;  /* Smallest margin */
+  }
+}
+
 
 /* View profile link as button */
 .view-profile-link {
@@ -1008,6 +1107,9 @@ body, #page-wrapper {
     {{$closebuttontext}}{{#str}}closeblockdrawer, core{{/str}}{{/closebuttontext}}
   {{/ theme_boost/drawer}}
 {{/hasblocks}}
+
+
+
 
 <body {{{ bodyattributes }}}>
     {{> core/local/toast/wrapper}}
