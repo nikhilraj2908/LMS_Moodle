@@ -636,6 +636,14 @@ if (has_capability('moodle/site:manageblocks', context_system::instance())) {
     echo $OUTPUT->addblockbutton('content');
 }
 
+$calendarinstanceid = 1;
+$uniqid = html_writer::random_id();
+
+$templatecontext['calendarinstanceid'] = $calendarinstanceid;
+$templatecontext['uniqid'] = $uniqid;
+$templatecontext['iscalendarblock'] = false;
+
+
 
 echo $OUTPUT->render_from_template('core/dashboard', $templatecontext);
 
@@ -646,3 +654,5 @@ echo $OUTPUT->footer();
 $eventparams = array('context' => $context);
 $event = \core\event\dashboard_viewed::create($eventparams);
 $event->trigger();
+
+

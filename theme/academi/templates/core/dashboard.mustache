@@ -11,8 +11,8 @@
             font-family: Arial, sans-serif;
         }
       .dashboard-header {
-    background-color: #204070;
-    color: white;
+
+    color: black;
     padding: 15px 20px;
     display: flex;
     align-items: center;
@@ -25,9 +25,23 @@
             border-radius: 50%;
             margin-right: 15px;
         }
-        .container {
-            padding: 20px;
-        }
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  max-width: 100% !important;
+  overflow-x: hidden;
+}
+.d-flex.justify-content-between {
+  align-items: stretch;
+  gap: 2%;
+  overflow-x: hidden; /* prevent horizontal scroll */
+}
+
         .dashboard-row {
             display: grid;
             grid-template-columns: 8fr 4fr;
@@ -97,25 +111,29 @@
             align-items: center;
             gap: 2px;
         }
-        .progress-container {
-            position: relative;
-            width: 150px;
-            height: 150px;
-            margin: 0 auto;
-        }
+.progress-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
         .progress-container canvas {
             width: 150px !important;
             height: 150px !important;
         }
-        .progress-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 14px;
-            font-weight: bold;
-            color: #333333;
-        }
+  .progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  font-size: 20px;
+  color: #204070;
+  user-select: none;
+}
         .learning-path-legend {
             display: flex;
             justify-content: center;
@@ -434,6 +452,49 @@
     color: #666;
     text-align: center;
 }
+
+#topofscroll.main-inner {
+  padding: 0px 0px !important;
+  margin: 0 !important;
+}
+
+.d-flex.justify-content-between {
+  align-items: stretch;
+  gap: 2%;
+}
+
+.dashboard-card.flex-grow-1 {
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    /* Optionally fix max width per card */
+    max-width: 23%; /* For 4 cards in top row */
+}
+
+.dashboard-card.flex-grow-1 > * {
+  flex-grow: 1;
+}
+
+.top-row, .bottom-row {
+    gap: 20px;
+}
+
+.bottom-row .dashboard-card.flex-grow-1 {
+    max-width: 32%; /* 3 cards in bottom row with gaps */
+}
+/* Responsive adjustment for smaller screens */
+@media (max-width: 768px) {
+    .top-row, .bottom-row {
+        flex-direction: column;
+    }
+
+    .dashboard-card.flex-grow-1 {
+        max-width: 100% !important;
+        margin-bottom: 20px;
+    }
+}
+
+
     </style>
 </head>
 <script src="https://cdn.jsdelivr.net/npm/chart.js">
@@ -441,92 +502,119 @@
 </script>
 
 <body>
-    <div class="bg-light"><div class="dashboard-header justify-content-between">
+    <div class="bg-light">
+        <div class="dashboard-header justify-content-between">
             <div class="d-flex align-items-center">
-               {{{userpicture}}}
+                {{{userpicture}}}
                 <span class="ms-2">Hey! {{username}}</span>
             </div>
-          
-    </div>
+
+        </div>
 
 
 
 
         <div class="container">
             <!-- First Row: User Stats, Course Enrolled, Learning Path -->
-            <div class="mb-4">
-    <!-- Row Header: "Continue Learning" on the left, "View All" on the right -->
- 
-    <!-- Three Boxes -->
-    <div class="d-flex justify-content-between mt-3">
-        <!-- 1) Most Recent Course -->
-        <div class="dashboard-card flex-grow-1 me-3">
-    <h3>Continue <span class="img-heading">Learning</span></h3>
-    {{#recentCourse}}
-    <div class="recent-course" style="background-image: url('{{course_image_url}}');">
-        <div class="course-overlay">
-            <h4>{{coursename}}</h4>
-            <a href="{{courseurl}}">Go to Course</a>
-        </div>
-    </div>
-    {{/recentCourse}}
-    {{^recentCourse}}
-    <p>No recently accessed course found.</p>
-    {{/recentCourse}}
-</div>
 
+            <!-- Row Header: "Continue Learning" on the left, "View All" on the right -->
+            <div class="d-flex justify-content-between top-row mb-4">
+                <!-- New Streaks Card -->
+                <div class="dashboard-card flex-grow-1 me-3" style="max-width: 23%;">
+                    <h3>Start a weekly streak 🔥</h3>
+                    <p>One ring down! Now, watch your course(s).</p>
 
-        <!-- 2) Recently Enrolled Courses (rotates every 3 seconds) -->
-       <div class="dashboard-card flex-grow-1 me-3">
-    <h3>Recent <span class="img-heading">Enrolled Courses</span></h3>
-    <div id="course-carousel">
-        {{#enrolledCourses}}
-        <div class="course-item" style="background-image: url('{{course_image_url}}');">
-            <div class="course-overlay">
-                <h4>{{coursename}}</h4>
-                <a href="{{courseurl}}">Go to Course</a>
-            </div>
-        </div>
-        {{/enrolledCourses}}
-    </div>
-</div>
-
-
-        <!-- 3) Total Courses Enrolled -->
-        <div class="dashboard-card flex-grow-1">
-                                    <h3 >Course <span class="img-heading">Enrolled</span> </h3>
-
-                   <div class="d-flex justify-content-center mt-4" style="border-bottom: 3px dotted black; ">
-                        <span class="text-left">
-                                <h1 class="coursecount  text-left text-center fw-bold" style="color:#204070; font-size:60px;" >{{totalCourses}}</h1>
-                        </span>
+                    <!-- Circle badge with lightning icon and weeks -->
+                    <div class="mx-auto my-3"
+                        style="width: 140px; height: 140px; border-radius: 50%; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <div class="streak-icon mb-1" style="font-size: 2rem;">⚡</div>
+                        <h4 class="fw-bold mb-0">0 weeks</h4>
+                        <small class="text-muted">Current streak</small>
                     </div>
-                     <span >
-                                <img src={{course_enrolled_url}} alt="User enrollments" width="90" class="mt-4  ">
-                        </span>
-                    
-        </div>
-        
-    </div>
-</div>
-            <div class="dashboard-row">
-                <div class="dashboard-card">
-                    <h2>Hours <span class="img-heading">Activity</span></h2>
-                  <div class="hours-activity-section d-flex justify-content-around align-items-center">
 
-                       
+                    <!-- Additional streak info -->
+                    <div>
+                        <p><span>⏰</span> 0/30 course min</p>
+                        <p><span>✅</span> 1/1 visit</p>
+                        <p>May 26 – Jun 2</p>
+                    </div>
+                </div>
+
+                <!-- Continue Learning-->
+                <div class="dashboard-card flex-grow-1 me-3" style="max-width: 23%;">
+                    <h3>Continue <span class="img-heading">Learning</span></h3>
+                    {{#recentCourse}}
+                    <div class="recent-course" style="background-image: url('{{course_image_url}}');">
+                        <div class="course-overlay">
+                            <h4>{{coursename}}</h4>
+                            <a href="{{courseurl}}">Go to Course</a>
+                        </div>
+                    </div>
+                    {{/recentCourse}}
+                    {{^recentCourse}}
+                    <p>No recently accessed course found.</p>
+                    {{/recentCourse}}
+                </div>
+
+
+                <!-- 2) Recently Enrolled Courses (rotates every 3 seconds) -->
+                <div class="dashboard-card flex-grow-1 me-3" style="max-width: 23%;">
+                    <h3>Recent <span class="img-heading">Enrolled Courses</span></h3>
+                    <div id="course-carousel">
+                        {{#enrolledCourses}}
+                        <div class="course-item" style="background-image: url('{{course_image_url}}');">
+                            <div class="course-overlay">
+                                <h4>{{coursename}}</h4>
+                                <a href="{{courseurl}}">Go to Course</a>
+                            </div>
+                        </div>
+                        {{/enrolledCourses}}
+                    </div>
+                </div>
+
+
+                <!-- Learning Path-->
+             <div class="dashboard-card flex-grow-1" style="max-width: 23%;">
+  <h2>Learning <span class="img-heading">Path</span></h2>
+  <div class="learning-path h-75">
+    <div class="progress-container">
+      <canvas id="learningPathChart" width="150" height="150"></canvas>
+      <div class="progress-text" id="learningPathText">{{learningPathPercentage}}% completed</div>
+    </div>
+  </div>
+  <div class="learning-path-legend mb-3">
+    <div><span class="bullet excellent"></span>{{completedCourses}} Completed</div>
+    <div><span class="bullet keep-going"></span>{{totalOverdue}} Overdue</div>
+  </div>
+</div>
+
+
+            </div>
+
+
+            <div class="d-flex justify-content-between top-row mb-4">
+                <!--Hours Activity-->
+                <div class="dashboard-card flex-grow-1 me-3" style="max-width: 32%;">
+                    <h2>Hours <span class="img-heading">Activity</span></h2>
+                    <div class="hours-activity-section d-flex justify-content-around align-items-center">
+
+
                         <div class="hours-activity-chart">
-                             <div class="hours-activity-header">
-                                <span style="color: {{#isIncrease}}green{{/isIncrease}}{{^isIncrease}}red{{/isIncrease}};">
-                                    {{#isIncrease}}+{{/isIncrease}}{{^isIncrease}}-{{/isIncrease}}{{percentageChange}}% 
-                                    {{#isIncrease}}Increase than last week{{/isIncrease}}{{^isIncrease}}Decrease than last week{{/isIncrease}}
+                            <div class="hours-activity-header">
+                                <span
+                                    style="color: {{#isIncrease}}green{{/isIncrease}}{{^isIncrease}}red{{/isIncrease}};">
+                                    {{#isIncrease}}+{{/isIncrease}}{{^isIncrease}}-{{/isIncrease}}{{percentageChange}}%
+                                    {{#isIncrease}}Increase than last week{{/isIncrease}}{{^isIncrease}}Decrease
+                                    than last week{{/isIncrease}}
                                 </span>
                             </div>
                             <canvas id="hoursActivityChart"></canvas>
                         </div>
                         <div class="hours-total-section">
                             <div class="total-hours">
-                                <div><h5>Current Week</h5></div>
+                                <div>
+                                    <h5>Current Week</h5>
+                                </div>
                                 <div class="hours-number">{{currentWeekTotal}} hrs</div>
                             </div>
                             <div class="total-hours">
@@ -536,53 +624,50 @@
                         </div>
                     </div>
                 </div>
-                
-                 <div class="dashboard-card ">
-                    <h2>Learning <span class="img-heading">Path</span></h2>
-                     
-                    <div class="learning-path h-75">
-                        <div class="progress-container">
-                            <canvas id="learningPathChart"></canvas>
-                          <div class="progress-text" id="learningPathText">{{learningPathPercentage}}% completed</div>
 
-                        </div>
-                    </div>
-                    <div class="learning-path-legend mb-3">
 
-                        <div><span class="bullet excellent"></span>{{completedCourses}} Completed</div>
-                        <div><span class="bullet keep-going"></span>{{totalOverdue}} Overdue</div>
-                    </div>
-                   
-                </div>
-            </div>
-
-            <!-- Second Row: Total Earned Points -->
-            <div class="dashboard-card">
-                <h3>Total <span class="img-heading">Earned Points</span></h3>
-                <div class="points-section">
-                    <div class="points-bars">
-                        {{#courses}}
-                        <div class="course-info">
-                            <span>{{course_name}}</span>
-                            <span>{{points_display}}</span>
+                <div class="dashboard-card flex-grow-1" style="max-width: 32%;">
+                    <h3>Total <span class="img-heading">Earned Points</span></h3>
+                    <div class="points-section">
+                        <div class="points-bars">
+                            {{#courses}}
+                            <div class="course-info">
+                                <span>{{course_name}}</span>
+                                <span>{{points_display}}</span>
+                            </div>
+                            <div class="progress">
+                                <div class="bar" style="width: {{percentage}}%; background-color: {{bar_color}};"></div>
+                            </div>
+                            {{/courses}}
                         </div>
-                        <div class="progress">
-                            <div class="bar" style="width: {{percentage}}%; background-color: {{bar_color}};"></div>
+                        <div class="points-total">
+                            <img src="{{course_award_url}}" alt="Award">
+                            <h4><span class="img-heading">{{totalPoints}}</span>/{{totalPossiblePoints}}</h4>
                         </div>
-                        {{/courses}}
-                    </div>
-                    <div class="points-total">
-                        <img src="{{course_award_url}}" alt="Award">
-                        <h4><span class="img-heading">{{totalPoints}}</span>/{{totalPossiblePoints}}</h4>
                     </div>
                 </div>
+
+                <div class="dashboard-card flex-grow-1 me-3" style="max-width: 32%;">
+                    <h3>Course <span class="img-heading">Enrolled</span> </h3>
+
+                    <div class="d-flex justify-content-center mt-4" style="border-bottom: 3px dotted black; ">
+                        <span class="text-left">
+                            <h1 class="coursecount  text-left text-center fw-bold"
+                                style="color:#204070; font-size:60px;">{{totalCourses}}</h1>
+                        </span>
+                    </div>
+                    <span>
+                        <img src={{course_enrolled_url}} alt="User enrollments" width="90" class="mt-4  ">
+                    </span>
+
+                </div>
+
+
             </div>
-            <div class="recent-enrolled-courses">
-   
-</div>
+           
         </div>
     </div>
-    
+
 </body>
 <script>document.addEventListener("DOMContentLoaded", function () {
    // Define default image URL
@@ -777,49 +862,54 @@
     new Chart(ctx, { type: "bar", data: data, options: options });
 
     // ✅ Learning Path Chart with Rounded Edges and Shadow
-    var learningPathCtx = document.getElementById("learningPathChart").getContext("2d");
+var learningPathCtx = document.getElementById("learningPathChart").getContext("2d");
 
-     const completedPercentage = {{learningPathPercentage}}; 
-    const overduePercentage = 100 - completedPercentage;
+const completedPercentage = {{learningPathPercentage}};
+const overduePercentage = 100 - completedPercentage;
 
-    // 1) Start the chart at 100% (full circle)
-    let initialData = [100, 0];
-    // 2) Final data from your PHP
-    let finalData = [completedPercentage, overduePercentage];
+// Create gradient fill
+var gradient = learningPathCtx.createLinearGradient(0, 0, 0, 150);
+gradient.addColorStop(0, "#204070");
+gradient.addColorStop(1, "#A3C0F9");
 
-    // Create the doughnut chart with initialData
-    var learningPathChart = new Chart(document.getElementById("learningPathChart").getContext("2d"), {
-        type: "doughnut",
-        data: {
-            datasets: [{
-                data: initialData,
-                backgroundColor: ["#204070", "#808080"],
-                borderWidth: 0,
-                borderRadius: [5, 5],
-                hoverBorderWidth: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            cutout: "65%",
-            plugins: {
-                legend: { display: false },
-                tooltip: { enabled: false }
-            },
-            animation: {
-                duration: 1500,     // 3-second animation
-                animateRotate: true,
-                animateScale: true
-            },
-            elements: {
-                arc: {
-                    borderJoinStyle: "round",
-                    hoverBorderWidth: 6
-                }
-            }
+var data = {
+    datasets: [{
+        data: [completedPercentage, overduePercentage],
+        backgroundColor: [gradient, "#e6e6e6"],
+        borderWidth: 0,
+        borderRadius: 20,   // Rounded edges for the arc
+        hoverBorderWidth: 0,
+        cutout: '75%'
+    }]
+};
+
+var options = {
+    responsive: true,
+    maintainAspectRatio: true,
+    cutout: '75%',
+    rotation: -90 * (Math.PI/180), // Start from top (12 o'clock)
+    circumference: 360 * (Math.PI/180),
+    plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false }
+    },
+    animation: {
+        animateRotate: true,
+        duration: 1500
+    },
+    elements: {
+        arc: {
+            borderJoinStyle: "round"
         }
-    });
+    }
+};
+
+var learningPathChart = new Chart(learningPathCtx, {
+    type: 'doughnut',
+    data: data,
+    options: options
+});
+
 
     // 3) After a short delay, animate from 100% to the final data
     setTimeout(function() {
@@ -833,5 +923,4 @@ document.getElementById("learningPathText").innerText = "{{learningPathPercentag
 
 </script>
 </html>
-
 
