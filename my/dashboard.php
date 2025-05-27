@@ -145,10 +145,14 @@ $templatecontext += [
 ];
 
 
+$templatecontext['streak_icon_url'] = $OUTPUT->image_url('streak_icon', 'theme_academi')->out();
+
+
 // ======================== 📌 Render Dashboard Template ========================
 $mustache = new Mustache_Engine([
     'loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__) . '/templates'),
 ]);
+
 
 echo $OUTPUT->header();
 echo $mustache->render('dashboard', $templatecontext);
