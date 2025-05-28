@@ -1218,7 +1218,7 @@ body, #page-wrapper {
         <!-- Admin buttons -->
             <a href="{{config.wwwroot}}/course/edit.php" class="btn-figma btn-primary-figma btn-admin">Create Course</a>
             <a href="{{config.wwwroot}}/course/management.php" class="btn-figma btn-outline-figma btn-admin">Manage Courses</a>
-            <a href="{{config.wwwroot}}/report/modulecompletion/index.php" class="btn-figma btn-outline-figma btn-admin">Reports</a>
+            <a href="{{config.wwwroot}}/report/modulecompletion/index.php?action=loadfilter&id=1" class="btn-figma btn-outline-figma btn-admin">Reports</a>
 
         
         <!-- User buttons -->
@@ -1242,9 +1242,9 @@ body, #page-wrapper {
         <!-- Course Cards Overlay -->
         <div class="course-cards-overlay">
     <div class="carousel-course-btn">
-        <button class="active">New</button>
-        <button>Continue Learning</button>
-        <button>Closing Soon</button> 
+        <button class="active" data-type="new">New</button>
+        <button data-type="continue">Continue Learning</button>
+        <button data-type="closing">Closing Soon</button> 
     </div>
     <div class="course-cards-container">
         <div class="custom-course-grid" id="courseGrid">
@@ -1657,6 +1657,49 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+
+document.addEventListener('DOMContentLoaded', function() {
+  const buttons = document.querySelectorAll('.carousel-course-btn button');
+  const courseGrid = document.getElementById('courseGrid');
+
+  function renderCourses(courses) {
+    courseGrid.innerHTML = '';  // clear existing courses
+    courses.forEach(course => {
+      const courseCard = document.createElement('div');
+      courseCard.className = 'custom-course-card';
+
+      courseCard.innerHTML = `
+        <div class="custom-course-card-image">
+          <img src="${course.course_image_url}" alt="${course.course_name}">
+        </div>
+        <div class="custom-course-content">
+          <h3 class="custom-course-title">${course.course_name}</h3>
+          <a href="${course.course_url}" class="course-card-link"><span>Explore Course</span></a>
+        </div>
+      `;
+      courseGrid.appendChild(courseCard);
+    });
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      buttons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const type = this.getAttribute('data-type');
+
+      // IMPORTANT: This URL must point to your PHP AJAX file
+      fetch(`/theme/academi/layout/getcourses.php?type=${type}`)
+        .then(response => response.json())
+        .then(data => {
+          renderCourses(data);
+        })
+        .catch(err => {
+          console.error('Failed to fetch courses:', err);
+        });
+    });
+  });
+});
 
     </script>
 </body>
