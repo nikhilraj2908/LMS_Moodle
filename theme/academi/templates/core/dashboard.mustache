@@ -10,37 +10,36 @@
             background-color: #f5f5f5;
             font-family: Arial, sans-serif;
         }
-      .dashboard-header {
-
-    color: black;
-    padding: 15px 20px;
-    display: flex;
-    align-items: center;
-    font-size: 20px;
-    position: relative; /* 🔥 Required for absolute positioning of child */
-    z-index: 1; /* Ensure it stacks above other content */
-}
+        .dashboard-header {
+            color: black;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+            position: relative;
+            z-index: 1;
+        }
 
         .dashboard-header img {
             border-radius: 50%;
             margin-right: 15px;
         }
-body, html {
-  margin: 0;
-  padding: 0;
-}
+        body, html {
+            margin: 0;
+            padding: 0;
+        }
 
-.container {
-  padding-left: 8px !important;
-  padding-right: 8px !important;
-  max-width: 100% !important;
-  overflow-x: hidden;
-}
-.d-flex.justify-content-between {
-  align-items: stretch;
-  gap: 2%;
-  overflow-x: hidden; /* prevent horizontal scroll */
-}
+        .container {
+            padding-left: 8px !important;
+            padding-right: 8px !important;
+            max-width: 100% !important;
+            overflow-x: hidden;
+        }
+        .d-flex.justify-content-between {
+            align-items: stretch;
+            gap: 2%;
+            overflow-x: hidden;
+        }
 
         .dashboard-row {
             display: grid;
@@ -54,7 +53,6 @@ body, html {
             border-radius: 10px;
             padding: 15px;
             text-align: center;
-            
         }
         .dashboard-card h3 {
             font-size: 25px;
@@ -102,48 +100,66 @@ body, html {
             font-size: 36px;
             color: #204070;
             margin: 0;
-              filter: drop-shadow(3px 3px 8px rgba(0, 0, 0, 0.3)); /* Adds a smooth shadow */
-    border-radius: 50%; 
+            filter: drop-shadow(3px 3px 8px rgba(0, 0, 0, 0.3));
+            border-radius: 50%; 
         }
         .learning-path {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 2px;
+            padding: 20px 0;
         }
-.progress-container {
-  position: relative;
-  width: 150px;
-  height: 150px;
-  margin: 0 auto;
-  border-radius: 20px;
-  background: white;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
+        .progress-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            overflow: visible;
+        }
+
         .progress-container canvas {
-            width: 150px !important;
-            height: 150px !important;
+            width: 180px !important;
+            height: 180px !important;
+            display: block;
         }
-  .progress-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-weight: bold;
-  font-size: 20px;
-  color: #204070;
-  user-select: none;
-}
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            font-size: 24px;
+            color: #204070;
+            user-select: none;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .progress-text small {
+            font-size: 14px;
+            display: block;
+        }
+
         .learning-path-legend {
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 10px;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
             font-size: 14px;
+            text-align: left;
+            padding-left: 20px;
         }
         .learning-path-legend .bullet {
             width: 12px;
             height: 12px;
+        }
+        .completed-bullet {
+            background-color: #204070;
+        }
+        .overdue-bullet {
+            background-color: #808080;
         }
         .points-section {
             display: flex;
@@ -192,7 +208,7 @@ body, html {
             gap: 10px;
             font-size: 14px;
             text-align:center;
-                margin-left: 2rem;
+            margin-left: 2rem;
         }
         .hours-activity-header .arrow {
             display: inline-block;
@@ -218,105 +234,93 @@ body, html {
         }
 
         .hours-total-section {
-    width: 30%;
+            width: 30%;
+        }
+        .fade:not(.show) {
+            opacity: 1;
+        }
 
-}
-.fade:not(.show) {
-  opacity: 1;
-}
+        .total-hours {
+            margin-bottom: 15px;
+        }
 
-.total-hours {
-    margin-bottom: 15px;
-}
+        .total-hours h5 {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
 
-.total-hours h5 {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 5px;
-}
+        .hours-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #204070;
+        }
+        #course-carousel {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
 
-.hours-number {
-    font-size: 32px;
-    font-weight: bold;
-    color: #204070;
-}
-#course-carousel {
-    position: relative;
-    width: 100%;
-    /* Adjust height to your preference or match parent container */
-    height: 200px;
-    overflow: hidden;
-}
+        #course-carousel .course-item {
+            display: none; 
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.4s ease-in-out;
+            position: relative;
+        }
 
-/* Initially all items hidden; we show one at a time via JavaScript */
-#course-carousel .course-item {
-    display: none; 
-    width: 100%;
-    height: 100%;
-    background-size: cover;       /* Ensures the image covers entire div */
-    background-position: center;  /* Centers the image */
-    transition: transform 0.4s ease-in-out;
-    position: relative;
-}
+        a.course-link-button {
+            border: 1px solid #204070;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            text-decoration: none;
+            color: #204070;
+            font-weight: 500;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
 
-/* Zoom on hover */
-#course-carousel .course-item:hover {
-    transform: scale(1.05);
-}
+        a.course-link-button:hover {
+            background-color: #204070;
+            color: #ffffff;
+        }
 
-/* Text overlay container */
-.course-overlay {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    color: #fff;
-    background: rgba(0,0,0,0.5); /* Semi-transparent black background */
-    padding: 10px;
-}
+        .course-overlay {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            color: #fff;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+        }
 
-.course-overlay h4 {
-    margin: 0;
-}
+        .course-overlay h4 {
+            margin: 0;
+        }
 
-.course-overlay a {
-    color: #fff;
-    text-decoration: underline;
-}
-.recent-course {
-    position: relative;
-    width: 100%;
-    height: 200px;              /* Adjust height as needed */
-    border-radius: 5px;
-    overflow: hidden;
-    background-size: cover;
-    background-position: center;
-    transition: transform 0.3s ease;
-}
+        .course-overlay a {
+            color: #fff;
+            text-decoration: underline;
+        }
+        .recent-course {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            border-radius: 5px;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.3s ease;
+        }
 
-.recent-course:hover {
-    transform: scale(1.05);    /* Slight zoom on hover */
-}
-
-.course-overlay {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
-    color: #fff;
-    padding: 10px;
-}
-
-.course-overlay h4 {
-    margin: 0;
-    font-size: 18px;
-}
-
-.course-overlay a {
-    color: #fff;
-    text-decoration: underline;
-    font-size: 14px;
-}
+        .recent-course:hover {
+            transform: scale(1.05);
+        }
 
         #course-results {
             position: absolute;
@@ -370,136 +374,129 @@ body, html {
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-   .course-search-container {
-    position: relative;
-    width: 100%; /* Or set a fixed width like 300px if preferred */
-    max-width: 300px;
-}
+        .course-search-container {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+        }
 
-#search-results-container {
-    position: absolute;
-    top: 100%; /* just below the input */
-    left: 0;
-    right: 0;
-    background-color: #204070;
-    color: white;
-    z-index: 999;
-    border-radius: 0 0 5px 5px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    display: none; /* shown dynamically */
-}
+        #search-results-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #204070;
+            color: white;
+            z-index: 999;
+            border-radius: 0 0 5px 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            display: none;
+        }
 
-.search-result-item {
-    padding: 8px 12px;
-    border-bottom: 1px solid white;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
+        .search-result-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
 
-.search-result-item:hover {
-    background-color: #3c6894;
-}
-.search-results {
-    position: absolute;
-    top: 100%;  /* below the input box */
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    z-index: 9999;
-    max-height: 400px;
-    overflow-y: auto;
-}
+        .search-result-item:hover {
+            background-color: #3c6894;
+        }
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 9999;
+            max-height: 400px;
+            overflow-y: auto;
+        }
 
-.search-result-item:last-child {
-    border-bottom: none;
-}
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
 
-.search-result-item a {
-    color: inherit;
-    text-decoration: none;
-}
+        .search-result-item a {
+            color: inherit;
+            text-decoration: none;
+        }
 
-.course-thumbnail {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    margin-right: 10px;
-    border-radius: 4px;
-}
+        .course-thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            margin-right: 10px;
+            border-radius: 4px;
+        }
 
-.course-info h5 {
-    margin: 0 0 5px 0;
-    font-size: 16px;
-}
+        .course-info h5 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+        }
 
-.course-info p {
-    margin: 0;
-    font-size: 14px;
-    color: #666;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
+        .course-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
 
-.no-results {
-    padding: 10px;
-    color: #666;
-    text-align: center;
-}
+        .no-results {
+            padding: 10px;
+            color: #666;
+            text-align: center;
+        }
 
-#topofscroll.main-inner {
-  padding: 0px 0px !important;
-  margin: 0 !important;
-}
+        #topofscroll.main-inner {
+            padding: 0px 0px !important;
+            margin: 0 !important;
+        }
 
-.d-flex.justify-content-between {
-  align-items: stretch;
-  gap: 2%;
-}
+        .d-flex.justify-content-between {
+            align-items: stretch;
+            gap: 10px;
+        }
+        .dashboard-card.flex-grow-1 {
+            flex: 1;
+            min-width: 0;
+            max-width: 100%;
+        }
 
-.dashboard-card.flex-grow-1 {
-    flex: 1;
-    min-width: 0;
-    max-width: 100%;
-    /* Optionally fix max width per card */
-    max-width: 23%; /* For 4 cards in top row */
-}
+        .dashboard-card.flex-grow-1 > * {
+            flex-grow: 1;
+        }
 
-.dashboard-card.flex-grow-1 > * {
-  flex-grow: 1;
-}
+        .top-row, .bottom-row {
+            gap: 20px;
+        }
 
-.top-row, .bottom-row {
-    gap: 20px;
-}
+        .bottom-row .dashboard-card.flex-grow-1 {
+            max-width: 32%;
+        }
 
-.bottom-row .dashboard-card.flex-grow-1 {
-    max-width: 32%; /* 3 cards in bottom row with gaps */
-}
-/* Responsive adjustment for smaller screens */
-@media (max-width: 768px) {
-    .top-row, .bottom-row {
-        flex-direction: column;
-    }
+        @media (max-width: 768px) {
+            .top-row, .bottom-row {
+                flex-direction: column;
+            }
 
-    .dashboard-card.flex-grow-1 {
-        max-width: 100% !important;
-        margin-bottom: 20px;
-    }
-}
-
-
+            .dashboard-card.flex-grow-1 {
+                max-width: 100% !important;
+                margin-bottom: 20px;
+            }
+        }
     </style>
 </head>
-<script src="https://cdn.jsdelivr.net/npm/chart.js">
-
-</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <body>
     <div class="bg-light">
@@ -508,22 +505,15 @@ body, html {
                 {{{userpicture}}}
                 <span class="ms-2">Hey! {{username}}</span>
             </div>
-
         </div>
-
-
-
 
         <div class="container">
             <!-- First Row: User Stats, Course Enrolled, Learning Path -->
-
-            <!-- Row Header: "Continue Learning" on the left, "View All" on the right -->
             <div class="d-flex justify-content-between top-row mb-4">
                 <!-- New Streaks Card -->
-                <div class="dashboard-card flex-grow-1 me-3" style="max-width: 23%;">
+                <div class="dashboard-card flex-grow-1" style="max-width: 15%;">
                     <h3>Start a weekly streak 🔥</h3>
                     <p>One ring down! Now, watch your course(s).</p>
-
                     <!-- Circle badge with lightning icon and weeks -->
                     <div class="mx-auto my-3"
                         style="width: 140px; height: 140px; border-radius: 50%; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
@@ -531,7 +521,6 @@ body, html {
                         <h4 class="fw-bold mb-0">0 weeks</h4>
                         <small class="text-muted">Current streak</small>
                     </div>
-
                     <!-- Additional streak info -->
                     <div>
                         <p><span>⏰</span> 0/30 course min</p>
@@ -540,14 +529,44 @@ body, html {
                     </div>
                 </div>
 
-                <!-- Continue Learning-->
-                <div class="dashboard-card flex-grow-1 me-3" style="max-width: 23%;">
-                    <h3>Continue <span class="img-heading">Learning</span></h3>
+                <!-- Continue Learning -->
+                <div class="dashboard-card flex-grow-1" style="max-width: 30%; border-radius: 20px; padding: 20px;">
+                    <h3 style="text-align: left; font-weight: bold;">Continue <span class="img-heading">Learning</span></h3>
                     {{#recentCourse}}
-                    <div class="recent-course" style="background-image: url('{{course_image_url}}');">
-                        <div class="course-overlay">
-                            <h4>{{coursename}}</h4>
-                            <a href="{{courseurl}}">Go to Course</a>
+                    <!-- Outer clean card -->
+                    <div style="background: #fff; border-radius: 20px; padding: 0; overflow: hidden;">
+                        <!-- Inner shadow box: image + progress + category only -->
+                        <div style="padding: 15px; margin: 10px; border-radius: 20px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                            <!-- Image -->
+                            <div style="border-radius: 12px; overflow: hidden; margin-bottom: 12px;">
+                                <img src="{{course_image_url}}" alt="{{coursename}}" style="width: 100%; height: 170px; display: block;">
+                            </div>
+                            <!-- Progress Bar -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                                <!-- Left: Progress Text + Bar -->
+                                <div style="flex-grow: 1;">
+                                    <div style="width: 100%; height: 10px; background: #eee; border-radius: 999px; overflow: hidden;">
+                                        <div style="width: {{progressPercentage}}%; height: 100%; background: linear-gradient(90deg, #204070, #A3C0F9); border-radius: 999px;"></div>
+                                    </div>
+                                    <div style="font-size: 14px; color: #333; text-align: start; margin-top: 6px;">
+                                        {{progressPercentage}}% Completed</div>
+                                </div>
+                                <!-- Right: Category Pill -->
+                                <div style="margin-left: 10px;">
+                                    <span style="background: #204070; color: white; padding: 6px 16px; border-radius: 999px 0 999px 999px; font-size: 13px;">
+                                        {{category}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Outside content: course name + button -->
+                        <div style="padding: 15px 15px 20px; text-align: start;">
+                            <h4 style="font-size: 18px; font-weight: 600; text-align: start; margin-bottom: 10px; color: #000;">
+                                {{coursename}}</h4>
+                            <a href="{{courseurl}}"
+                                style="border: 1px solid #204070; padding: 6px 14px; border-radius: 6px; font-size: 14px; text-decoration: none; color: #white; font-weight: 500; display: inline-block;"  class="course-link-button">
+                                Continue Learning →
+                            </a>
                         </div>
                     </div>
                     {{/recentCourse}}
@@ -556,56 +575,66 @@ body, html {
                     {{/recentCourse}}
                 </div>
 
-
-                <!-- 2) Recently Enrolled Courses (rotates every 3 seconds) -->
-                <div class="dashboard-card flex-grow-1 me-3" style="max-width: 23%;">
-                    <h3>Recent <span class="img-heading">Enrolled Courses</span></h3>
-                    <div id="course-carousel">
+                <!-- Recently Enrolled Courses -->
+                <div class="dashboard-card flex-grow-1" style="max-width: 30%; border-radius: 20px; padding: 20px;">
+                    <h3 style="text-align: left; font-weight: bold;">Recent <span class="img-heading">Enrolled</span></h3>
+                    <div id="course-carousel" style="height: auto;">
                         {{#enrolledCourses}}
-                        <div class="course-item" style="background-image: url('{{course_image_url}}');">
-                            <div class="course-overlay">
-                                <h4>{{coursename}}</h4>
-                                <a href="{{courseurl}}">Go to Course</a>
+                        <!-- Outer Card: One visible at a time -->
+                        <div class="course-item" style="display: none;">
+                            <!-- Shadowed Box: Only for image -->
+                            <div style="background: #fff; border-radius: 20px; padding: 0; overflow: hidden;">
+                                <div style="padding: 15px; margin: 10px; border-radius: 20px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                                    <!-- Image -->
+                                    <div style="border-radius: 12px; overflow: hidden; margin-bottom: 0;">
+                                        <img src="{{course_image_url}}" alt="{{coursename}}" style="width: 100%; height: 220px; display: block;">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Outside Shadow Box: Title + Button -->
+                            <div style="padding: 15px 0 0 0; text-align: left;">
+                                <h4 style="font-size: 18px; font-weight: 600; color: #000; margin-bottom: 10px;">
+                                    {{coursename}}
+                                </h4>
+                                <a href="{{courseurl}}"
+                                    style="border: 1px solid #204070; padding: 6px 14px; border-radius: 6px; font-size: 14px; text-decoration: none; color: #white; font-weight: 500;" class="course-link-button">
+                                    Go to Course →
+                                </a>
                             </div>
                         </div>
                         {{/enrolledCourses}}
                     </div>
                 </div>
 
-
-                <!-- Learning Path-->
-             <div class="dashboard-card flex-grow-1" style="max-width: 23%;">
-  <h2>Learning <span class="img-heading">Path</span></h2>
-  <div class="learning-path h-75">
-    <div class="progress-container">
-      <canvas id="learningPathChart" width="150" height="150"></canvas>
-      <div class="progress-text" id="learningPathText">{{learningPathPercentage}}% completed</div>
-    </div>
-  </div>
-  <div class="learning-path-legend mb-3">
-    <div><span class="bullet excellent"></span>{{completedCourses}} Completed</div>
-    <div><span class="bullet keep-going"></span>{{totalOverdue}} Overdue</div>
-  </div>
-</div>
-
-
+                <!-- Learning Path -->
+                <div class="dashboard-card flex-grow-1" style="max-width: 23%;">
+                    <h2>Learning <span class="img-heading">Path</span></h2>
+                    <div class=" align-content-center h-75">
+                        <div class="progress-container">
+                        <canvas id="learningPathPieChart" width="180" height="180"></canvas>
+                        <div class="progress-text">
+                            {{learningPathPercentage}}%<br><small>Completed</small>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-around mb-3 mt-3">
+                        <div><span class="bullet completed-bullet"></span> {{completedCourses}} Completed</div>
+                        <div><span class="bullet overdue-bullet"></span> {{totalOverdue}} Overdue</div>
+                    </div>
+                    </div>
+                </div>
             </div>
 
-
+            <!-- Second Row: Hours Activity, Earned Points, Course Enrolled -->
             <div class="d-flex justify-content-between top-row mb-4">
-                <!--Hours Activity-->
-                <div class="dashboard-card flex-grow-1 me-3" style="max-width: 32%;">
+                <!-- Hours Activity -->
+                <div class="dashboard-card flex-grow-1" style="max-width: 32%;">
                     <h2>Hours <span class="img-heading">Activity</span></h2>
                     <div class="hours-activity-section d-flex justify-content-around align-items-center">
-
-
                         <div class="hours-activity-chart">
                             <div class="hours-activity-header">
-                                <span
-                                    style="color: {{#isIncrease}}green{{/isIncrease}}{{^isIncrease}}red{{/isIncrease}};">
+                                <span style="color: {{#isIncrease}}green{{/isIncrease}}{{^isIncrease}}red{{/isIncrease}};">
                                     {{#isIncrease}}+{{/isIncrease}}{{^isIncrease}}-{{/isIncrease}}{{percentageChange}}%
-                                    {{#isIncrease}}Increase than last week{{/isIncrease}}{{^isIncrease}}Decrease
-                                    than last week{{/isIncrease}}
+                                    {{#isIncrease}}Increase than last week{{/isIncrease}}{{^isIncrease}}Decrease than last week{{/isIncrease}}
                                 </span>
                             </div>
                             <canvas id="hoursActivityChart"></canvas>
@@ -625,7 +654,7 @@ body, html {
                     </div>
                 </div>
 
-
+                <!-- Total Earned Points -->
                 <div class="dashboard-card flex-grow-1" style="max-width: 32%;">
                     <h3>Total <span class="img-heading">Earned Points</span></h3>
                     <div class="points-section">
@@ -647,280 +676,144 @@ body, html {
                     </div>
                 </div>
 
-                <div class="dashboard-card flex-grow-1 me-3" style="max-width: 32%;">
+                <!-- Course Enrolled -->
+                <div class="dashboard-card flex-grow-1" style="max-width: 32%;">
                     <h3>Course <span class="img-heading">Enrolled</span> </h3>
-
                     <div class="d-flex justify-content-center mt-4" style="border-bottom: 3px dotted black; ">
                         <span class="text-left">
-                            <h1 class="coursecount  text-left text-center fw-bold"
-                                style="color:#204070; font-size:60px;">{{totalCourses}}</h1>
+                            <h1 class="coursecount text-left text-center fw-bold" style="color:#204070; font-size:60px;">{{totalCourses}}</h1>
                         </span>
                     </div>
                     <span>
-                        <img src={{course_enrolled_url}} alt="User enrollments" width="90" class="mt-4  ">
+                        <img src={{course_enrolled_url}} alt="User enrollments" width="90" class="mt-4">
                     </span>
-
                 </div>
-
-
             </div>
-           
         </div>
     </div>
 
-</body>
-<script>document.addEventListener("DOMContentLoaded", function () {
-   // Define default image URL
-    const searchInput = document.getElementById('course-search-input');
-    const searchResultsContainer = document.getElementById('search-results-container');
-    
-    if (searchInput && searchResultsContainer) {
-        searchInput.addEventListener('input', debounce(function(e) {
-            const query = e.target.value.trim();
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Course Carousel Functionality
+            const courseItems = document.querySelectorAll("#course-carousel .course-item");
+            const carouselContainer = document.getElementById("course-carousel");
+            let currentIndex = 0;
+            let rotationInterval;
+
+            function showNextCourse() {
+                // Hide all courses
+                courseItems.forEach((item) => (item.style.display = "none"));
+                // Show the current course
+                courseItems[currentIndex].style.display = "block";
+                // Move to the next course
+                currentIndex = (currentIndex + 1) % courseItems.length;
+            }
+
+            // Start rotation
+            function startRotation() {
+                rotationInterval = setInterval(showNextCourse, 2500);
+            }
+
+            // Stop rotation
+            function stopRotation() {
+                clearInterval(rotationInterval);
+            }
+
+            // Show the first course immediately
+            if (courseItems.length > 0) {
+                showNextCourse();
+                // Then start auto-rotation
+                startRotation();
+            }
+
+            // Pause on hover
+            if (carouselContainer) {
+                carouselContainer.addEventListener("mouseenter", stopRotation);
+                // Resume on mouse leave
+                carouselContainer.addEventListener("mouseleave", startRotation);
+            }
+
+            // Hours Activity Chart
+            var ctx = document.getElementById("hoursActivityChart").getContext("2d");
+            var hoursData = JSON.parse('{{{hoursActivity}}}');
             
-            if (query.length >= 2) {
-                fetchSearchResults(query);
-            } else {
-                clearSearchResults();
-            }
-        }, 300));
-        
-        // Close results when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!searchResultsContainer.contains(e.target) && e.target !== searchInput) {
-                clearSearchResults();
+            var data = {
+                labels: ["sun", "mon", "tue", "wed", "thr", "fri", "sat"],
+                datasets: [{
+                    label: "Hours Spent",
+                    data: hoursData,
+                    backgroundColor: ["#000000", "#808080", "#204070", "#204070", "#204070", "#204070", "#204070"],
+                    borderWidth: 0,
+                    barThickness: 20
+                }]
+            };
+
+            var options = {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            };
+
+            new Chart(ctx, { type: "bar", data: data, options: options });
+
+            // Learning Path Pie Chart
+            const learningPathCtx = document.getElementById('learningPathPieChart').getContext('2d');
+            const completedPercent = parseFloat("{{learningPathPercentage}}") || 0;
+            const remainingPercent = 100 - completedPercent;
+
+            // Create gradient for the completed portion
+            const gradient = learningPathCtx.createLinearGradient(0, 0, 0, 180);
+            gradient.addColorStop(0, '#204070');  // Dark blue at top
+            gradient.addColorStop(1, '#A3C0F9');  // Light blue at bottom
+
+            const learningPathChart = new Chart(learningPathCtx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [completedPercent, remainingPercent],
+                        backgroundColor: [gradient, '#e6e6e6'],
+                        borderWidth: 0,
+                        cutout: '70%',
+                        borderRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    rotation: -90,
+                    circumference: 360,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        duration: 1200
+                    }
+                }
+            });
+
+            // Update center text
+            const progressText = document.querySelector('.progress-text');
+            if (progressText) {
+                progressText.innerHTML = `${completedPercent}%<br><small>Completed</small>`;
             }
         });
-    }
-    
-    // Debounce function to limit API calls
-    function debounce(func, wait) {
-        let timeout;
-        return function() {
-            const context = this, args = arguments;
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(context, args), wait);
-        };
-    }
-    
-    function fetchSearchResults(query) {
-        // Show loading indicator
-        searchResultsContainer.innerHTML = '<div class="text-center p-2">Searching...</div>';
-        searchResultsContainer.style.display = 'block';
-        
-        fetch(window.location.href, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: 'search=' + encodeURIComponent(query)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data && data.success) {
-                displaySearchResults(data.searchResults);
-            } else {
-                displayError(data?.error || 'No results found');
-            }
-        })
-        .catch(error => {
-            console.error('Search error:', error);
-            displayError('Failed to complete search. Please try again.');
-        });
-    }
-    
- function displaySearchResults(results) {
-    const container = document.getElementById('search-results-container');
-    container.innerHTML = '';
-
-    if (!results || results.length === 0) {
-        container.innerHTML = '<div class="search-result-item">No courses found</div>';
-        container.style.display = 'block';
-        return;
-    }
-
-    results.forEach(course => {
-        const item = document.createElement('div');
-        item.className = 'search-result-item';
-        item.textContent = course.coursename;
-        item.onclick = () => window.location.href = course.courseurl;
-        container.appendChild(item);
-    });
-
-    container.style.display = 'block';
-}
-
-    
-    function displayError(message) {
-        if (!searchResultsContainer) return;
-        searchResultsContainer.innerHTML = `<div class="alert alert-danger p-2">${escapeHtml(message)}</div>`;
-        searchResultsContainer.style.display = 'block';
-    }
-    
-    function clearSearchResults() {
-        if (searchResultsContainer) {
-            searchResultsContainer.innerHTML = '';
-            searchResultsContainer.style.display = 'none';
-        }
-    }
-    
-    // Helper function to escape HTML
-    function escapeHtml(unsafe) {
-        if (!unsafe) return '';
-        return unsafe
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-
-
-     const courseItems = document.querySelectorAll("#course-carousel .course-item");
-    const carouselContainer = document.getElementById("course-carousel");
-    let currentIndex = 0;
-    let rotationInterval;
-
-    function showNextCourse() {
-        // Hide all courses
-        courseItems.forEach((item) => (item.style.display = "none"));
-        // Show the current course
-        courseItems[currentIndex].style.display = "block";
-        // Move to the next course
-        currentIndex = (currentIndex + 1) % courseItems.length;
-    }
-
-    // Start rotation
-    function startRotation() {
-        rotationInterval = setInterval(showNextCourse, 2500);
-    }
-
-    // Stop rotation
-    function stopRotation() {
-        clearInterval(rotationInterval);
-    }
-
-    // Show the first course immediately
-    showNextCourse();
-    // Then start auto-rotation
-    startRotation();
-
-    // Pause on hover
-    carouselContainer.addEventListener("mouseenter", stopRotation);
-    // Resume on mouse leave
-    carouselContainer.addEventListener("mouseleave", startRotation);
-
-    // ✅ Hours Activity Chart
-    var ctx = document.getElementById("hoursActivityChart").getContext("2d");
-    var hoursData = JSON.parse('{{{hoursActivity}}}');
-    console.log("Hours Activity Data:", hoursData); // Debug: Log the hours data
-
-    var data = {
-        labels: ["sun", "mon", "tue", "wed", "thr", "fri", "sat"],
-        datasets: [{
-            label: "Hours Spent",
-            data: hoursData,
-            backgroundColor: ["#000000", "#808080", "#204070", "#204070", "#204070", "#204070", "#204070"],
-            borderWidth: 0,
-            barThickness: 20
-        }]
-    };
-
-    var options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: { stepSize: 1 },
-                grid: { display: true, drawBorder: false },
-                max: 4
-            },
-            x: {
-                grid: { display: false, drawBorder: false },
-                ticks: { font: { size: 12 } }
-            }
-        },
-        plugins: {
-            legend: { display: false },
-            tooltip: { enabled: false }
-        },
-             animation: {
-                duration: 2000,     // 3-second animation
-               
-            },
-        
-    };
-
-    new Chart(ctx, { type: "bar", data: data, options: options });
-
-    // ✅ Learning Path Chart with Rounded Edges and Shadow
-var learningPathCtx = document.getElementById("learningPathChart").getContext("2d");
-
-const completedPercentage = {{learningPathPercentage}};
-const overduePercentage = 100 - completedPercentage;
-
-// Create gradient fill
-var gradient = learningPathCtx.createLinearGradient(0, 0, 0, 150);
-gradient.addColorStop(0, "#204070");
-gradient.addColorStop(1, "#A3C0F9");
-
-var data = {
-    datasets: [{
-        data: [completedPercentage, overduePercentage],
-        backgroundColor: [gradient, "#e6e6e6"],
-        borderWidth: 0,
-        borderRadius: 20,   // Rounded edges for the arc
-        hoverBorderWidth: 0,
-        cutout: '75%'
-    }]
-};
-
-var options = {
-    responsive: true,
-    maintainAspectRatio: true,
-    cutout: '75%',
-    rotation: -90 * (Math.PI/180), // Start from top (12 o'clock)
-    circumference: 360 * (Math.PI/180),
-    plugins: {
-        legend: { display: false },
-        tooltip: { enabled: false }
-    },
-    animation: {
-        animateRotate: true,
-        duration: 1500
-    },
-    elements: {
-        arc: {
-            borderJoinStyle: "round"
-        }
-    }
-};
-
-var learningPathChart = new Chart(learningPathCtx, {
-    type: 'doughnut',
-    data: data,
-    options: options
-});
-
-
-    // 3) After a short delay, animate from 100% to the final data
-    setTimeout(function() {
-        learningPathChart.data.datasets[0].data = finalData;
-        learningPathChart.update(); // triggers the animation
-    }, 1000); // 1-second delay before starting the "shrink" animationntById("learningPathText").innerText = "{{learningPathPercentage}}% completed";
-
-});
-
-document.getElementById("learningPathText").innerText = "{{learningPathPercentage}}% completed";
-
-</script>
+    </script>
+</body>
 </html>
-
