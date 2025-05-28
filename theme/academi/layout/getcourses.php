@@ -1,5 +1,6 @@
 <?php
 // theme/academi/layout/getcourses.php
+error_log('Received course type: ' . $type);
 
 require_once('../../../config.php');
 require_login();
