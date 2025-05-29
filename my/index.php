@@ -643,6 +643,11 @@ $templatecontext['calendarinstanceid'] = $calendarinstanceid;
 $templatecontext['uniqid'] = $uniqid;
 $templatecontext['iscalendarblock'] = false;
 
+// Get current streak count from DB
+$streakCount = $DB->count_records('user_streaks', ['userid' => $userid]);
+
+// Add to template context
+$templatecontext['current_streak'] = $streakCount;
 
 
 echo $OUTPUT->render_from_template('core/dashboard', $templatecontext);

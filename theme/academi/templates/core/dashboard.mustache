@@ -814,7 +814,8 @@
                         style="width: 140px; height: 140px; border-radius: 50%; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
                         <div id="streak-icon" class="streak-icon mb-1" style="font-size: 5rem;">⚡</div>
                     </div>
-                    <h4 class="fw-bold mb-0 text-center">0 weeks</h4>
+                <h4 id="streak-count" class="fw-bold mb-0 text-center">{{current_streak}} weeks</h4>
+
                     <p class="text-center">Current streak</p>
                     <div>
                         <p><span>⏰</span> 0/30 course min</p>
@@ -1200,26 +1201,32 @@ const learningPathChart = new Chart(learningPathCtx, {
             }
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const streakIcon = document.getElementById('streak-icon');
-            const visitStatus = document.getElementById('visit-status');
-            let visitCompleted = false;
 
-            streakIcon.addEventListener('click', () => {
-                visitCompleted = !visitCompleted;
-                if (visitCompleted) {
-                    visitStatus.innerHTML = '<span>✅</span> 1/1 visit';
-                } else {
-                    visitStatus.innerHTML = '<span>❌</span> 0/1 visit';
-                }
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/moodle/theme/academi/streak.php', {
+        method: 'POST',
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Update streak count
+        const streakCountElement = document.getElementById('streak-count');
+        if (streakCountElement) {
+            streakCountElement.textContent = data.streakCount + " weeks";
+        }
 
-                // Animate icon on click
-                streakIcon.classList.add('pop');
-                streakIcon.addEventListener('animationend', () => {
-                    streakIcon.classList.remove('pop');
-                }, { once: true });
-            });
-        });
+        // Update visit status text
+        const visitStatus = document.getElementById('visit-status');
+        if (visitStatus) {
+            if (data.visitDone) {
+                visitStatus.innerHTML = '<span>✅</span> 1/1 visit';
+            } else {
+                visitStatus.innerHTML = '<span>❌</span> 0/1 visit';
+            }
+        }
+    })
+    .catch(console.error);
+});
     </script>
 </body>
 
