@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
             background-color: #f5f5f5;
             font-family: Arial, sans-serif;
         }
+
         .dashboard-header {
             color: black;
             padding: 15px 20px;
@@ -24,7 +26,9 @@
             border-radius: 50%;
             margin-right: 15px;
         }
-        body, html {
+
+        body,
+        html {
             margin: 0;
             padding: 0;
         }
@@ -35,6 +39,7 @@
             max-width: 100% !important;
             overflow-x: hidden;
         }
+
         .d-flex.justify-content-between {
             align-items: stretch;
             gap: 2%;
@@ -47,6 +52,7 @@
             gap: 20px;
             margin-bottom: 20px;
         }
+
         .dashboard-card {
             background: white;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -54,24 +60,29 @@
             padding: 15px;
             text-align: center;
         }
+
         .dashboard-card h3 {
             font-size: 25px;
             margin-bottom: 10px;
             color: #333;
         }
+
         .img-heading {
             color: #204070;
         }
+
         .user-stats img {
             width: 70%;
             margin: 0 auto;
         }
+
         .user-stats-legend {
             display: flex;
             justify-content: center;
             gap: 15px;
             margin-top: 10px;
         }
+
         .bullet {
             display: inline-block;
             width: 10px;
@@ -79,36 +90,51 @@
             border-radius: 50%;
             margin-right: 5px;
         }
-        .excellent { background-color: #204070; }
-        .good { background-color: #3C6894; }
-        .keep-going { background-color: #808080; }
+
+        .excellent {
+            background-color: #204070;
+        }
+
+        .good {
+            background-color: #3C6894;
+        }
+
+        .keep-going {
+            background-color: #808080;
+        }
+
         .course-enrolled {
             position: relative;
         }
+
         .course-enrolled .dotted-line {
             border-bottom: 3px dotted black;
             margin-bottom: 10px;
             padding-bottom: 10px;
         }
+
         .course-enrolled img {
             position: absolute;
             top: 15px;
             right: 15px;
             width: 50px;
         }
+
         .course-enrolled h2 {
             font-size: 36px;
             color: #204070;
             margin: 0;
             filter: drop-shadow(3px 3px 8px rgba(0, 0, 0, 0.3));
-            border-radius: 50%; 
+            border-radius: 50%;
         }
+
         .learning-path {
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px 0;
         }
+
         .progress-container {
             position: relative;
             width: 180px;
@@ -137,6 +163,7 @@
             text-align: center;
             line-height: 1.2;
         }
+
         .progress-text small {
             font-size: 14px;
             display: block;
@@ -151,65 +178,79 @@
             text-align: left;
             padding-left: 20px;
         }
+
         .learning-path-legend .bullet {
             width: 12px;
             height: 12px;
         }
+
         .completed-bullet {
             background-color: #204070;
         }
+
         .overdue-bullet {
             background-color: #808080;
         }
+
         .points-section {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 10px;
         }
+
         .points-bars {
             width: 70%;
         }
+
         .points-bars .progress {
             height: 10px;
             background: lightgray;
             border-radius: 5px;
             margin-bottom: 10px;
         }
+
         .points-bars .bar {
             height: 100%;
             border-radius: 5px;
         }
+
         .points-bars .course-info {
             display: flex;
             justify-content: space-between;
             font-size: 12px;
             margin-bottom: 5px;
         }
+
         .points-total {
             text-align: center;
         }
+
         .points-total img {
             width: 40%;
             margin-bottom: 10px;
         }
+
         .points-total h4 {
             font-size: 18px;
             margin: 0;
         }
+
         .hours-activity-section {
             display: flex;
             padding: 10px;
             gap: 10px;
         }
+
         .hours-activity-header {
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: 14px;
-            text-align:center;
+            text-align: center;
             margin-left: 2rem;
         }
+
         .hours-activity-header .arrow {
             display: inline-block;
             width: 20px;
@@ -219,23 +260,27 @@
             line-height: 20px;
             font-size: 12px;
         }
+
         .increase .arrow {
             background-color: #90ee90;
             color: green;
         }
+
         .decrease .arrow {
             background-color: #ffcccb;
             color: red;
         }
+
         .hours-activity-chart {
             width: 70%;
             height: 200px;
-            text-align:center;
+            text-align: center;
         }
 
         .hours-total-section {
             width: 30%;
         }
+
         .fade:not(.show) {
             opacity: 1;
         }
@@ -256,6 +301,7 @@
             font-weight: bold;
             color: #204070;
         }
+
         #course-carousel {
             position: relative;
             width: 100%;
@@ -264,7 +310,7 @@
         }
 
         #course-carousel .course-item {
-            display: none; 
+            display: none;
             width: 100%;
             height: 100%;
             background-size: cover;
@@ -295,7 +341,7 @@
             bottom: 0;
             width: 100%;
             color: #fff;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             padding: 10px;
         }
 
@@ -307,6 +353,7 @@
             color: #fff;
             text-decoration: underline;
         }
+
         .recent-course {
             position: relative;
             width: 100%;
@@ -329,26 +376,26 @@
             overflow-y: auto;
             display: none;
             z-index: 1001;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 0 0 5px 5px;
         }
-        
+
         #course-results a {
             color: #333;
             text-decoration: none;
         }
-        
+
         #course-results a:hover {
             background-color: #f8f9fa;
         }
-        
+
         .search-course-item {
             display: flex;
             align-items: center;
             padding: 10px;
             border-bottom: 1px solid #eee;
         }
-        
+
         .search-course-image {
             width: 50px;
             height: 50px;
@@ -356,16 +403,16 @@
             object-fit: cover;
             margin-right: 10px;
         }
-        
+
         .search-course-info {
             flex-grow: 1;
         }
-        
+
         .search-course-name {
             font-weight: bold;
             margin-bottom: 3px;
         }
-        
+
         .search-course-summary {
             font-size: 12px;
             color: #666;
@@ -374,6 +421,7 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+
         .course-search-container {
             position: relative;
             width: 100%;
@@ -390,7 +438,7 @@
             z-index: 999;
             border-radius: 0 0 5px 5px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             display: none;
         }
 
@@ -405,6 +453,7 @@
         .search-result-item:hover {
             background-color: #3c6894;
         }
+
         .search-results {
             position: absolute;
             top: 100%;
@@ -413,7 +462,7 @@
             background: white;
             border: 1px solid #ddd;
             border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             z-index: 9999;
             max-height: 400px;
             overflow-y: auto;
@@ -466,17 +515,19 @@
             align-items: stretch;
             gap: 10px;
         }
+
         .dashboard-card.flex-grow-1 {
             flex: 1;
             min-width: 0;
             max-width: 100%;
         }
 
-        .dashboard-card.flex-grow-1 > * {
+        .dashboard-card.flex-grow-1>* {
             flex-grow: 1;
         }
 
-        .top-row, .bottom-row {
+        .top-row,
+        .bottom-row {
             gap: 20px;
         }
 
@@ -485,7 +536,9 @@
         }
 
         @media (max-width: 768px) {
-            .top-row, .bottom-row {
+
+            .top-row,
+            .bottom-row {
                 flex-direction: column;
             }
 
@@ -493,6 +546,41 @@
                 max-width: 100% !important;
                 margin-bottom: 20px;
             }
+        }
+
+
+        .streak-icon {
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .streak-icon:hover {
+            transform: translateY(-10px);
+        }
+
+        @keyframes popAnimation {
+            0% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 0 transparent);
+            }
+
+            50% {
+                transform: scale(1.3);
+                filter: drop-shadow(0 0 10px #ff7f50);
+            }
+
+            100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 0 transparent);
+            }
+        }
+
+        .streak-icon.pop {
+            animation: popAnimation 0.4s ease forwards;
+        }
+
+        .pagelayout-mydashboard #region-main {
+            padding: 0px;
         }
     </style>
 </head>
@@ -509,51 +597,57 @@
 
         <div class="container">
             <!-- First Row: User Stats, Course Enrolled, Learning Path -->
-            <div class="d-flex justify-content-between top-row mb-4">
+            <div class="d-flex justify-content-between top-row " style="margin-bottom: 10px;">
                 <!-- New Streaks Card -->
-                <div class="dashboard-card flex-grow-1" style="max-width: 15%;">
-                    <h3>Start a weekly streak 🔥</h3>
+                <div class="dashboard-card flex-grow-1 text-start" style="max-width: 20%; margin-left: 30px;">
+                    <h3>Start a weekly streak! 🔥</h3>
                     <p>One ring down! Now, watch your course(s).</p>
-                    <!-- Circle badge with lightning icon and weeks -->
                     <div class="mx-auto my-3"
                         style="width: 140px; height: 140px; border-radius: 50%; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <div class="streak-icon mb-1" style="font-size: 2rem;">⚡</div>
-                        <h4 class="fw-bold mb-0">0 weeks</h4>
-                        <small class="text-muted">Current streak</small>
+                        <div id="streak-icon" class="streak-icon mb-1" style="font-size: 5rem;">⚡</div>
                     </div>
-                    <!-- Additional streak info -->
+                    <h4 class="fw-bold mb-0 text-center">0 weeks</h4>
+                    <p class="text-center">Current streak</p>
                     <div>
                         <p><span>⏰</span> 0/30 course min</p>
-                        <p><span>✅</span> 1/1 visit</p>
+                        <p id="visit-status"><span>❌</span> 0/1 visit</p>
                         <p>May 26 – Jun 2</p>
                     </div>
                 </div>
 
                 <!-- Continue Learning -->
                 <div class="dashboard-card flex-grow-1" style="max-width: 30%; border-radius: 20px; padding: 20px;">
-                    <h3 style="text-align: left; font-weight: bold;">Continue <span class="img-heading">Learning</span></h3>
+                    <h3 style="text-align: left; font-weight: bold; margin-left: 15px;">Continue <span
+                            class="img-heading">Learning</span></h3>
                     {{#recentCourse}}
                     <!-- Outer clean card -->
-                    <div style="background: #fff; border-radius: 20px; padding: 0; overflow: hidden;">
+                    <div style="background: #fff; border-radius: 15px; padding: 0; overflow: hidden;">
                         <!-- Inner shadow box: image + progress + category only -->
-                        <div style="padding: 15px; margin: 10px; border-radius: 20px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                        <div
+                            style="padding: 15px; margin: 10px; border-radius: 20px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
                             <!-- Image -->
                             <div style="border-radius: 12px; overflow: hidden; margin-bottom: 12px;">
-                                <img src="{{course_image_url}}" alt="{{coursename}}" style="width: 100%; height: 170px; display: block;">
+                                <img src="{{course_image_url}}" alt="{{coursename}}"
+                                    style="width: 100%; height: 170px; display: block;">
                             </div>
                             <!-- Progress Bar -->
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
                                 <!-- Left: Progress Text + Bar -->
                                 <div style="flex-grow: 1;">
-                                    <div style="width: 100%; height: 10px; background: #eee; border-radius: 999px; overflow: hidden;">
-                                        <div style="width: {{progressPercentage}}%; height: 100%; background: linear-gradient(90deg, #204070, #A3C0F9); border-radius: 999px;"></div>
+                                    <div
+                                        style="width: 100%; height: 10px; background: #eee; border-radius: 999px; overflow: hidden;">
+                                        <div
+                                            style="width: {{progressPercentage}}%; height: 100%; background: linear-gradient(90deg, #204070, #A3C0F9); border-radius: 999px;">
+                                        </div>
                                     </div>
                                     <div style="font-size: 14px; color: #333; text-align: start; margin-top: 6px;">
                                         {{progressPercentage}}% Completed</div>
                                 </div>
                                 <!-- Right: Category Pill -->
                                 <div style="margin-left: 10px;">
-                                    <span style="background: #204070; color: white; padding: 6px 16px; border-radius: 999px 0 999px 999px; font-size: 13px;">
+                                    <span
+                                        style="background: #204070; color: white; padding: 6px 16px; border-radius: 999px 0 999px 999px; font-size: 13px;">
                                         {{category}}
                                     </span>
                                 </div>
@@ -561,10 +655,12 @@
                         </div>
                         <!-- Outside content: course name + button -->
                         <div style="padding: 15px 15px 20px; text-align: start;">
-                            <h4 style="font-size: 18px; font-weight: 600; text-align: start; margin-bottom: 10px; color: #000;">
+                            <h4
+                                style="font-size: 18px; font-weight: 600; text-align: start; margin-bottom: 10px; color: #000;">
                                 {{coursename}}</h4>
                             <a href="{{courseurl}}"
-                                style="border: 1px solid #204070; padding: 6px 14px; border-radius: 6px; font-size: 14px; text-decoration: none; color: #white; font-weight: 500; display: inline-block;"  class="course-link-button">
+                                style="border: 1px solid #204070; padding: 6px 14px; border-radius: 6px; font-size: 14px; text-decoration: none; color: #white; font-weight: 500; display: inline-block;"
+                                class="course-link-button">
                                 Continue Learning →
                             </a>
                         </div>
@@ -577,27 +673,32 @@
 
                 <!-- Recently Enrolled Courses -->
                 <div class="dashboard-card flex-grow-1" style="max-width: 30%; border-radius: 20px; padding: 20px;">
-                    <h3 style="text-align: left; font-weight: bold;">Recent <span class="img-heading">Enrolled</span></h3>
+                    <h3 style="text-align: left; font-weight: bold; margin-left: 15px; ">Recent <span
+                            class="img-heading">Enrolled</span></h3>
                     <div id="course-carousel" style="height: auto;">
                         {{#enrolledCourses}}
                         <!-- Outer Card: One visible at a time -->
                         <div class="course-item" style="display: none;">
                             <!-- Shadowed Box: Only for image -->
                             <div style="background: #fff; border-radius: 20px; padding: 0; overflow: hidden;">
-                                <div style="padding: 15px; margin: 10px; border-radius: 20px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                                <div
+                                    style="padding: 15px; margin: 10px; border-radius: 20px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
                                     <!-- Image -->
-                                    <div style="border-radius: 12px; overflow: hidden; margin-bottom: 0;">
-                                        <img src="{{course_image_url}}" alt="{{coursename}}" style="width: 100%; height: 220px; display: block;">
+                                    <div style="border-radius: 12px; overflow: hidden; margin-bottom: 0; ">
+                                        <img src="{{course_image_url}}" alt="{{coursename}}"
+                                            style="width: 100%; height: 220px; display: block; ">
                                     </div>
                                 </div>
                             </div>
                             <!-- Outside Shadow Box: Title + Button -->
                             <div style="padding: 15px 0 0 0; text-align: left;">
-                                <h4 style="font-size: 18px; font-weight: 600; color: #000; margin-bottom: 10px;">
+                                <h4
+                                    style="font-size: 18px; font-weight: 600; color: #000; margin-bottom: 10px; margin-left: 15px;">
                                     {{coursename}}
                                 </h4>
                                 <a href="{{courseurl}}"
-                                    style="border: 1px solid #204070; padding: 6px 14px; border-radius: 6px; font-size: 14px; text-decoration: none; color: #white; font-weight: 500;" class="course-link-button">
+                                    style="border: 1px solid #204070; padding: 6px 14px; border-radius: 6px; font-size: 14px; text-decoration: none; color: #white; font-weight: 500; margin-left: 15px;"
+                                    class="course-link-button">
                                     Go to Course →
                                 </a>
                             </div>
@@ -607,19 +708,19 @@
                 </div>
 
                 <!-- Learning Path -->
-                <div class="dashboard-card flex-grow-1" style="max-width: 23%;">
+                <div class="dashboard-card flex-grow-1 " style="max-width: 23%; margin-right:30px;">
                     <h2>Learning <span class="img-heading">Path</span></h2>
                     <div class=" align-content-center h-75">
                         <div class="progress-container">
-                        <canvas id="learningPathPieChart" width="180" height="180"></canvas>
-                        <div class="progress-text">
-                            {{learningPathPercentage}}%<br><small>Completed</small>
+                            <canvas id="learningPathPieChart" width="250" height="250"></canvas>
+                            <div class="progress-text">
+                                {{learningPathPercentage}}%<br><small>Completed</small>
+                            </div>
                         </div>
-                    </div>
-                    <div class="d-flex justify-content-around mb-3 mt-3">
-                        <div><span class="bullet completed-bullet"></span> {{completedCourses}} Completed</div>
-                        <div><span class="bullet overdue-bullet"></span> {{totalOverdue}} Overdue</div>
-                    </div>
+                        <div class="d-flex justify-content-around mb-3 mt-3">
+                            <div><span class="bullet completed-bullet"></span> {{completedCourses}} Completed</div>
+                            <div><span class="bullet overdue-bullet"></span> {{totalOverdue}} Overdue</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -627,14 +728,16 @@
             <!-- Second Row: Hours Activity, Earned Points, Course Enrolled -->
             <div class="d-flex justify-content-between top-row mb-4">
                 <!-- Hours Activity -->
-                <div class="dashboard-card flex-grow-1" style="max-width: 32%;">
-                    <h2>Hours <span class="img-heading">Activity</span></h2>
+                <div class="dashboard-card flex-grow-1 margin-left: 15px;" style=" margin-left: 30px;>
+                    <h2>Hours <span class=" img-heading">Activity</span></h2>
                     <div class="hours-activity-section d-flex justify-content-around align-items-center">
                         <div class="hours-activity-chart">
                             <div class="hours-activity-header">
-                                <span style="color: {{#isIncrease}}green{{/isIncrease}}{{^isIncrease}}red{{/isIncrease}};">
+                                <span
+                                    style="color: {{#isIncrease}}green{{/isIncrease}}{{^isIncrease}}red{{/isIncrease}};">
                                     {{#isIncrease}}+{{/isIncrease}}{{^isIncrease}}-{{/isIncrease}}{{percentageChange}}%
-                                    {{#isIncrease}}Increase than last week{{/isIncrease}}{{^isIncrease}}Decrease than last week{{/isIncrease}}
+                                    {{#isIncrease}}Increase than last week{{/isIncrease}}{{^isIncrease}}Decrease than
+                                    last week{{/isIncrease}}
                                 </span>
                             </div>
                             <canvas id="hoursActivityChart"></canvas>
@@ -655,7 +758,7 @@
                 </div>
 
                 <!-- Total Earned Points -->
-                <div class="dashboard-card flex-grow-1" style="max-width: 32%;">
+                <div class="dashboard-card flex-grow-1" style="max-width: 46%;">
                     <h3>Total <span class="img-heading">Earned Points</span></h3>
                     <div class="points-section">
                         <div class="points-bars">
@@ -677,11 +780,12 @@
                 </div>
 
                 <!-- Course Enrolled -->
-                <div class="dashboard-card flex-grow-1" style="max-width: 32%;">
+                <div class="dashboard-card flex-grow-1" style="max-width: 14%; margin-right:30px ">
                     <h3>Course <span class="img-heading">Enrolled</span> </h3>
                     <div class="d-flex justify-content-center mt-4" style="border-bottom: 3px dotted black; ">
                         <span class="text-left">
-                            <h1 class="coursecount text-left text-center fw-bold" style="color:#204070; font-size:60px;">{{totalCourses}}</h1>
+                            <h1 class="coursecount text-left  fw-bold" style="color:#204070; font-size:60px;">
+                                {{totalCourses}}</h1>
                         </span>
                     </div>
                     <span>
@@ -736,7 +840,7 @@
             // Hours Activity Chart
             var ctx = document.getElementById("hoursActivityChart").getContext("2d");
             var hoursData = JSON.parse('{{{hoursActivity}}}');
-            
+
             var data = {
                 labels: ["sun", "mon", "tue", "wed", "thr", "fri", "sat"],
                 datasets: [{
@@ -772,41 +876,41 @@
 
             new Chart(ctx, { type: "bar", data: data, options: options });
 
-            // Learning Path Pie Chart
-            const learningPathCtx = document.getElementById('learningPathPieChart').getContext('2d');
-            const completedPercent = parseFloat("{{learningPathPercentage}}") || 0;
-            const remainingPercent = 100 - completedPercent;
+const learningPathCtx = document.getElementById('learningPathPieChart').getContext('2d');
+const completedPercent = parseFloat("{{learningPathPercentage}}") || 0;
+const remainingPercent = 100 - completedPercent;
 
-            // Create gradient for the completed portion
-            const gradient = learningPathCtx.createLinearGradient(0, 0, 0, 180);
-            gradient.addColorStop(0, '#204070');  // Dark blue at top
-            gradient.addColorStop(1, '#A3C0F9');  // Light blue at bottom
+// Create a custom gradient along the arc using Canvas API
+const gradient = learningPathCtx.createConicGradient(-Math.PI / 2, 70, 90);
+gradient.addColorStop(0, '#204070');  // Dark blue start
+gradient.addColorStop(1, '#A3C0F9');  // Light blue end
 
-            const learningPathChart = new Chart(learningPathCtx, {
-                type: 'doughnut',
-                data: {
-                    datasets: [{
-                        data: [completedPercent, remainingPercent],
-                        backgroundColor: [gradient, '#e6e6e6'],
-                        borderWidth: 0,
-                        cutout: '70%',
-                        borderRadius: 0
-                    }]
-                },
-                options: {
-                    responsive: false,
-                    rotation: -90,
-                    circumference: 360,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
-                    },
-                    animation: {
-                        animateRotate: true,
-                        duration: 1200
-                    }
-                }
-            });
+const learningPathChart = new Chart(learningPathCtx, {
+    type: 'doughnut',
+    data: {
+        datasets: [{
+            data: [completedPercent, remainingPercent],
+            backgroundColor: [gradient, '#e6e6e6'],
+            borderWidth: 0,
+            cutout: '55%',   // bigger thickness of the arc
+            borderRadius: 30,  // rounded edges of the arc
+        }]
+    },
+    options: {
+        responsive: false,
+        rotation: -90,         // start from top center
+        circumference: 360,    // full circle
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false }
+        },
+        animation: {
+            animateRotate: true,
+            duration: 1700
+        }
+    }
+});
+
 
             // Update center text
             const progressText = document.querySelector('.progress-text');
@@ -814,6 +918,28 @@
                 progressText.innerHTML = `${completedPercent}%<br><small>Completed</small>`;
             }
         });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const streakIcon = document.getElementById('streak-icon');
+            const visitStatus = document.getElementById('visit-status');
+            let visitCompleted = false;
+
+            streakIcon.addEventListener('click', () => {
+                visitCompleted = !visitCompleted;
+                if (visitCompleted) {
+                    visitStatus.innerHTML = '<span>✅</span> 1/1 visit';
+                } else {
+                    visitStatus.innerHTML = '<span>❌</span> 0/1 visit';
+                }
+
+                // Animate icon on click
+                streakIcon.classList.add('pop');
+                streakIcon.addEventListener('animationend', () => {
+                    streakIcon.classList.remove('pop');
+                }, { once: true });
+            });
+        });
     </script>
 </body>
+
 </html>
