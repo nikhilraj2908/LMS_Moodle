@@ -44,6 +44,7 @@
             align-items: stretch;
             gap: 2%;
             overflow-x: hidden;
+          
         }
 
         .dashboard-row {
@@ -53,13 +54,28 @@
             margin-bottom: 20px;
         }
 
-        .dashboard-card {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
+         .dashboard-card {
+        
+ background: white;
+    border-radius: 24px;
+    width: 100%;
+    padding: 30px;
+text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
+
+
+
+.dashboard-card:hover{
+    background: linear-gradient(to bottom, #ffffff 0%, rgb(204 242 255) 100%);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+
+
 
         .dashboard-card h3 {
             font-size: 25px;
@@ -549,63 +565,176 @@
         }
 
 
-        .streak-icon {
-            transition: transform 0.3s ease;
-            cursor: pointer;
+       .streak-card {
+            width: 320px;
+            padding: 25px 30px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #f0f6fc 0%, #ffffff 60%);
+            box-shadow: 0 0 10px 2px rgba(28, 60, 114, 0.4);
+            font-family: Arial, sans-serif;
+            color: #000000;
         }
-
-        .streak-icon:hover {
-            transform: translateY(-10px);
+ 
+        .streak-header {
+            text-align: left;
+            margin-bottom: 20px;
         }
-
-        @keyframes popAnimation {
-            0% {
-                transform: scale(1);
-                filter: drop-shadow(0 0 0 transparent);
-            }
-
-            50% {
-                transform: scale(1.3);
-                filter: drop-shadow(0 0 10px #ff7f50);
-            }
-
-            100% {
-                transform: scale(1);
-                filter: drop-shadow(0 0 0 transparent);
-            }
+ 
+        .streak-title-normal {
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 4px;
         }
-
-        .streak-icon.pop {
-            animation: popAnimation 0.4s ease forwards;
+ 
+        .streak-title-bold {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1c3c72;
+            margin-bottom: 10px;
         }
-
-        .pagelayout-mydashboard #region-main {
-            padding: 0px;
+ 
+        .streak-subtext {
+            font-size: 15px;
+            font-weight: 400;
+            color: #000;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-        .learning-path-card {
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-            width: 100%;
-            max-width: 380px;
-            padding: 30px;
-            text-align: center;
+ 
+        .streak-progress-container {
             position: relative;
-            overflow: hidden;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 20px auto;
         }
+ 
+        .outer-ring {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #b8d7f9, #d9e9fd);
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+ 
+        .inner-circle {
+            width: 140px;
+            height: 140px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            position: relative;
+        }
+ 
+        .flame-icon {
+            position: absolute;
+            top: -40px;
+            /* overlaps the ring */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 60px;
+            /* large size */
+            color: #FF5722;
+            filter: drop-shadow(0 0 5px rgba(255, 87, 34, 0.7));
+            z-index: 3;
+        }
+ 
+        .progress-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: #1c3c72;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+ 
+        .progress-text {
+            font-size: 16px;
+            font-weight: 400;
+            color: #000;
+        }
+ 
+/* Lift the inner white circle smoothly */
+.lift-inner-circle {
+  transition: transform 0.3s ease;
+}
+ 
+/* Lift the flame with delay */
+.lift-flame {
+  transition: transform 0.3s ease 0.15s;
+}
+ 
+/* On hover of the whole container, lift inner white circle up */
+.streak-hover-container:hover .lift-inner-circle {
+  transform: translateY(-10px);
+}
+ 
+/* On hover, lift flame up separately */
+.streak-hover-container:hover .lift-flame {
+  transform: translate(-50%, -20px);
+}
+ 
+.lift-flame {
+  position: absolute;
+  top: -48px;
+  left: 47%;
+  width: 60px;
+  height: 80px;
+  z-index: 3;
+ 
+  /* Center horizontally */
+  transform: translateX(-50%);
+  transition: transform 0.3s ease 0.15s;
+}
+ 
+/* On hover, lift vertically but keep horizontal centering */
+.streak-hover-container:hover .lift-flame {
+  transform: translate(-50%, -20px);
+}
+ 
+#quote-text {
+  transition: opacity 1s ease;
+  opacity: 1;
+}
+.fade-out {
+  opacity: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ .learning-path-card {
+    background: white;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 380px;
+    padding: 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.learning-path-card:hover {
+       background: linear-gradient(to bottom, #ffffff 0%, rgb(204 242 255) 100%);
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
         
         .card-header {
             margin-bottom: 30px;
@@ -789,6 +918,242 @@
                 font-size: 40px;
             }
         }
+
+
+
+
+
+
+        
+.learning-card {
+    background: white;
+    border-radius: 24px;
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.learning-card:hover {
+    background: linear-gradient(to bottom, #ffffff 0%, rgb(230 246 255) 100%);
+    box-shadow: 0 12px 30px rgba(32, 64, 112, 0.15);
+    transform: translateY(-5px);
+}
+
+.card-header {
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #204070;
+    margin-bottom: 5px;
+}
+
+.card-subtitle {
+    font-size: 16px;
+    color: #7a8ca5;
+    font-weight: 500;
+}
+
+.course-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.course-category {
+    background: #e6f0ff;
+    color: #204070;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.course-status {
+    color: {{#is_completed}}#28a745{{/is_completed}}{{^is_completed}}#ff6b6b{{/is_completed}};
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.course-image {
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.course-image img {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    display: block;
+}
+
+.course-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #204070;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.progress-section {
+    background: #f8fbff;
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #e6f0ff;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.progress-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #204070;
+}
+
+.progress-percent {
+    font-size: 18px;
+    font-weight: 700;
+    color: #3c6cff;
+}
+
+.progress-bar-container {
+    background: #e6f0ff;
+    height: 10px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, #3c6cff, #6d95ff);
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.course-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 10px;
+    flex: 1;
+    background: #f8fbff;
+    border-radius: 10px;
+    margin: 0 5px;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #204070;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #7a8ca5;
+}
+
+.no-course {
+    text-align: center;
+    padding: 30px 0;
+    color: #7a8ca5;
+}
+
+.no-course i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #e6f0ff;
+}
+
+.no-course p {
+    font-size: 18px;
+    margin: 0;
+}
+
+.continue-button {
+    background: linear-gradient(to right, #3c6cff, #6d95ff);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 14px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(60, 108, 255, 0.3);
+    width: 100%;
+    margin-top: 15px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+}
+
+.continue-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(60, 108, 255, 0.4);
+    background: linear-gradient(to right, #2a5be6, #5c85e6);
+}
+
+.decoration {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    opacity: 0.1;
+}
+
+.decoration-1 {
+    top: -40px;
+    right: -40px;
+    background: linear-gradient(135deg, #3c6cff, #6d95ff);
+}
+
+.decoration-2 {
+    bottom: -60px;
+    left: -60px;
+    background: linear-gradient(135deg, #3c6cff, #6d95ff);
+    width: 180px;
+    height: 180px;
+}
+
+
+  #course-carousel .course-item {
+        width: 100%;
+        transition: opacity 0.5s ease;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    #course-carousel .course-item.show {
+        display: block !important;
+        opacity: 1;
+        position: relative;
+    }
+    #course-carousel .course-item.hide {
+        opacity: 0;
+        display: none !important;
+        position: absolute;
+    }
     </style>
 </head>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -804,117 +1169,244 @@
 
         <div class="container">
             <!-- First Row: User Stats, Course Enrolled, Learning Path -->
-            <div class="d-flex justify-content-between top-row " style="margin-bottom: 10px;">
+            <div class="d-flex justify-content-between top-row " style="margin: 10px 30px;">
                 <!-- New Streaks Card -->
                 
-                <div class="dashboard-card flex-grow-1 text-start" style="max-width: 20%; margin-left: 30px;">
-                    <h3>Start a weekly streak! 🔥</h3>
-                    <p>One ring down! Now, watch your course(s).</p>
-                    <div class="mx-auto my-3"
-                        style="width: 140px; height: 140px; border-radius: 50%; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <div id="streak-icon" class="streak-icon mb-1" style="font-size: 5rem;">⚡</div>
-                    </div>
-                <h4 id="streak-count" class="fw-bold mb-0 text-center">{{current_streak}} weeks</h4>
+              
 
-                    <p class="text-center">Current streak</p>
-                    <div>
-                        <p><span>⏰</span> 0/30 course min</p>
-                        <p id="visit-status"><span>❌</span> 0/1 visit</p>
-                        <p>May 26 – Jun 2</p>
-                    </div>
+
+
+
+<div class="learning-card"
+>
+ 
+    <div style="font-size: 25px; font-weight: 400; margin-bottom: 5px;">
+        Start a daily&nbsp;<span style="font-weight: 700; color: #1c3c72;">Streak!</span>
+    </div>
+    <div style="font-size: 15px; font-weight: 400; margin-bottom: 30px;">
+        You’re off to a great start!
+    </div>
+ 
+    <div class="streak-hover-container"
+        style="position: relative; width: 180px; height: 180px; margin: 0 auto; margin-top: 60px;">
+ 
+        <!-- Your SVG flame -->
+        <div class="lift-flame"
+            style="position: absolute; top: -48px; left: 47%; width: 60px; height: 80px; z-index: 3;">
+ 
+            <svg width="80" height="150" viewBox="0 0 298 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_d_588_10)">
+                    <path
+                        d="M147.435 24C200.325 131.363 -102.838 235.507 96.9984 380C81.9374 309.688 105.869 264.47 147.435 230.6C131.622 285.125 171.386 321.936 160.521 361.461C178.008 355.406 188.039 342.766 196.508 328.746C209.359 341.803 214.653 358.781 211.775 380C277.465 333.993 287.992 276.687 237.947 206.972C235.342 233.601 218.532 248.312 196.508 254.727C243.328 138.056 224.103 70.5153 147.435 24Z"
+                        fill="#FF5915" />
+                    <path
+                        d="M64.106 139.263C36.0928 109.339 46.2794 65.4095 89.5726 40.2612C71.5338 88.0089 107.718 101.063 64.106 139.263Z"
+                        fill="#FF5915" />
+                </g>
+                <defs>
+                    <filter id="filter0_d_588_10" x="0.299999" y="0.299999" width="296.75" height="411.4"
+                        filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                            result="hardAlpha" />
+                        <feOffset dy="4" />
+                        <feGaussianBlur stdDeviation="13.85" />
+                        <feComposite in2="hardAlpha" operator="out" />
+                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
+                        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_588_10" />
+                        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_588_10" result="shape" />
+                    </filter>
+                </defs>
+            </svg>
+ 
+        </div>
+ 
+        <!-- Outer ring with light blue to white gradient -->
+        <div class="lift-circle"
+            style="width: 180px; height: 180px; border-radius: 50%; background: linear-gradient(to bottom, #c6ddf8 0%, #ffffff 100%);  display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease;">
+ 
+ 
+            <!-- Inner white circle -->
+            <div class="lift-inner-circle"
+                style="width: 140px; height: 140px; background: #fff; border-radius: 50%; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+ 
+                <div style="font-size: 48px; font-weight: 700; color: #1c3c72; line-height: 1; user-select: none;">
+                    2
                 </div>
+ 
+                <div
+                    style="font-size: 16px; font-weight: 400; color: #000; user-select: none; margin-top: 6px; line-height: 1.2;">
+                    Days!<br>Keep going
+                </div>
+ 
+            </div>
+        </div>
+ 
+    </div>
+ 
+    <div style="text-align: center; margin-top: 0px; font-size: 20px; font-weight: 400;">
+        1/1 Visit ✅ <span style="color: #28a745; font-weight: 700;"></span>
+    </div>
+ 
+    <div id="quote-text" style="text-align: center; margin-top: 8px; font-size: 13px; color: #000;">
+        Small steps every day lead to big achievements.
+    </div>
+ 
+    <!-- Progress Bar Container -->
+    <div
+        style="margin: 20px auto 0; width: 100%; height: 12px; background: #eee; border-radius: 10px; overflow: hidden;">
+        <div
+            style="width: 25%; height: 100%; background: linear-gradient(90deg, #204070, #6d95ff); border-radius: 10px;">
+        </div>
+    </div>
+ 
+    <div id="streak-goal-text" style="text-align: center; margin-top: 20px; font-size: 15px; color: #1c3c72;">
+        Complete 10 days streak to earn a bronze badge!
+    </div>
+ 
+ 
+ 
+ 
+</div>
+
 
                 <!-- Continue Learning -->
-                <div class="dashboard-card flex-grow-1" style="max-width: 30%; border-radius: 20px; padding: 20px;">
-                    <h3 style="text-align: left; font-weight: bold; margin-left: 15px;">Continue <span
-                            class="img-heading">Learning</span></h3>
-                    {{#recentCourse}}
-                    <!-- Outer clean card -->
-                    <div style="background: #fff; border-radius: 15px; padding: 0; overflow: hidden;">
-                        <!-- Inner shadow box: image + progress + category only -->
-                        <div
-                            style="padding: 15px; margin: 10px; border-radius: 20px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                            <!-- Image -->
-                            <div style="border-radius: 12px; overflow: hidden; margin-bottom: 12px;">
-                                <img src="{{course_image_url}}" alt="{{coursename}}"
-                                    style="width: 100%; height: 170px; display: block;">
-                            </div>
-                            <!-- Progress Bar -->
-                            <div
-                                style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                                <!-- Left: Progress Text + Bar -->
-                                <div style="flex-grow: 1;">
-                                    <div
-                                        style="width: 100%; height: 10px; background: #eee; border-radius: 999px; overflow: hidden;">
-                                        <div
-                                            style="width: {{progressPercentage}}%; height: 100%; background: linear-gradient(90deg, #204070, #A3C0F9); border-radius: 999px;">
-                                        </div>
-                                    </div>
-                                    <div style="font-size: 14px; color: #333; text-align: start; margin-top: 6px;">
-                                        {{progressPercentage}}% Completed</div>
-                                </div>
-                                <!-- Right: Category Pill -->
-                                <div style="margin-left: 10px;">
-                                    <span
-                                        style="background: #204070; color: white; padding: 6px 16px; border-radius: 999px 0 999px 999px; font-size: 13px;">
-                                        {{category}}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Outside content: course name + button -->
-                        <div style="padding: 15px 15px 20px; text-align: start;">
-                            <h4
-                                style="font-size: 18px; font-weight: 600; text-align: start; margin-bottom: 10px; color: #000;">
-                                {{coursename}}</h4>
-                            <a href="{{courseurl}}"
-                                style="border: 1px solid #204070; padding: 6px 14px; border-radius: 6px; font-size: 14px; text-decoration: none; color: #white; font-weight: 500; display: inline-block;"
-                                class="course-link-button">
-                                Continue Learning →
-                            </a>
-                        </div>
-                    </div>
-                    {{/recentCourse}}
-                    {{^recentCourse}}
-                    <p>No recently accessed course found.</p>
-                    {{/recentCourse}}
-                </div>
+               <div class="learning-card">
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+    
+    <div class="card-header">
+        <h1 class="card-title">Continue Learning</h1>
+        <p class="card-subtitle">Pick up where you left off</p>
+    </div>
+    
+    <div class="card-content">
+        {{#recentCourse}}
+        <div class="course-meta">
+            <div class="course-category">{{category}}</div>
+            <div class="course-status">
+                {{#is_completed}}✅ Completed{{/is_completed}}
+                {{^is_completed}}⌛ Not Completed{{/is_completed}}
+            </div>
+        </div>
+        
+        <div class="course-image">
+            <img src="{{course_image_url}}" alt="{{coursename}}">
+        </div>
+        
+        <div class="course-name">{{coursename}}</div>
+        
+        <div class="progress-section">
+            <div class="progress-header">
+                <div class="progress-title">Course Progress</div>
+                <div class="progress-percent">{{progressPercentage}}%</div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width: {{progressPercentage}}%;"></div>
+            </div>
+        </div>
+        
+        <div class="course-stats">
+            <div class="stat-item">
+                <div class="stat-value">{{total_modules}}</div>
+                <div class="stat-label">Modules</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{progressPercentage}}%</div>
+                <div class="stat-label">Complete</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{last_accessed_time}}</div>
+                <div class="stat-label">Last Viewed</div>
+            </div>
+        </div>
+        {{/recentCourse}}
+        {{^recentCourse}}
+        <div class="no-course">
+            <i class="fas fa-book-open"></i>
+            <p>No recently accessed course found</p>
+        </div>
+        {{/recentCourse}}
+    </div>
+    
+    {{#recentCourse}}
+    <a href="{{courseurl}}" class="continue-button">
+        {{#is_completed}}Review Course{{/is_completed}}
+        {{^is_completed}}Continue Learning →{{/is_completed}}
+    </a>
+    {{/recentCourse}}
+</div>
 
                 <!-- Recently Enrolled Courses -->
-                <div class="dashboard-card flex-grow-1" style="max-width: 30%; border-radius: 20px; padding: 20px;">
-                    <h3 style="text-align: left; font-weight: bold; margin-left: 15px; ">Recent <span
-                            class="img-heading">Enrolled</span></h3>
-                    <div id="course-carousel" style="height: auto;">
-                        {{#enrolledCourses}}
-                        <!-- Outer Card: One visible at a time -->
-                        <div class="course-item" style="display: none;">
-                            <!-- Shadowed Box: Only for image -->
-                            <div style="background: #fff; border-radius: 20px; padding: 0; overflow: hidden;">
-                                <div
-                                    style="padding: 15px; margin: 10px; border-radius: 20px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                                    <!-- Image -->
-                                    <div style="border-radius: 12px; overflow: hidden; margin-bottom: 0; ">
-                                        <img src="{{course_image_url}}" alt="{{coursename}}"
-                                            style="width: 100%; height: 220px; display: block; ">
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Outside Shadow Box: Title + Button -->
-                            <div style="padding: 15px 0 0 0; text-align: left;">
-                                <h4
-                                    style="font-size: 18px; font-weight: 600; color: #000; margin-bottom: 10px; margin-left: 15px;">
-                                    {{coursename}}
-                                </h4>
-                                <a href="{{courseurl}}"
-                                    style="border: 1px solid #204070; padding: 6px 14px; border-radius: 6px; font-size: 14px; text-decoration: none; color: #white; font-weight: 500; margin-left: 15px;"
-                                    class="course-link-button">
-                                    Go to Course →
-                                </a>
-                            </div>
-                        </div>
-                        {{/enrolledCourses}}
+                 <div class="dashboard-card flex-grow-1" style="max-width: 30%; border-radius: 20px; padding: 20px;">
+    <div class="card-header">
+        <h1 class="card-title">Recent Enrolled Courses</h1>
+        <p class="card-subtitle">Explore your recently enrolled courses</p>
+    </div>
+    <div id="course-carousel" style="height: auto; position: relative; overflow: hidden;">
+        {{#enrolledCourses}}
+        <div class="course-item" style="display: none;">
+            <div class="learning-card">
+                <!-- Category + Completion Status -->
+                <div class="course-meta">
+                
+                    <div class="course-category">{{category}}</div>
+                    <div class="course-status" style="color: {{#course_completion_status}}#28a745{{/course_completion_status}}{{^course_completion_status}}#ff6b6b{{/course_completion_status}}">
+                        {{#course_completion_status}}✅ Completed{{/course_completion_status}}
+                        {{^course_completion_status}}⌛ Not Completed{{/course_completion_status}}
                     </div>
                 </div>
+
+                <!-- Course Image -->
+                <div class="course-image">
+                    <img src="{{course_image_url}}" alt="{{course_name}}">
+                </div>
+
+                <!-- Course Name -->
+                        <div class="course-name">{{coursename}}</div>
+
+
+                <!-- Progress Section -->
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <div class="progress-title">Course Progress</div>
+                        <div class="progress-percent">{{progressPercentage}}%</div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: {{progressPercentage}}%;"></div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="course-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">{{total_modules}}</div>
+                        <div class="stat-label">Modules</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{progressPercentage}}%</div>
+                        <div class="stat-label">Complete</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{last_accessed_time}}</div>
+                        <div class="stat-label">Last Viewed</div>
+                    </div>
+                </div>
+
+                <!-- Button -->
+                <a href="{{courseurl}}" class="continue-button">Go to Course →</a>
+            </div>
+        </div>
+        {{/enrolledCourses}}
+
+        {{^enrolledCourses}}
+        <div class="no-course">
+            <i class="fas fa-book-open"></i>
+            <p>No recent courses enrolled</p>
+        </div>
+        {{/enrolledCourses}}
+    </div>
+</div>
 
                 <!-- Learning Path -->
                 <div class="learning-path-card">
@@ -1227,6 +1719,78 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .catch(console.error);
 });
+
+
+
+
+ document.addEventListener("DOMContentLoaded", function () {
+        const courseItems = document.querySelectorAll("#course-carousel .course-item");
+        let currentIndex = 0;
+        if(courseItems.length === 0) return;
+
+        function showCourse(index) {
+            courseItems.forEach((item, i) => {
+                if (i === index) {
+                    item.classList.add('show');
+                    item.classList.remove('hide');
+                } else {
+                    item.classList.remove('show');
+                    item.classList.add('hide');
+                }
+            });
+        }
+
+        function startCarousel() {
+            showCourse(currentIndex);
+            setInterval(() => {
+                currentIndex = (currentIndex + 1) % courseItems.length;
+                showCourse(currentIndex);
+            }, 3500);
+        }
+
+        startCarousel();
+    });
+      document.addEventListener('DOMContentLoaded', () => {
+    const quotes = [
+      "Small steps every day lead to big achievements.",
+      "Consistency is the key to success.",
+      "Keep pushing forward, no matter what."
+    ];
+ 
+    let currentIndex = 0;
+    const quoteElement = document.getElementById('quote-text');
+ 
+    setInterval(() => {
+      // Start fade out
+      quoteElement.classList.add('fade-out');
+ 
+      // After fade out completes (500ms), change text and fade in
+      setTimeout(() => {
+        currentIndex = (currentIndex + 1) % quotes.length;
+        quoteElement.textContent = quotes[currentIndex];
+        quoteElement.classList.remove('fade-out');
+      }, 500); // Match this duration to CSS transition time
+    }, 5000); // Change every 5 seconds
+  });
+ 
+ 
+ 
+document.addEventListener('DOMContentLoaded', () => {
+  const streakGoals = [
+    "Complete 10 days streak to earn a bronze badge!",
+    "Continue for 25 days to earn a silver badge!",
+    "Continue for 40 days to earn a gold badge!"
+  ];
+ 
+  let streakIndex = 0;
+  const streakGoalElement = document.getElementById('streak-goal-text');
+ 
+  setInterval(() => {
+    streakIndex = (streakIndex + 1) % streakGoals.length;
+    streakGoalElement.textContent = streakGoals[streakIndex];
+  }, 10000); // Change every 5 seconds
+});
+ 
     </script>
 </body>
 
