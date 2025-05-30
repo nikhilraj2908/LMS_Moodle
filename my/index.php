@@ -237,7 +237,7 @@ if (isloggedin() && !isguestuser()) {
 
     // Fetch the last 3 enrolled courses
     $enrolledCoursesSql = "
-        SELECT 
+      SELECT 
     c.id AS course_id,
     c.fullname AS course_name,
     c.shortname AS course_shortname,
@@ -250,16 +250,40 @@ if (isloggedin() && !isguestuser()) {
     f.filename AS course_image_filename,
     f.filepath AS course_image_filepath,
     f.mimetype AS course_image_mimetype,
-    CONCAT('/pluginfile.php/', ctx.id, '/course/overviewfiles/', f.filename) AS course_image_url
+    CONCAT('/pluginfile.php/', ctx.id, '/course/overviewfiles/', f.filename) AS course_image_url,
+    
+    -- Add total modules for each course
+    (SELECT COUNT(*) FROM mdl_course_modules cm WHERE cm.course = c.id AND cm.visible = 1) AS total_modules,
+    
+    -- Course completion status
+    CASE WHEN ccomp.timecompleted IS NOT NULL AND ccomp.timecompleted > 0 THEN 1 ELSE 0 END AS course_completion_status,
+    
+    -- Progress percentage of modules completed by user
+    ROUND(
+        (
+            SELECT COUNT(*) 
+            FROM mdl_course_modules_completion cmc
+            JOIN mdl_course_modules cm ON cmc.coursemoduleid = cm.id
+            WHERE cm.course = c.id 
+              AND cmc.userid = ue.userid
+              AND cmc.completionstate = 1
+              AND cm.visible = 1
+        ) * 100.0 / NULLIF(
+            (SELECT COUNT(*) FROM mdl_course_modules cm WHERE cm.course = c.id AND cm.visible = 1), 0
+        ), 2
+    ) AS progress_percentage
+
 FROM mdl_course c
 JOIN mdl_enrol e ON e.courseid = c.id
 JOIN mdl_user_enrolments ue ON ue.enrolid = e.id
 LEFT JOIN mdl_course_categories cc ON c.category = cc.id
 LEFT JOIN mdl_context ctx ON c.id = ctx.instanceid AND ctx.contextlevel = 50
 LEFT JOIN mdl_files f ON ctx.id = f.contextid 
-           AND f.component = 'course' 
-           AND f.filearea = 'overviewfiles' 
-           AND f.filename <> '.'
+       AND f.component = 'course' 
+       AND f.filearea = 'overviewfiles' 
+       AND f.filename <> '.'
+LEFT JOIN mdl_course_completions ccomp ON ccomp.course = c.id AND ccomp.userid = ue.userid
+
 WHERE ue.userid = ?
   AND c.visible = 1
 ORDER BY ue.timecreated DESC
@@ -277,23 +301,27 @@ try {
     $enrolledCourses = [];
 }
 
-// Prepare enrolled courses data.
-$enrolledCoursesData = [];
+// Prepare enrolled courses data.$enrolledCoursesData = [];
 foreach ($enrolledCourses as $course) {
     $cleanedSummary = format_string($course->course_summary, true);
-    
-    // Check if the course image exists; if not, use the default image.
+
     $course_image_url = (!empty($course->course_image_filename))
         ? $CFG->wwwroot . $course->course_image_url
         : $default_image_url;
-    
+
     $enrolledCoursesData[] = [
-        'courseid'         => $course->course_id,
-        'coursename'       => $course->course_name,
-        'coursesummary'    => $cleanedSummary,
-        'enrolled_time'    => $course->enrolled_time,
-        'course_image_url' => $course_image_url,  // Use the computed image URL
-        'courseurl'        => new moodle_url('/course/view.php', ['id' => $course->course_id])
+        'courseid'           => $course->course_id,
+        'coursename'         => $course->course_name,
+        'coursesummary'      => $cleanedSummary,
+        'courseshortname'    => $course->course_shortname,
+        'last_accessed_time' => date('Y-m-d H:i:s', $course->enrolled_time), // Format timecreated if needed
+        'course_image_url'   => $course_image_url,
+        'courseurl'          => new moodle_url('/course/view.php', ['id' => $course->course_id]),
+        'category'           => $course->category_name,
+        'progressPercentage' => $course->progress_percentage ?? 0,
+        'total_modules'      => $course->total_modules ?? 0,
+        'completion_status'  => $course->course_completion_status ? 'Completed' : 'In Progress',
+        'is_completed'       => (bool)$course->course_completion_status,
     ];
 }
 
@@ -307,7 +335,7 @@ $templatecontext['searchResults'] = $formattedsearchresults ?? [];
    // Define the default image URL (if not already defined).
 $default_image_url = $CFG->wwwroot . '/theme/academi/pix/defaultcourse.jpg';
 
-// Query to fetch the most recent course accessed by the user.
+// Query to fetch the most recent course accessed by the user with additional data
 $recentCourseSql = "
     SELECT 
         c.id AS course_id,
@@ -318,7 +346,23 @@ $recentCourseSql = "
         f.filename AS course_image_filename,
         f.filepath AS course_image_filepath,
         f.mimetype AS course_image_mimetype,
-        CONCAT('/pluginfile.php/', ctx.id, '/course/overviewfiles/', f.filename) AS course_image_url
+        CONCAT('/pluginfile.php/', ctx.id, '/course/overviewfiles/', f.filename) AS course_image_url,
+        cc.name AS category_name,
+        (SELECT COUNT(*) FROM mdl_course_modules cm WHERE cm.course = c.id AND cm.visible = 1) AS total_modules,
+        CASE WHEN ccomp.timecompleted IS NOT NULL AND ccomp.timecompleted > 0 THEN 1 ELSE 0 END AS course_completion_status,
+        ROUND(
+            (
+                SELECT COUNT(*) 
+                FROM mdl_course_modules_completion cmc
+                JOIN mdl_course_modules cm ON cmc.coursemoduleid = cm.id
+                WHERE cm.course = c.id 
+                  AND cmc.userid = l.userid
+                  AND cmc.completionstate = 1
+                  AND cm.visible = 1
+            ) * 100.0 / NULLIF(
+                (SELECT COUNT(*) FROM mdl_course_modules cm WHERE cm.course = c.id AND cm.visible = 1), 0
+            ), 2
+        ) AS progress_percentage
     FROM mdl_logstore_standard_log l
     JOIN mdl_course c ON l.courseid = c.id
     LEFT JOIN mdl_context ctx ON c.id = ctx.instanceid AND ctx.contextlevel = 50
@@ -326,9 +370,11 @@ $recentCourseSql = "
                           AND f.component = 'course'
                           AND f.filearea = 'overviewfiles'
                           AND f.filename <> '.'
+    LEFT JOIN mdl_course_categories cc ON c.category = cc.id
+    LEFT JOIN mdl_course_completions ccomp ON ccomp.course = c.id AND ccomp.userid = l.userid
     WHERE l.userid = ?
       AND l.courseid IS NOT NULL
-      AND c.fullname <> 'AlogicData' -- or c.id <> 5, whichever you need
+      AND c.fullname <> 'AlogicData'
       AND c.visible = 1
     ORDER BY l.timecreated DESC
     LIMIT 1
@@ -336,11 +382,6 @@ $recentCourseSql = "
 
 try {
     $recentCourse = $DB->get_record_sql($recentCourseSql, [$USER->id]);
-    if (!$recentCourse) {
-        error_log("No recent course found for user ID: " . $USER->id);
-    } else {
-        error_log("Recent course found: " . print_r($recentCourse, true)); // Debug
-    }
 } catch (dml_exception $e) {
     error_log("Error fetching recent course: " . $e->getMessage());
     $recentCourse = null;
@@ -348,27 +389,34 @@ try {
 
 // Add recent course data to the template context
 if ($recentCourse) {
-    // Clean the course summary using the correct alias:
     $cleanedSummary = format_string($recentCourse->course_summary, true);
 
-    // Handle the image (fallback to default if not present):
     $course_image_url = (!empty($recentCourse->course_image_filename))
         ? $CFG->wwwroot . $recentCourse->course_image_url
         : $default_image_url;
 
-        $templatecontext['recentCourse'] = [
-            'courseid'         => $recentCourse->course_id,
-            'coursename'       => $recentCourse->course_name,   // Use course_name
-            'coursesummary'    => $cleanedSummary,
-            'courseshortname'  => $recentCourse->course_shortname,
-            'last_accessed_time' => $recentCourse->last_accessed_time,
-            'course_image_url' => $course_image_url,            // computed above
-            'courseurl'        => new moodle_url('/course/view.php', ['id' => $recentCourse->course_id])
-        ];
+    $progressPercentage = $recentCourse->progress_percentage ?? 0;
+    if ($progressPercentage === null) {
+        $progressPercentage = 0;
+    }
+
+    $templatecontext['recentCourse'] = [
+        'courseid'           => $recentCourse->course_id,
+        'coursename'         => $recentCourse->course_name,
+        'coursesummary'      => $cleanedSummary,
+        'courseshortname'    => $recentCourse->course_shortname,
+        'last_accessed_time' => $recentCourse->last_accessed_time,
+        'course_image_url'   => $course_image_url,
+        'courseurl'          => new moodle_url('/course/view.php', ['id' => $recentCourse->course_id]),
+        'category'           => $recentCourse->category_name,
+        'progressPercentage' => $progressPercentage,
+        'total_modules'      => $recentCourse->total_modules,
+        'completion_status'  => $recentCourse->course_completion_status ? 'Completed' : 'In Progress',
+        'is_completed'       => (bool)$recentCourse->course_completion_status
+    ];
 } else {
     $templatecontext['recentCourse'] = null;
 }
-
     // Debug: Log the recent course data
     if ($recentCourse) {
         error_log("Recent Course Found: " . $recentCourse->course_name);
@@ -643,6 +691,11 @@ $templatecontext['calendarinstanceid'] = $calendarinstanceid;
 $templatecontext['uniqid'] = $uniqid;
 $templatecontext['iscalendarblock'] = false;
 
+// Get current streak count from DB
+$streakCount = $DB->count_records('user_streaks', ['userid' => $userid]);
+
+// Add to template context
+$templatecontext['current_streak'] = $streakCount;
 
 
 echo $OUTPUT->render_from_template('core/dashboard', $templatecontext);
