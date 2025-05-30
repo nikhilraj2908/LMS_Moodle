@@ -44,6 +44,7 @@
             align-items: stretch;
             gap: 2%;
             overflow-x: hidden;
+
         }
 
         .dashboard-row {
@@ -1300,42 +1301,6 @@
 
 
                 </div>
- 
-                <div
-                    style="font-size: 16px; font-weight: 400; color: #000; user-select: none; margin-top: 6px; line-height: 1.2;">
-                    Days!<br>Keep going
-                </div>
- 
-            </div>
-        </div>
- 
-    </div>
- 
-    <div style="text-align: center; margin-top: 0px; font-size: 20px; font-weight: 400;">
-        1/1 Visit ✅ <span style="color: #28a745; font-weight: 700;"></span>
-    </div>
- 
-    <div id="quote-text" style="text-align: center; margin-top: 8px; font-size: 13px; color: #000;">
-        Small steps every day lead to big achievements.
-    </div>
- 
-    <!-- Progress Bar Container -->
-    <div
-        style="margin: 20px auto 0; width: 100%; height: 12px; background: #eee; border-radius: 10px; overflow: hidden;">
-        <div
-            style="width: 25%; height: 100%; background: linear-gradient(90deg, #204070, #6d95ff); border-radius: 10px;">
-        </div>
-    </div>
- 
-    <div id="streak-goal-text" style="text-align: center; margin-top: 20px; font-size: 15px; color: #1c3c72;">
-        Complete 10 days streak to earn a bronze badge!
-    </div>
- 
- 
- 
- 
-</div>
-
 
 
                 <!-- Continue Learning -->
@@ -1476,57 +1441,6 @@
                         {{/enrolledCourses}}
                     </div>
                 </div>
-
-                <!-- Course Image -->
-                <div class="course-image">
-                    <img src="{{course_image_url}}" alt="{{course_name}}">
-                </div>
-
-                <!-- Course Name -->
-                        <div class="course-name">{{coursename}}</div>
-
-
-                <!-- Progress Section -->
-                <div class="progress-section">
-                    <div class="progress-header">
-                        <div class="progress-title">Course Progress</div>
-                        <div class="progress-percent">{{progressPercentage}}%</div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill" style="width: {{progressPercentage}}%;"></div>
-                    </div>
-                </div>
-
-                <!-- Stats -->
-                <div class="course-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">{{total_modules}}</div>
-                        <div class="stat-label">Modules</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">{{progressPercentage}}%</div>
-                        <div class="stat-label">Complete</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">{{last_accessed_time}}</div>
-                        <div class="stat-label">Last Viewed</div>
-                    </div>
-                </div>
-
-                <!-- Button -->
-                <a href="{{courseurl}}" class="continue-button">Go to Course →</a>
-            </div>
-        </div>
-        {{/enrolledCourses}}
-
-        {{^enrolledCourses}}
-        <div class="no-course">
-            <i class="fas fa-book-open"></i>
-            <p>No recent courses enrolled</p>
-        </div>
-        {{/enrolledCourses}}
-    </div>
-</div>
 
                 <!-- Learning Path -->
                 <div class="learning-path-card">
