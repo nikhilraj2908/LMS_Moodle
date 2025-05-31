@@ -314,7 +314,7 @@ foreach ($enrolledCourses as $course) {
         'coursename'         => $course->course_name,
         'coursesummary'      => $cleanedSummary,
         'courseshortname'    => $course->course_shortname,
-        'last_accessed_time' => date('Y-m-d H:i:s', $course->enrolled_time), // Format timecreated if needed
+        'last_accessed_time' => date('Y-m-d ', $course->enrolled_time), // Format timecreated if needed
         'course_image_url'   => $course_image_url,
         'courseurl'          => new moodle_url('/course/view.php', ['id' => $course->course_id]),
         'category'           => $course->category_name,
@@ -405,6 +405,7 @@ if ($recentCourse) {
         'coursename'         => $recentCourse->course_name,
         'coursesummary'      => $cleanedSummary,
         'courseshortname'    => $recentCourse->course_shortname,
+        
         'last_accessed_time' => $recentCourse->last_accessed_time,
         'course_image_url'   => $course_image_url,
         'courseurl'          => new moodle_url('/course/view.php', ['id' => $recentCourse->course_id]),
