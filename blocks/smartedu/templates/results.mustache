@@ -1,0 +1,117 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_smartedu/results
+
+    Template to display list of resources of a course.
+
+    Context variables required for this template:
+    * has_error (boolean): Indicates if there was an error processing the resource.
+    * error_message (string): The error message to display if `has_error` is true.
+    * resource_name (string): The name of the resource being summarized.
+    * summary (string): The summary of the resource content.
+    * questions (array): List of questions generated for the resource, where each question contains:
+        - question_number (int): The number of the question.
+        - question_text (string): The text of the question.
+        - option_a (string): Option A for the question.
+        - option_b (string): Option B for the question.
+        - option_c (string): Option C for the question.
+        - option_d (string): Option D for the question.
+    * send_responses_label (string): Label for the button to show responses.
+
+    Example context (json):
+    {
+    }
+}}
+<div class="container">
+    {{#has_error}}
+        <div class="alert alert-danger" role="alert">
+            {{{error_message}}}
+        </div>
+    {{/has_error}}
+
+    {{^has_error}}
+
+        <div class="card">
+            <div class="card-header">
+                <strong>{{resource_name}}</strong>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{{summary}}}</p>
+            </div>
+        </div>
+
+        <div class="card mt-2">
+            <div class="card-header">
+                <strong>{{study_script_title}}</strong>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{{study_script}}}</p>
+            </div>
+        </div>
+
+        <div class="card mt-2">
+            <div class="card-header">
+                <strong>{{mind_map_title}}</strong>
+            </div>
+            <div class="card-body">
+                <div id="mindMap" style="width:100%;height:500px;"></div>
+            </div>
+        </div>
+
+        {{#questions}}
+            <div class="card mt-2 question" data-correct="{{correct_option}}">
+                <div class="card-header">
+                    <strong>{{question_number}}: {{question_text}}</strong>
+                </div>
+                <div class="card-body">
+                    <label><input type="radio" name="{{question_number}}" value="A"> {{option_a}}</label><br>
+                    <label><input type="radio" name="{{question_number}}" value="B"> {{option_b}}</label><br>
+                    <label><input type="radio" name="{{question_number}}" value="C"> {{option_c}}</label><br>
+                    <label><input type="radio" name="{{question_number}}" value="D"> {{option_d}}</label><br>
+                </div>
+                <div class="correct card-footer text-success d-none">
+                    {{correct_answer_label}}
+                </div>
+                <div class="wrong card-footer text-danger d-none">
+                    {{wrong_answer_label}} {{response_label}} <strong>{{correct_option}}</strong>                    
+                </div>
+                <div class="feedback-A card-footer text-primary d-none">
+                    {{feedback_a}}
+                </div>
+                <div class="feedback-B card-footer text-primary d-none">
+                    {{feedback_b}}
+                </div>
+                <div class="feedback-C card-footer text-primary d-none">
+                    {{feedback_c}}
+                </div>
+                <div class="feedback-D card-footer text-primary d-none">
+                    {{feedback_d}}
+                </div>
+            </div>                    
+        {{/questions}}
+
+        {{#has_questions}}
+            <div class="mt-2">
+                <button id="send_responses" class="btn btn-primary" type="button" aria-expanded="false">
+                    {{{send_responses_label}}}
+                </button>
+            </div>
+        {{/has_questions}}
+    {{/has_error}}
+</div>
+
