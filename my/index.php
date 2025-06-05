@@ -236,59 +236,106 @@ if (isloggedin() && !isguestuser()) {
     $awardgif = $OUTPUT->image_url('award', 'theme_academi')->out();
 
     // Fetch the last 3 enrolled courses
-    $enrolledCoursesSql = "
-      SELECT 
-    c.id AS course_id,
-    c.fullname AS course_name,
-    c.shortname AS course_shortname,
-    c.summary AS course_summary,
-    c.startdate AS course_startdate,
-    c.enddate AS course_enddate,
-    c.visible AS course_visible,
-    cc.name AS category_name,
-    ue.timecreated AS enrolled_time,
-    f.filename AS course_image_filename,
-    f.filepath AS course_image_filepath,
-    f.mimetype AS course_image_mimetype,
-    CONCAT('/pluginfile.php/', ctx.id, '/course/overviewfiles/', f.filename) AS course_image_url,
-    
-    -- Add total modules for each course
-    (SELECT COUNT(*) FROM mdl_course_modules cm WHERE cm.course = c.id AND cm.visible = 1) AS total_modules,
-    
-    -- Course completion status
-    CASE WHEN ccomp.timecompleted IS NOT NULL AND ccomp.timecompleted > 0 THEN 1 ELSE 0 END AS course_completion_status,
-    
-    -- Progress percentage of modules completed by user
-    ROUND(
+ $enrolledCoursesSql = "
+    SELECT 
+      c.id                    AS course_id,
+      c.fullname              AS course_name,
+      c.shortname             AS course_shortname,
+      c.summary               AS course_summary,
+      c.startdate             AS course_startdate,
+      c.enddate               AS course_enddate,
+      c.visible               AS course_visible,
+      cc.name                 AS category_name,
+      ue.timecreated          AS enrolled_time,
+      f.filename              AS course_image_filename,
+      f.filepath              AS course_image_filepath,
+      f.mimetype              AS course_image_mimetype,
+      CONCAT('/pluginfile.php/', ctx.id, '/course/overviewfiles/', f.filename) AS course_image_url,
+      
+      /* -------------------------------
+         1) TOTAL MODULES (exclude section 0)
+         Count only those modules whose section >= 1
+      -------------------------------- */
+      (
+        SELECT COUNT(*)
+          FROM mdl_course_modules cm
+          JOIN mdl_course_sections cs
+            ON cm.section = cs.id
+         WHERE cm.course   = c.id
+           AND cm.visible  = 1
+           AND cs.section >= 1
+      ) AS total_modules,
+      
+      /* -------------------------------
+         2) COURSE COMPLETION STATUS
+         Unchanged: checks mdl_course_completions
+      -------------------------------- */
+      CASE
+        WHEN ccomp.timecompleted IS NOT NULL 
+         AND ccomp.timecompleted > 0
+        THEN 1
+        ELSE 0
+      END AS course_completion_status,
+      
+      /* -------------------------------
+         3) PROGRESS PERCENTAGE (exclude section 0)
+         Numerator: count only completed modules (section >= 1)
+         Denominator: count only total modules (section >= 1)
+      -------------------------------- */
+      ROUND(
         (
-            SELECT COUNT(*) 
+          SELECT COUNT(*)
             FROM mdl_course_modules_completion cmc
-            JOIN mdl_course_modules cm ON cmc.coursemoduleid = cm.id
-            WHERE cm.course = c.id 
-              AND cmc.userid = ue.userid
-              AND cmc.completionstate = 1
-              AND cm.visible = 1
-        ) * 100.0 / NULLIF(
-            (SELECT COUNT(*) FROM mdl_course_modules cm WHERE cm.course = c.id AND cm.visible = 1), 0
-        ), 2
-    ) AS progress_percentage
+            JOIN mdl_course_modules cm
+              ON cmc.coursemoduleid = cm.id
+            JOIN mdl_course_sections cs
+              ON cm.section = cs.id
+           WHERE cm.course            = c.id
+             AND cmc.userid           = ue.userid
+             AND cmc.completionstate  = 1
+             AND cm.visible           = 1
+             AND cs.section          >= 1
+        ) * 100.0
+        / NULLIF(
+            (
+              SELECT COUNT(*)
+                FROM mdl_course_modules cm
+                JOIN mdl_course_sections cs
+                  ON cm.section = cs.id
+               WHERE cm.course   = c.id
+                 AND cm.visible  = 1
+                 AND cs.section >= 1
+            ), 
+            0
+          ),
+        2
+      ) AS progress_percentage
 
-FROM mdl_course c
-JOIN mdl_enrol e ON e.courseid = c.id
-JOIN mdl_user_enrolments ue ON ue.enrolid = e.id
-LEFT JOIN mdl_course_categories cc ON c.category = cc.id
-LEFT JOIN mdl_context ctx ON c.id = ctx.instanceid AND ctx.contextlevel = 50
-LEFT JOIN mdl_files f ON ctx.id = f.contextid 
-       AND f.component = 'course' 
-       AND f.filearea = 'overviewfiles' 
-       AND f.filename <> '.'
-LEFT JOIN mdl_course_completions ccomp ON ccomp.course = c.id AND ccomp.userid = ue.userid
+    FROM mdl_course c
+    JOIN mdl_enrol e 
+      ON e.courseid = c.id
+    JOIN mdl_user_enrolments ue 
+      ON ue.enrolid = e.id
+    LEFT JOIN mdl_course_categories cc 
+      ON c.category = cc.id
+    LEFT JOIN mdl_context ctx 
+      ON c.id = ctx.instanceid 
+     AND ctx.contextlevel = 50
+    LEFT JOIN mdl_files f 
+      ON ctx.id = f.contextid 
+     AND f.component = 'course' 
+     AND f.filearea  = 'overviewfiles' 
+     AND f.filename <> '.'
+    LEFT JOIN mdl_course_completions ccomp 
+      ON ccomp.course = c.id 
+     AND ccomp.userid = ue.userid
 
-WHERE ue.userid = ?
-  AND c.visible = 1
-ORDER BY ue.timecreated DESC
-LIMIT 3;
-    ";
+    WHERE ue.userid = ?
+      AND c.visible = 1
+
+    ORDER BY ue.timecreated DESC
+    LIMIT 3
+";
 
     // Define the default image URL.
 $default_image_url = $CFG->wwwroot . '/theme/academi/pix/defaultcourse.jpg';
@@ -309,21 +356,39 @@ foreach ($enrolledCourses as $course) {
         ? $CFG->wwwroot . $course->course_image_url
         : $default_image_url;
 
+    // 1) Grab numeric percentage (0–100)
+    $percent = (float)($course->progress_percentage ?? 0);
+
+    // 2) Raw completion flag from mdl_course_completions
+    $rawCompletion = (bool)$course->course_completion_status;
+
+    // 3) Mark as "really completed" if either:
+    //    – Moodle's course completion record exists (rawCompletion = true)
+    //    – OR progressPercentage is already 100%
+    $reallyCompleted = ($rawCompletion || $percent >= 100.0);
+
     $enrolledCoursesData[] = [
         'courseid'           => $course->course_id,
         'coursename'         => $course->course_name,
         'coursesummary'      => $cleanedSummary,
         'courseshortname'    => $course->course_shortname,
-        'last_accessed_time' => date('Y-m-d ', $course->enrolled_time), // Format timecreated if needed
+        'last_accessed_time' => date('Y-m-d ', $course->enrolled_time),
         'course_image_url'   => $course_image_url,
         'courseurl'          => new moodle_url('/course/view.php', ['id' => $course->course_id]),
         'category'           => $course->category_name,
-        'progressPercentage' => $course->progress_percentage ?? 0,
+
+        // use the numeric percent directly
+        'progressPercentage' => $percent,
         'total_modules'      => $course->total_modules ?? 0,
-        'completion_status'  => $course->course_completion_status ? 'Completed' : 'In Progress',
-        'is_completed'       => (bool)$course->course_completion_status,
+
+        // override the raw completion with our "reallyCompleted" boolean
+        'completion_status'        => $reallyCompleted ? 'Completed' : 'In Progress',
+        'course_completion_status' => $reallyCompleted ? 1 : 0, 
+           // this ensures mustache {{#course_completion_status}} works
+        'is_completed'             => $reallyCompleted,
     ];
 }
+
 
 // Add enrolled courses data to the template context.
 $templatecontext['enrolledCourses'] = $enrolledCoursesData;
@@ -338,44 +403,93 @@ $default_image_url = $CFG->wwwroot . '/theme/academi/pix/defaultcourse.jpg';
 // Query to fetch the most recent course accessed by the user with additional data
 $recentCourseSql = "
     SELECT 
-        c.id AS course_id,
-        c.fullname AS course_name,
-        c.shortname AS course_shortname,
-        c.summary AS course_summary,
-        FROM_UNIXTIME(l.timecreated) AS last_accessed_time,
-        f.filename AS course_image_filename,
-        f.filepath AS course_image_filepath,
-        f.mimetype AS course_image_mimetype,
-        CONCAT('/pluginfile.php/', ctx.id, '/course/overviewfiles/', f.filename) AS course_image_url,
-        cc.name AS category_name,
-        (SELECT COUNT(*) FROM mdl_course_modules cm WHERE cm.course = c.id AND cm.visible = 1) AS total_modules,
-        CASE WHEN ccomp.timecompleted IS NOT NULL AND ccomp.timecompleted > 0 THEN 1 ELSE 0 END AS course_completion_status,
-        ROUND(
+      c.id                   AS course_id,
+      c.fullname             AS course_name,
+      c.shortname            AS course_shortname,
+      c.summary              AS course_summary,
+      FROM_UNIXTIME(l.timecreated) AS last_accessed_time,
+      f.filename             AS course_image_filename,
+      f.filepath             AS course_image_filepath,
+      f.mimetype             AS course_image_mimetype,
+      CONCAT('/pluginfile.php/', ctx.id, '/course/overviewfiles/', f.filename) AS course_image_url,
+      cc.name                AS category_name,
+
+      /* ---------------------
+         1) TOTAL MODULES (exclude section 0)
+      --------------------- */
+      (
+        SELECT COUNT(*)
+          FROM mdl_course_modules cm
+          JOIN mdl_course_sections cs ON cm.section = cs.id
+         WHERE cm.course   = c.id
+           AND cm.visible  = 1
+           AND cs.section >= 1
+      ) AS total_modules,
+
+      /* ---------------------
+         2) COURSE COMPLETION STATUS
+      --------------------- */
+      CASE 
+        WHEN ccomp.timecompleted IS NOT NULL 
+         AND ccomp.timecompleted > 0
+        THEN 1
+        ELSE 0
+      END AS course_completion_status,
+
+      /* ---------------------
+         3) PROGRESS PERCENTAGE (exclude section 0)
+      --------------------- */
+      ROUND(
+        (
+          SELECT COUNT(*)
+            FROM mdl_course_modules_completion cmc
+            JOIN mdl_course_modules cm 
+              ON cmc.coursemoduleid = cm.id
+            JOIN mdl_course_sections cs 
+              ON cm.section = cs.id
+           WHERE cm.course            = c.id
+             AND cmc.userid           = l.userid
+             AND cmc.completionstate  = 1
+             AND cm.visible           = 1
+             AND cs.section          >= 1
+        ) * 100.0
+        / NULLIF(
             (
-                SELECT COUNT(*) 
-                FROM mdl_course_modules_completion cmc
-                JOIN mdl_course_modules cm ON cmc.coursemoduleid = cm.id
-                WHERE cm.course = c.id 
-                  AND cmc.userid = l.userid
-                  AND cmc.completionstate = 1
-                  AND cm.visible = 1
-            ) * 100.0 / NULLIF(
-                (SELECT COUNT(*) FROM mdl_course_modules cm WHERE cm.course = c.id AND cm.visible = 1), 0
-            ), 2
-        ) AS progress_percentage
+              SELECT COUNT(*)
+                FROM mdl_course_modules cm
+                JOIN mdl_course_sections cs 
+                  ON cm.section = cs.id
+               WHERE cm.course   = c.id
+                 AND cm.visible  = 1
+                 AND cs.section >= 1
+            ), 
+            0
+          ), 
+        2
+      ) AS progress_percentage
+
     FROM mdl_logstore_standard_log l
-    JOIN mdl_course c ON l.courseid = c.id
-    LEFT JOIN mdl_context ctx ON c.id = ctx.instanceid AND ctx.contextlevel = 50
-    LEFT JOIN mdl_files f ON ctx.id = f.contextid
-                          AND f.component = 'course'
-                          AND f.filearea = 'overviewfiles'
-                          AND f.filename <> '.'
-    LEFT JOIN mdl_course_categories cc ON c.category = cc.id
-    LEFT JOIN mdl_course_completions ccomp ON ccomp.course = c.id AND ccomp.userid = l.userid
-    WHERE l.userid = ?
+    JOIN mdl_course c 
+      ON l.courseid = c.id
+    LEFT JOIN mdl_context ctx 
+      ON c.id = ctx.instanceid 
+     AND ctx.contextlevel = 50
+    LEFT JOIN mdl_files f 
+      ON ctx.id = f.contextid 
+     AND f.component = 'course' 
+     AND f.filearea  = 'overviewfiles' 
+     AND f.filename <> '.'
+    LEFT JOIN mdl_course_categories cc 
+      ON c.category = cc.id
+    LEFT JOIN mdl_course_completions ccomp 
+      ON ccomp.course = c.id 
+     AND ccomp.userid = l.userid
+
+    WHERE l.userid       = ?
       AND l.courseid IS NOT NULL
       AND c.fullname <> 'AlogicData'
-      AND c.visible = 1
+      AND c.visible       = 1
+
     ORDER BY l.timecreated DESC
     LIMIT 1
 ";
@@ -395,10 +509,14 @@ if ($recentCourse) {
         ? $CFG->wwwroot . $recentCourse->course_image_url
         : $default_image_url;
 
-    $progressPercentage = $recentCourse->progress_percentage ?? 0;
-    if ($progressPercentage === null) {
-        $progressPercentage = 0;
-    }
+    // 1) Grab numeric percentage (0–100)
+    $percent = (float)($recentCourse->progress_percentage ?? 0);
+
+    // 2) Raw completion flag from mdl_course_completions
+    $rawCompletion = (bool)$recentCourse->course_completion_status;
+
+    // 3) Mark as "really completed" if rawCompletion OR percent >= 100
+    $reallyCompleted = ($rawCompletion || $percent >= 100.0);
 
     $templatecontext['recentCourse'] = [
         'courseid'           => $recentCourse->course_id,
@@ -410,14 +528,20 @@ if ($recentCourse) {
         'course_image_url'   => $course_image_url,
         'courseurl'          => new moodle_url('/course/view.php', ['id' => $recentCourse->course_id]),
         'category'           => $recentCourse->category_name,
-        'progressPercentage' => $progressPercentage,
+
+        // send the numeric percentage here
+        'progressPercentage' => $percent,
         'total_modules'      => $recentCourse->total_modules,
-        'completion_status'  => $recentCourse->course_completion_status ? 'Completed' : 'In Progress',
-        'is_completed'       => (bool)$recentCourse->course_completion_status
+
+        // override the raw completion with our "reallyCompleted" boolean
+        'completion_status'        => $reallyCompleted ? 'Completed' : 'In Progress',
+        'course_completion_status' => $reallyCompleted ? 1 : 0,
+        'is_completed'             => $reallyCompleted,
     ];
 } else {
     $templatecontext['recentCourse'] = null;
 }
+
     // Debug: Log the recent course data
     if ($recentCourse) {
         error_log("Recent Course Found: " . $recentCourse->course_name);
@@ -650,28 +774,34 @@ if ($recentCourse) {
     }
 
     // Assign to template context
+      // … (all your data‐gathering SQL above) … 
+
+    // Assign to template context
     $templatecontext = [
-        'username' => $displayname,
-        'userpicture' => $userpicture,
-        'completedCourses' => $completedCourses,
-        'totalCourses' => $totalCourses,
-        'totalOverdue' => $totalOverdue,
-        'totalPoints' => $formattedTotalPoints,
-        'totalPossiblePoints' => $formattedTotalPossiblePoints,
+        'username'               => $displayname,
+        'userpicture'            => $userpicture,
+        'completedCourses'       => $completedCourses,
+        'totalCourses'           => $totalCourses,            // existing
+        'totalOverdue'           => $totalOverdue,            // existing
+        'totalModules'           => $totalCourses,            // NEW: fill “Total” box
+        'remainingCourses'       => $totalOverdue,            // NEW: fill “Remaining” box
+        'totalPoints'            => $formattedTotalPoints,
+        'totalPossiblePoints'    => $formattedTotalPossiblePoints,
         'learningPathPercentage' => $learningPathPercentage,
-        'overduePercentage' => $overduePercentage,
-        'asset1_image_url' => $imageurl,
-        'course_enrolled_url' => $courseenrolledgif,
-        'course_award_url' => $awardgif,
-        'hoursActivity' => json_encode($hoursActivity),
-        'percentageChange' => abs($percentageChange),
-        'isIncrease' => $isIncrease,
-        'currentWeekTotal' => round($currentWeekTotal, 2),
-        'previousWeekTotal' => round($previousWeekTotal, 2),
-        'courses' => $courses_data,
-        'recentCourse' => $templatecontext['recentCourse'],
-        'enrolledCourses' => $enrolledCoursesData // Add enrolled courses to the template context
+        'overduePercentage'      => $overduePercentage,
+        'asset1_image_url'       => $imageurl,
+        'course_enrolled_url'    => $courseenrolledgif,
+        'course_award_url'       => $awardgif,
+        'hoursActivity'          => json_encode($hoursActivity),
+        'percentageChange'       => abs($percentageChange),
+        'isIncrease'             => $isIncrease,
+        'currentWeekTotal'       => round($currentWeekTotal, 2),
+        'previousWeekTotal'      => round($previousWeekTotal, 2),
+        'courses'                => $courses_data,
+        'recentCourse'           => $templatecontext['recentCourse'],
+        'enrolledCourses'        => $enrolledCoursesData
     ];
+
 }
 
 // Render the template

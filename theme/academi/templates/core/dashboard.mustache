@@ -1313,20 +1313,22 @@
                     </div>
                 </div>
   <!-- 2) Continue Learning Card -->
-  <div class="card-equal learning-card" style="width:25%;">
-    <div class="decoration decoration-1"></div>
-    <div class="decoration decoration-2"></div>
-    <div class="card-header">
-      <h1 class="card-title">Continue Learning</h1>
-      <p class="card-subtitle">Pick up where you left off</p>
-    </div>
-    <div class="card-content">
-      {{#recentCourse}}
+ <div class="card-equal learning-card" style="width:25%;">
+  <div class="decoration decoration-1"></div>
+  <div class="decoration decoration-2"></div>
+  <div class="card-header">
+    <h1 class="card-title">Continue Learning</h1>
+    <p class="card-subtitle">Pick up where you left off</p>
+  </div>
+  <div class="card-content">
+    {{#recentCourse}}
       <div class="course-meta">
         <div class="course-category">{{category}}</div>
+
+        <!-- changed from "is_completed" to "course_completion_status" -->
         <div class="course-status">
-          {{#is_completed}}✅ Completed{{/is_completed}}
-          {{^is_completed}}⌛ Not Completed{{/is_completed}}
+          {{#course_completion_status}}✅ Completed{{/course_completion_status}}
+          {{^course_completion_status}}⌛ Not Completed{{/course_completion_status}}
         </div>
       </div>
       <div class="course-image">
@@ -1352,38 +1354,41 @@
           <div class="stat-label">Last Viewed</div>
         </div>
       </div>
-      {{/recentCourse}}
-      {{^recentCourse}}
+    {{/recentCourse}}
+    {{^recentCourse}}
       <div class="no-course">
         <i class="fas fa-book-open"></i>
         <p>No recently accessed course found</p>
       </div>
-      {{/recentCourse}}
-    </div>
-    {{#recentCourse}}
-    <a href="{{courseurl}}" class="continue-button">
-      {{#is_completed}}Review Course{{/is_completed}}
-      {{^is_completed}}Continue Learning →{{/is_completed}}
-    </a>
     {{/recentCourse}}
   </div>
+
+  {{#recentCourse}}
+    <!-- changed from "is_completed" to "course_completion_status" -->
+    <a href="{{courseurl}}" class="continue-button">
+      {{#course_completion_status}}Review Course{{/course_completion_status}}
+      {{^course_completion_status}}Continue Learning →{{/course_completion_status}}
+    </a>
+  {{/recentCourse}}
+</div>
   <!-- /.Continue Learning Card -->
 
   <!-- 3) Recent Enrollments Card -->
-  <div class="card-equal learning-card "style="width:25%;">
-    <div class="decoration decoration-1"></div>
-    <div class="decoration decoration-2"></div>
-    <div class="card-header">
-      <h1 class="card-title">Recent Enrollments</h1>
-      <p class="card-subtitle">Explore your recently enrolled courses</p>
-    </div>
-    <div id="course-carousel" style="flex: 1; position: relative; overflow: hidden;">
-      {{#enrolledCourses}}
+ <div class="card-equal learning-card" style="width:25%;">
+  <div class="decoration decoration-1"></div>
+  <div class="decoration decoration-2"></div>
+  <div class="card-header">
+    <h1 class="card-title">Recent Enrollments</h1>
+    <p class="card-subtitle">Explore your recently enrolled courses</p>
+  </div>
+  <div id="course-carousel" style="flex: 1; position: relative; overflow: hidden;">
+    {{#enrolledCourses}}
       <div class="course-item" style="display: none;">
         <div class="recentcourse-card-inner">
           <div class="course-meta">
             <div class="course-category">{{category}}</div>
-            <div class="course-status" style="color: {{#course_completion_status}}#28a745{{/course_completion_status}}{{^course_completion_status}}#ff6b6b{{/course_completion_status}};">
+            <div class="course-status"
+                 style="color: {{#course_completion_status}}#28a745{{/course_completion_status}}{{^course_completion_status}}#ff6b6b{{/course_completion_status}};">
               {{#course_completion_status}}✅ Completed{{/course_completion_status}}
               {{^course_completion_status}}⌛ Not Completed{{/course_completion_status}}
             </div>
@@ -1426,56 +1431,60 @@
           </a>
         </div>
       </div>
-      {{/enrolledCourses}}
-      {{^enrolledCourses}}
+    {{/enrolledCourses}}
+    {{^enrolledCourses}}
       <div class="no-course" style="text-align: center; padding: 30px 0; color: #7a8ca5;">
         <i class="fas fa-book-open" style="font-size: 48px; margin-bottom: 15px; color: #e6f0ff;"></i>
         <p>No recent courses enrolled</p>
       </div>
-      {{/enrolledCourses}}
-    </div>
+    {{/enrolledCourses}}
   </div>
+</div>
   <!-- /.Recent Enrollments Card -->
 
   <!-- 4) Learning Path Card -->
-  <div class="card-equal learning-card"style="width:23%;">
-    <div class="decoration decoration-1"></div>
-    <div class="decoration decoration-2"></div>
-    <div class="card-header">
-      <h1 class="card-title">Learning Path</h1>
-      <p class="card-subtitle">Track your progress and continue learning</p>
-    </div>
-    <div class="progress-container" style="margin: 60px auto 60px;">
-      <div class="progress-bg"></div>
-      <div class="progress-circle">
-        <div class="progress-fill"></div>
-      </div>
-      <div class="progress-inner">
-        <div class="progress-value" id="progressValue">{{learningPathPercentage}}%</div>
-        <div class="progress-label">Completed</div>
-      </div>
-    </div>
-    <div class="progress-stats" style="display: flex; justify-content: space-around; margin-top: 10px;">
-      <div class="stat-item">
-        <div class="stat-value" id="modulesValue">{{totalModules}}</div>
-        <div class="stat-label">Total</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="completedValue">{{completedCourses}}</div>
-        <div class="stat-label">Completed</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="remainingValue">{{remainingCourses}}</div>
-        <div class="stat-label">Remaining</div>
-      </div>
-    </div>
-    <div class="progress-bar" style="height: 10px; background: #f0f3f8; border-radius: 5px; margin: 25px 0 15px; overflow: hidden;">
-      <div class="progress-bar-fill" id="progressBarFill" style="width: {{learningPathPercentage}}%; background: linear-gradient(to right, #3c6cff, #6d95ff); height: 100%; border-radius: 5px;"></div>
-    </div>
-    <p style="color: #7a8ca5; margin-bottom: 10px;">
-      You've completed <span id="completedPercentText">{{learningPathPercentage}}%</span> of your learning path
-    </p>
+ <!-- *** Learning Path Card *** -->
+<div class="learning-path-card" style="width: 380px;">
+  <div class="card-header">
+    <h1 class="card-title">Learning Path</h1>
+    <p class="card-subtitle">Track your progress and continue learning</p>
   </div>
+
+  <div class="progress-container" style="margin: 60px auto 60px;">
+    <div class="progress-bg"></div>
+    <div class="progress-circle">
+      <div class="progress-fill"></div>
+    </div>
+    <div class="progress-inner">
+      <div class="progress-value" id="progressValue">{{learningPathPercentage}}%</div>
+      <div class="progress-label">Completed</div>
+    </div>
+  </div>
+
+  <div class="progress-stats" style="display: flex; justify-content: space-around; margin-top: 10px;">
+    <div class="stat-item">
+      <div class="stat-value" id="modulesValue">{{totalModules}}</div> 
+      <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="completedValue">{{completedCourses}}</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="remainingValue">{{remainingCourses}}</div>
+      <div class="stat-label">Remaining</div>
+    </div>
+  </div>
+
+  <div class="progress-bar" style="height: 10px; background: #f0f3f8; border-radius: 5px; margin: 25px 0 15px; overflow: hidden;">
+    <div class="progress-bar-fill" id="progressBarFill" style="width: {{learningPathPercentage}}%; background: linear-gradient(to right, #3c6cff, #6d95ff); height: 100%; border-radius: 5px;"></div>
+  </div>
+  <p style="color: #7a8ca5; margin-bottom: 10px;">
+    You've completed <span id="completedPercentText">{{learningPathPercentage}}%</span> of your learning path
+  </p>
+</div>
+<!-- /.Learning Path Card -->
+
   <!-- /.Learning Path Card -->
 
 </div>
