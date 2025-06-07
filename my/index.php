@@ -31,13 +31,18 @@ $reset = optional_param('reset', null, PARAM_BOOL);
 
 require_login();
 
+// bring in globals
 global $DB, $USER, $OUTPUT, $CFG;
+
+// Load a *complete* user record so fullname() has all name fields.
+$completeuser = $DB->get_record('user', [
+    'id' => $USER->id
+], 'id, firstname, lastname, firstnamephonetic, lastnamephonetic, middlename, alternatename');
 
 // ================================
 // 1. AJAX SEARCH (if requested)
 // ================================
 $searchquery = optional_param('search', '', PARAM_TEXT);
-
 if (
     !empty($searchquery)
     && !empty($_SERVER['HTTP_X_REQUESTED_WITH'])
@@ -70,9 +75,9 @@ if (
         ];
         $searchresults = $DB->get_records_sql($searchsql, $params);
 
-        $formattedsearchresults = [];
+        $formatted = [];
         foreach ($searchresults as $course) {
-            $formattedsearchresults[] = [
+            $formatted[] = [
                 'courseid'        => $course->course_id,
                 'coursename'      => $course->course_name,
                 'courseshortname' => $course->course_shortname,
@@ -84,10 +89,9 @@ if (
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode([
             'success'       => true,
-            'searchResults' => $formattedsearchresults,
+            'searchResults' => $formatted,
             'searchQuery'   => $searchquery
-        ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
-
+        ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
         exit;
 
     } catch (Exception $e) {
@@ -95,9 +99,8 @@ if (
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode([
             'success' => false,
-            'error'   => "An error occurred while searching. Please try again."
-        ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
-
+            'error'   => 'An error occurred while searching. Please try again.'
+        ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
         exit;
     }
 }
@@ -117,24 +120,24 @@ if (empty($CFG->enabledashboard)) {
     if ($defaultpage == HOMEPAGE_MYCOURSES) {
         redirect(new moodle_url('/my/courses.php'));
     } else {
-        throw new moodle_exception('error:dashboardisdisabled', 'my');
+        throw new moodle_exception('error:dashboardisdisabled','my');
     }
 }
 
 if (isguestuser()) {
     if (empty($CFG->allowguestmymoodle)) {
-        redirect(new moodle_url('/', ['redirect' => 0]));
+        redirect(new moodle_url('/', ['redirect'=>0]));
     }
-    $userid = null;
+    $userid        = null;
     $USER->editing = $edit = 0;
-    $context = context_system::instance();
+    $context       = context_system::instance();
     $PAGE->set_blocks_editing_capability('moodle/my:configsyspages');
-    $pagetitle = "$strmymoodle (" . get_string('guest') . ")";
+    $pagetitle     = "$strmymoodle (" . get_string('guest') . ")";
 } else {
-    $userid = $USER->id;
-    $context = context_user::instance($USER->id);
+    $userid        = $USER->id;
+    $context       = context_user::instance($USER->id);
     $PAGE->set_blocks_editing_capability('moodle/my:manageblocks');
-    $pagetitle = $strmymoodle;
+    $pagetitle     = $strmymoodle;
 }
 
 if (!$currentpage = my_get_page($userid, MY_PAGE_PRIVATE)) {
@@ -148,13 +151,13 @@ $PAGE->add_body_class('limitedwidth');
 $PAGE->set_pagetype('my-index');
 $PAGE->blocks->add_region('content');
 $PAGE->set_subpage($currentpage->id);
-$PAGE->set_heading('');  // Remove the “Hi, user” heading
+$PAGE->set_heading('');
 $PAGE->set_title('');
 
 if (!isguestuser() && get_home_page() != HOMEPAGE_MY) {
     if (optional_param('setdefaulthome', false, PARAM_BOOL)) {
         set_user_preference('user_home_page_preference', HOMEPAGE_MY);
-    } else if (!empty($CFG->defaulthomepage) && $CFG->defaulthomepage == HOMEPAGE_USER) {
+    } else if (!empty($CFG->defaulthomepage) && $CFG->defaulthomepage==HOMEPAGE_USER) {
         $frontpagenode = $PAGE->settingsnav->add(
             get_string('frontpagesettings'),
             null,
@@ -164,47 +167,47 @@ if (!isguestuser() && get_home_page() != HOMEPAGE_MY) {
         $frontpagenode->force_open();
         $frontpagenode->add(
             get_string('makethismyhome'),
-            new moodle_url('/my/', ['setdefaulthome' => true]),
+            new moodle_url('/my/', ['setdefaulthome'=>true]),
             navigation_node::TYPE_SETTING
         );
     }
 }
 
 if (empty($CFG->forcedefaultmymoodle) && $PAGE->user_allowed_editing()) {
-    if ($edit !== null) {
+    if ($edit!==null) {
         $USER->editing = $edit;
     } else {
         if ($currentpage->userid) {
-            $edit = !empty($USER->editing) ? 1 : 0;
+            $edit = !empty($USER->editing)?1:0;
         } else {
-            if (!$currentpage = my_copy_page($USER->id, MY_PAGE_PRIVATE)) {
+            if (!$currentpage = my_copy_page($USER->id,MY_PAGE_PRIVATE)) {
                 throw new \moodle_exception('mymoodlesetup');
             }
-            $context = context_user::instance($USER->id);
+            $context       = context_user::instance($USER->id);
             $PAGE->set_context($context);
             $PAGE->set_subpage($currentpage->id);
             $USER->editing = $edit = 0;
         }
     }
 
-    $params = ['edit' => !$edit];
+    $params      = ['edit'=>!$edit];
     $resetbutton = '';
-    $editstring = !$currentpage->userid || empty($edit)
+    $editstring  = !$currentpage->userid||empty($edit)
         ? get_string('updatemymoodleon')
         : get_string('updatemymoodleoff');
     $button = !$PAGE->theme->haseditswitch
-        ? $OUTPUT->single_button(new moodle_url("$CFG->wwwroot/my/index.php", $params), $editstring)
+        ? $OUTPUT->single_button(new moodle_url("$CFG->wwwroot/my/index.php",$params),$editstring)
         : '';
-    $PAGE->set_button($resetbutton . $button);
+    $PAGE->set_button($resetbutton.$button);
 } else {
     $USER->editing = $edit = 0;
 }
 
 // =================================
-// 3. PREPARE STUDENT DASHBOARD DATA
+// 3. PREPARE DASHBOARD DATA
 // =================================
 $templatecontext = [
-    'username'               => fullname($USER),
+    'username'               => fullname($completeuser),
     'completedCourses'       => 0,
     'totalCourses'           => 0,
     'totalOverdue'           => 0,
@@ -220,24 +223,18 @@ $templatecontext = [
     'courses'                => [],
     'recentCourse'           => null,
     'enrolledCourses'        => [],
-    // We will add a 'template' key below (student / manager / admin)
+    // template will be set below
 ];
 
 if (isloggedin() && !isguestuser()) {
+    // a) basic user info
+    $displayname = fullname($completeuser);
+    $userpicture = $OUTPUT->user_picture($USER, ['size'=>70]);
+    $templatecontext['userpicture'] = $userpicture;
 
-    // ------------------------
-    // a) Basic user info
-    // ------------------------
-    $displayname       = fullname($USER);
-    $userpicture       = $OUTPUT->user_picture($USER, ['size' => 70]);
-    $imageurl          = $OUTPUT->image_url('Asset1', 'theme_academi');
-    $courseenrolledgif = $OUTPUT->image_url('graduate',    'theme_academi')->out();
-    $awardgif          = $OUTPUT->image_url('award',       'theme_academi')->out();
-
-    // ---------------------------------------
-    // b) Last 3 enrolled courses for this user
-    // ---------------------------------------
-    $enrolledCoursesSql = "
+    // b) last 3 enrolled courses
+    // ... your original SQL + loop ...
+ $enrolledCoursesSql = "
         SELECT 
           c.id                    AS course_id,
           c.fullname              AS course_name,
@@ -346,16 +343,120 @@ if (isloggedin() && !isguestuser()) {
         ];
     }
     $templatecontext['enrolledCourses'] = $enrolledCoursesData;
-
-    // ------------------------
     // c) AJAX search results
-    // ------------------------
     $templatecontext['searchQuery']   = $searchquery;
-    $templatecontext['searchResults'] = $formattedsearchresults ?? [];
+    $templatecontext['searchResults'] = $formatted ?? [];
 
-    // --------------------------------------
-    // d) Most recent course accessed by user
-    // --------------------------------------
+
+
+    $recentCourseSql = "
+        SELECT
+          c.id                              AS course_id,
+          c.fullname                        AS course_name,
+          c.shortname                       AS course_shortname,
+          c.summary                         AS course_summary,
+          FROM_UNIXTIME(l.timecreated)      AS last_accessed_time,
+          f.filename                        AS course_image_filename,
+          CONCAT(
+            '/pluginfile.php/',
+            ctx.id,
+            '/course/overviewfiles/',
+            f.filename
+          ) AS course_image_url,
+          cc.name                           AS category_name,
+          (
+            SELECT COUNT(*)
+              FROM mdl_course_modules cm
+              JOIN mdl_course_sections cs ON cm.section = cs.id
+             WHERE cm.course   = c.id
+               AND cm.visible  = 1
+               AND cs.section >= 1
+          ) AS total_modules,
+          CASE
+            WHEN ccomp.timecompleted IS NOT NULL
+             AND ccomp.timecompleted > 0
+            THEN 1
+            ELSE 0
+          END AS course_completion_status,
+          ROUND(
+            (
+              SELECT COUNT(*)
+                FROM mdl_course_modules_completion cmc
+                JOIN mdl_course_modules cm ON cmc.coursemoduleid = cm.id
+                JOIN mdl_course_sections cs ON cm.section = cs.id
+               WHERE cm.course            = c.id
+                 AND cmc.userid           = l.userid
+                 AND cmc.completionstate  = 1
+                 AND cm.visible           = 1
+                 AND cs.section          >= 1
+            ) * 100.0
+            / NULLIF(
+                (
+                  SELECT COUNT(*)
+                    FROM mdl_course_modules cm
+                    JOIN mdl_course_sections cs ON cm.section = cs.id
+                   WHERE cm.course   = c.id
+                     AND cm.visible  = 1
+                     AND cs.section >= 1
+                ),
+                0
+            ),
+            2
+          ) AS progress_percentage
+        FROM mdl_logstore_standard_log l
+        JOIN mdl_course c ON l.courseid = c.id
+        LEFT JOIN mdl_context ctx ON c.id = ctx.instanceid
+                               AND ctx.contextlevel = 50
+        LEFT JOIN mdl_files f ON ctx.id = f.contextid
+                             AND f.component = 'course'
+                             AND f.filearea  = 'overviewfiles'
+                             AND f.filename <> '.'
+        LEFT JOIN mdl_course_categories cc ON c.category = cc.id
+        LEFT JOIN mdl_course_completions ccomp 
+                             ON ccomp.course = c.id
+                            AND ccomp.userid = l.userid
+       WHERE l.userid       = ?
+         AND l.courseid IS NOT NULL
+         AND c.visible       = 1
+       ORDER BY l.timecreated DESC
+       LIMIT 1
+    ";
+
+    try {
+        $recentCourse = $DB->get_record_sql($recentCourseSql, [$USER->id]);
+    } catch (dml_exception $e) {
+        error_log("Error fetching recent course: " . $e->getMessage());
+        $recentCourse = null;
+    }
+
+    if ($recentCourse) {
+        $cleanedSummary   = format_string($recentCourse->course_summary, true);
+        $course_image_url = (!empty($recentCourse->course_image_filename))
+            ? $CFG->wwwroot . $recentCourse->course_image_url
+            : $default_image_url;
+        $percent         = (float)($recentCourse->progress_percentage ?? 0);
+        $rawCompletion   = (bool)$recentCourse->course_completion_status;
+        $reallyCompleted = ($rawCompletion || $percent >= 100.0);
+
+        $templatecontext['recentCourse'] = [
+            'courseid'                 => $recentCourse->course_id,
+            'coursename'               => $recentCourse->course_name,
+            'coursesummary'            => $cleanedSummary,
+            'courseshortname'          => $recentCourse->course_shortname,
+            'last_accessed_time'       => $recentCourse->last_accessed_time,
+            'course_image_url'         => $course_image_url,
+            'courseurl'                => new moodle_url('/course/view.php', ['id' => $recentCourse->course_id]),
+            'category'                 => $recentCourse->category_name,
+            'progressPercentage'       => $percent,
+            'total_modules'            => $recentCourse->total_modules,
+            'completion_status'        => $reallyCompleted ? 'Completed' : 'In Progress',
+            'course_completion_status' => $reallyCompleted ? 1 : 0,
+            'is_completed'             => $reallyCompleted,
+        ];
+    } else {
+        $templatecontext['recentCourse'] = null;
+    }
+
     $recentCourseSql = "
         SELECT
           c.id                              AS course_id,
@@ -465,12 +566,14 @@ if (isloggedin() && !isguestuser()) {
     }
 
     // Reset session‐tracking variables before running hour‐queries
+
+
+    // Reset session‐tracking variables before running hour‐queries
     $DB->execute("SET @prev_time = NULL, @prev_user = NULL, @session_id = 0");
 
-    // ------------------------------------------------
-    // e) Current Week Activity (hours‐spent per day)
-    // ------------------------------------------------
-    $currentWeekSql = "
+    // d) most recent course accessed
+    // ... your original SQL + assignment ...
+  $currentWeekSql = "
         WITH RECURSIVE week_days AS (
             SELECT DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) - 2) DAY) AS week_day
             UNION ALL
@@ -544,12 +647,12 @@ if (isloggedin() && !isguestuser()) {
         }
     }
 
-    // Reset again for previous‐week query
-    $DB->execute("SET @prev_time = NULL, @prev_user = NULL, @session_id = 0");
+   $DB->execute("SET @prev_time = NULL, @prev_user = NULL, @session_id = 0");
 
-    // ---------------------------------------
-    // f) Previous Week Activity (week total)
-    // ---------------------------------------
+    // e) current week activity
+    // ... your original SQL + loop ...
+
+
     $previousWeekSql = "
         WITH RECURSIVE week_days AS (
             SELECT DATE_SUB(
@@ -623,10 +726,19 @@ if (isloggedin() && !isguestuser()) {
     $templatecontext['percentageChange']  = abs($percentageChange);
     $templatecontext['isIncrease']        = $isIncrease;
 
-    // -------------------------------------
-    // g) User’s overall progress/points/etc.
-    // -------------------------------------
-    $sql = "
+
+  
+    // f) previous week activity
+    // ... your original SQL + calculation ...
+
+    // g) overall progress/points
+    // ... your original SQL + calculation ...
+
+    // h) points broken down by course
+    // ... your original SQL + loop ...
+
+
+   $sql = "
         WITH UserID AS (
             SELECT id AS userid FROM mdl_user WHERE id = ?
         ),
@@ -748,18 +860,16 @@ if (isloggedin() && !isguestuser()) {
 // ======================================
 // 4. WHO SEES WHAT? Admin / Manager / Student
 // ======================================
-$isadmin = is_siteadmin($USER->id);
+$isadmin        = is_siteadmin($USER->id);
+$isregionmgr    = false;
+$regioncategory = null;
 
-// Check if the user is assigned as a “Regional Manager” by having
-// the capability `moodle/category:create` in a COURSE CATEGORY context:
-$isregionmgr      = false;
-$regioncategoryid = null;
-
+// check regional manager role capability
 $sql = "
     SELECT ctx.instanceid AS categoryid
       FROM {context} ctx
-      JOIN {role_assignments} ra ON ra.contextid = ctx.id
-      JOIN {role_capabilities} rc ON rc.roleid = ra.roleid
+      JOIN {role_assignments} ra ON ra.contextid=ctx.id
+      JOIN {role_capabilities} rc ON rc.roleid=ra.roleid
      WHERE rc.capability = :capability
        AND rc.permission = :allow
        AND ctx.contextlevel = :ctxlevel
@@ -767,231 +877,222 @@ $sql = "
      LIMIT 1
 ";
 $params = [
-    'capability' => 'moodle/category:create',
-    'allow'      => CAP_ALLOW,
-    'ctxlevel'   => CONTEXT_COURSECAT,
-    'userid'     => $USER->id
+    'capability'=>'moodle/category:create',
+    'allow'=>CAP_ALLOW,
+    'ctxlevel'=>CONTEXT_COURSECAT,
+    'userid'=>$USER->id
 ];
-if ($row = $DB->get_record_sql($sql, $params)) {
-    $isregionmgr      = true;
-    $regioncategoryid = (int)$row->categoryid;
+if ($row = $DB->get_record_sql($sql,$params)) {
+    $isregionmgr    = true;
+    $regioncategory = (int)$row->categoryid;
 }
 
 if ($isadmin) {
-    // ====================================================
-    //  SITE ADMINISTRATOR DASHBOARD (dashboard_admin.mustache)
-    // ====================================================
-
-
+    // ADMIN DASHBOARD
     $templatecontext['template'] = 'theme_academi/core/dashboard_admin';
 
+    // active users
+    $templatecontext['activeUserCount'] = $DB->count_records('user',['deleted'=>0,'suspended'=>0]);
+    // ── Online users count + details (with roles and avatars) ──
+// … up above, inside the if ($isadmin) { … } block …
 
-    $activeusers = $DB->count_records('user', ['deleted' => 0, 'suspended' => 0]);
-    $templatecontext['activeUserCount'] = $activeusers;
+// ── Online users count + details ──
+$fiveMinutesAgo = time() - 300;
 
-    // 2) Count “online” users (lastaccess within past 5 minutes)
-    $fiveMinutesAgo = time() - 300;
-    $sqlOnlineCount = "
-        SELECT COUNT(id)
-          FROM {user}
-         WHERE lastaccess > :since
-           AND deleted = 0
-           AND suspended = 0
-    ";
-    $templatecontext['onlineUserCount'] = (int)$DB->count_records_sql(
-        $sqlOnlineCount,
-        ['since' => $fiveMinutesAgo]
-    );
-
-    // 3) Fetch “online” users including all phonetic/middle/alternate fields
-    $sqlOnlineUsers = "
-        SELECT
-            id,
-            firstname,
-            lastname,
-            firstnamephonetic,
-            lastnamephonetic,
-            middlename,
-            alternatename
-          FROM {user}
-         WHERE lastaccess > :since
-           AND deleted = 0
-           AND suspended = 0
-         ORDER BY lastname, firstname
-         LIMIT 20
-    ";
-    $onlineRecs = $DB->get_records_sql($sqlOnlineUsers, ['since' => $fiveMinutesAgo]);
-
-    $onlineUsers = [];
-    foreach ($onlineRecs as $u) {
-        // Now fullname($u) has everything it needs:
-        $onlineUsers[] = [
-            'id'       => $u->id,
-            'fullname' => fullname($u)
-        ];
-    }
-    $templatecontext['onlineUsers'] = $onlineUsers;
-
-
-    //
-    // a) “All Region” → ID lookup, then count its children (North, South, East, West)
-    //
- 
-// New code: count categories whose parent = 4
 $sql = "
-    SELECT COUNT(*) 
-      FROM {course_categories} 
-     WHERE parent = :parentid
-";
-$params = ['parentid' => 4];
-$templatecontext['regionCount'] = (int) $DB->count_records_sql($sql, $params);
-
-
-    //
-    // b) Count how many users have the “regionalmanager” role
-   // Example part of your PHP that builds $templatecontext['recentRegionManagers']:
-$regionalmgrroleid = $DB->get_field('role', 'id', ['shortname' => 'regionalmanager']);
-
-$sqlRecentManagers = "
-    SELECT 
+    SELECT
         u.id,
         u.firstname,
         u.lastname,
-        c.name AS regionname
-      FROM {role_assignments} ra
-      JOIN {user} u            ON u.id = ra.userid
-      JOIN {context} ctx       ON ctx.id = ra.contextid
-      JOIN {course_categories} c ON c.id = ctx.instanceid
-     WHERE ra.roleid = :rmrole
-       AND ctx.contextlevel = :ctxlevel
-     ORDER BY ra.id DESC
-     LIMIT 3
+        u.firstnamephonetic,
+        u.lastnamephonetic,
+        u.middlename,
+        u.alternatename,
+        u.lastaccess,
+        GROUP_CONCAT(DISTINCT r.shortname ORDER BY r.shortname SEPARATOR ', ') AS roles
+      FROM {user} u
+      JOIN {role_assignments} ra ON ra.userid    = u.id
+      JOIN {context}         ctx ON ctx.id       = ra.contextid
+      JOIN {role}            r   ON r.id         = ra.roleid
+     WHERE
+        u.lastaccess > :since
+        AND u.deleted   = 0
+        AND u.suspended = 0
+        AND ctx.contextlevel IN (:system, :category, :course)
+     GROUP BY u.id
+     ORDER BY u.lastaccess DESC
+     LIMIT 20
 ";
 
-$paramsRecent = [
-    'rmrole'   => $regionalmgrroleid,
-    'ctxlevel' => CONTEXT_COURSECAT
+$params = [
+    'since'    => $fiveMinutesAgo,
+    'system'   => CONTEXT_SYSTEM,
+    'category' => CONTEXT_COURSECAT,
+    'course'   => CONTEXT_COURSE
 ];
 
-$rms = $DB->get_records_sql($sqlRecentManagers, $paramsRecent);
+/** @var stdClass[] $onlineRecs */
+$onlineRecs = $DB->get_records_sql($sql, $params);
 
-$templatecontext['recentRegionManagers'] = [];
-foreach ($rms as $rm) {
-    $templatecontext['recentRegionManagers'][] = [
-        'username'   => fullname($rm),   // e.g. “Prafful Choudhary”
-        'regionname' => $rm->regionname  // e.g. “South Region”
+$sysctx = context_system::instance();
+$onlineUsersData = [];
+
+foreach ($onlineRecs as $u) {
+    $fullname = fullname($u);
+    $avatar   = $OUTPUT->user_picture(
+        $DB->get_record('user',['id'=>$u->id]),
+        ['size'=>45,'link'=>false,'class'=>'online-user-avatar']
+    );
+
+    $canmessage = (
+        isloggedin()
+        && !isguestuser()
+        && !empty($CFG->messaging)
+        && has_capability('moodle/site:sendmessage', $sysctx)
+    );
+    $messageurl = (new moodle_url('/message/index.php', ['id' => $u->id]))->out();
+    $profileurl = (new moodle_url('/user/profile.php', ['id' => $u->id]))->out();
+    // ** only keep the first role **
+    $rolesarr    = explode(',', $u->roles);
+    $primaryrole = trim($rolesarr[0]);
+
+    $onlineUsersData[] = [
+        'id'         => $u->id,
+        'avatar'     => $avatar,
+        'fullname'   => $fullname,
+        'role'       => $primaryrole,
+        'lastaccess' => userdate($u->lastaccess),
+        'messageurl' => $messageurl,
+        'profileurl'   => $profileurl, 
+        'canmessage' => $canmessage
     ];
 }
 
 
-    //
-    // f) “Global hours” data for the admin bar chart (dummy data)
-    //
+$templatecontext['onlineUserCount'] = count($onlineUsersData);
+$templatecontext['onlineUsersData'] = $onlineUsersData;
+$templatecontext['allUsersUrl'] = (new moodle_url('/admin/user.php'))->out();
+// … then later echo $OUTPUT->render_from_template() as before …
+
+
+
+
+
+    // total regions (children of parent=4)
+    $templatecontext['regionCount'] = (int)$DB->count_records_sql(
+        "SELECT COUNT(*) FROM {course_categories} WHERE parent=:pid",
+        ['pid'=>4]
+    );
+
+    // regional managers count/list
+    $regionalmgrroleid = $DB->get_field('role','id',['shortname'=>'regionalmanager']);
+    $templatecontext['regionMgrCount'] = (int)$DB->count_records('role_assignments',['roleid'=>$regionalmgrroleid]);
+
+     $sqlRecent = "
+        SELECT u.id,
+               u.firstname,
+               u.lastname,
+               c.name AS regionname
+          FROM {role_assignments} ra
+          JOIN {user} u            ON u.id       = ra.userid
+          JOIN {context} ctx       ON ctx.id     = ra.contextid
+          JOIN {course_categories} c ON c.id      = ctx.instanceid
+         WHERE ra.roleid      = :rmrole
+           AND ctx.contextlevel = :ctxlevel
+         ORDER BY ra.id DESC
+         LIMIT 3
+    ";
+    $rms = $DB->get_records_sql($sqlRecent, [
+        'rmrole'   => $regionalmgrroleid,
+        'ctxlevel' => CONTEXT_COURSECAT
+    ]);
+
+    $recentManagers = [];
+   foreach ($rms as $rm) {
+    $fulluser = $DB->get_record('user', ['id'=>$rm->id], '*', MUST_EXIST);
+
+    $avatar = $OUTPUT->user_picture($fulluser, [
+        'size' => 45,
+        'link' => false,
+        'class'=> 'manager-avatar'
+    ]);
+
+    $recentManagers[] = [
+        'id'         => $fulluser->id,
+        'username'   => fullname($fulluser),
+        'regionname' => $rm->regionname,
+        'avatarhtml' => $avatar
+    ];
+}
+    $templatecontext['recentRegionManagers'] = $recentManagers;
+
+    // global hours data (dummy)
     $globalHours = [];
-    for ($i = 0; $i < 7; $i++) {
-        $globalHours[] = rand(0, 10);
+    for ($i=0; $i<7; $i++) {
+        $globalHours[] = rand(0,10);
     }
     $templatecontext['globalHoursActivity'] = json_encode($globalHours);
 
-    //
-    // g) Pass the regional manager roleid for “List Regional Managers” link
-    //
+    // link roleid
     $templatecontext['regionMgrRoleId'] = $regionalmgrroleid;
 
-} else if ($isregionmgr && $regioncategoryid !== null) {
-    // ====================================================
-    //  REGIONAL MANAGER DASHBOARD (dashboard_manager.mustache)
-    // ====================================================
+} else if ($isregionmgr && $regioncategory !== null) {
+    // REGIONAL MANAGER DASHBOARD
     $templatecontext['template'] = 'theme_academi/core/dashboard_manager';
 
-    // a) Region name + ID
-    $category = $DB->get_record('course_categories', ['id' => $regioncategoryid]);
-    $templatecontext['regionname'] = $category->name;
-    $templatecontext['regionid']   = $regioncategoryid;
+    $cat = $DB->get_record('course_categories',['id'=>$regioncategory]);
+    $templatecontext['regionname'] = $cat->name;
+    $templatecontext['regionid']   = $regioncategory;
 
-    // b) Count distinct enrolled users under that category
-    $sql3 = "
+    // active users under region
+    $templatecontext['activeUserCount'] = (int)$DB->get_field_sql("
         SELECT COUNT(DISTINCT ue.userid)
           FROM {enrol} e
-          JOIN {user_enrolments} ue ON ue.enrolid = e.id
-          JOIN {course} c            ON c.id = e.courseid
-         WHERE c.category = :catid
-    ";
-    $templatecontext['activeUserCount'] = (int)$DB->get_field_sql($sql3, ['catid' => $regioncategoryid]);
+          JOIN {user_enrolments} ue ON ue.enrolid=e.id
+          JOIN {course} c ON c.id=e.courseid
+         WHERE c.category=:catid
+    ", ['catid'=>$regioncategory]);
 
-    // c) Total courses in this region
-    $templatecontext['totalCoursesInRegion'] = $DB->count_records('course', [
-        'category' => $regioncategoryid,
-        'visible'  => 1
+    $templatecontext['totalCoursesInRegion'] = $DB->count_records('course',[
+        'category'=>$regioncategory,'visible'=>1
     ]);
 
-    // d) Average completion rate (dummy placeholder)
-    $templatecontext['avgCompletionRate'] = round(rand(50, 90), 1);
-
-    // e) New enrollments last 7 days (dummy placeholder)
-    $templatecontext['newEnrollments7d'] = rand(0, 20);
-
-    // f) Top 3 courses by completion (dummy placeholder)
+    $templatecontext['avgCompletionRate'] = round(rand(50,90),1);
+    $templatecontext['newEnrollments7d'] = rand(0,20);
     $templatecontext['topCourses'] = [
-        ['coursename' => 'Course A', 'completionPercentage' => 82],
-        ['coursename' => 'Course B', 'completionPercentage' => 75],
-        ['coursename' => 'Course C', 'completionPercentage' => 63]
+        ['coursename'=>'Course A','completionPercentage'=>82],
+        ['coursename'=>'Course B','completionPercentage'=>75],
+        ['coursename'=>'Course C','completionPercentage'=>63]
     ];
 
-    // g) Region hours activity (dummy data)
     $regionHours = [];
-    for ($i = 0; $i < 7; $i++) {
-        $regionHours[] = rand(0, 8);
+    for ($i=0; $i<7; $i++) {
+        $regionHours[] = rand(0,8);
     }
     $templatecontext['regionHoursActivity'] = json_encode($regionHours);
 
 } else {
-    // ====================================================
-    //  REGULAR STUDENT DASHBOARD (dashboard.mustache override)
-    // ====================================================
-    // We simply tell Moodle to render the core/dashboard template,
-    // which your theme overrides at templates/core/dashboard.mustache.
+    // STUDENT DASHBOARD
     $templatecontext['template'] = 'core/dashboard';
 }
 
 // =================================
-// 4. RENDER THE CHOSEN TEMPLATE
+// 5. RENDER THE CHOSEN TEMPLATE
 // =================================
 echo $OUTPUT->header();
 
 if (core_userfeedback::should_display_reminder()) {
     core_userfeedback::print_reminder_block();
 }
-
 if (has_capability('moodle/site:manageblocks', context_system::instance())) {
     echo $OUTPUT->addblockbutton('content');
 }
-
-// Add calendar variables (even if unused)
-$calendarinstanceid = 1;
-$uniqid            = html_writer::random_id();
-$templatecontext['calendarinstanceid'] = $calendarinstanceid;
-$templatecontext['uniqid']             = $uniqid;
-$templatecontext['iscalendarblock']    = false;
-
-// Current streak (if you have a user_streaks table)
-$streakCount = $DB->count_records('user_streaks', ['userid' => $userid]);
-$templatecontext['current_streak'] = $streakCount;
-
-// Actually render the chosen Mustache template:
-if (!empty($templatecontext['template'])) {
-    $templatename = $templatecontext['template'];
-} else {
-    // Fallback so we never pass null into render_from_template
-    $templatename = 'core/dashboard';
-}
-
-echo $OUTPUT->render_from_template($templatename, $templatecontext);
+$templatecontext['date'] = userdate(time(), get_string('strftimedate'));
+echo $OUTPUT->render_from_template($templatecontext['template'], $templatecontext);
 
 echo $OUTPUT->custom_block_region('content');
 echo $OUTPUT->footer();
 
-// Trigger “dashboard viewed” event
-$eventparams = ['context' => $context];
-$event = \core\event\dashboard_viewed::create($eventparams);
+// trigger event
+$event = \core\event\dashboard_viewed::create(['context'=>$context]);
 $event->trigger();

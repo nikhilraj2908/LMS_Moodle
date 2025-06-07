@@ -1,539 +1,320 @@
-{{!
-  File: theme/academi/templates/core/dashboard_admin.mustache
-  Administrator Dashboard—uses these context variables from PHP:
-    - username              → full name of the admin
-    - userpicture           → HTML <img> tag or similar for the user’s avatar
-    - date                  → current date string (e.g. "June 6, 2025")
-    - regionCount           → total number of regions
-    - regionMgrCount        → total number of regional managers
-    - activeUserCount       → total active (not deleted, not suspended) users
-    - onlineUserCount       → total users “online” (e.g., lastaccess > now − 5min)
-    - totalCourseCount      → total visible courses (if still needed elsewhere)
-    - recentRegionManagers  → array (up to 3) of managers, each with:
-         • username       → manager’s full name
-         • regionname     → name of the region they manage
-    - globalHoursActivity   → JSON‐encoded array of 7 numbers (hours per day) for the chart
-    - regionMgrRoleId       → the roleid used for “List Regional Managers” quick link
-}}
+{{! Dynamic Administrator Dashboard — templates/core/dashboard_admin.mustache }}
 
 <style>
-:root {
-    --primary:   #204070;
+  :root {
+    --primary: #204070;
     --secondary: #3C6894;
-    --accent:    #6D95FF;
-    --light:     #F0F6FC;
-    --dark:      #1C3C72;
-}
-
-/* ──────────────────────────────────────────────────────────────────────────────
-   GENERAL LAYOUT: Bootstrap’s grid ensures everything is pushed down.
-   ────────────────────────────────────────────────────────────────────────────── */
-.admin-container {
-    max-width: 1400px;
-    margin: 30px auto;
-    padding: 0 20px 40px; /* bottom padding so that Moodle’s footer isn’t too close */
-}
-
-/* ──────────────────────────────────────────────────────────────────────────────
-   DASHBOARD HEADER
-   ────────────────────────────────────────────────────────────────────────────── */
-.dashboard-header {
+    --accent: #6D95FF;
+    --light: #F0F6FC;
+    --dark: #1C3C72;
+    --success: #28a745;
+    --border-radius: 16px;
+    --transition: all 0.3s ease;
+  }
+  * { box-sizing: border-box; margin:0; padding:0; font-family: 'Segoe UI',sans-serif; }
+  
+  .admin-container { max-width:1800px; margin:30px auto; padding:0 20px 40px; }
+  .dashboard-header {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
-    padding: 20px 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.dashboard-header h3 {
-    margin: 0;
-    font-weight: 700;
-    font-size: 1.8rem;
-}
-.dashboard-header small {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.9rem;
-}
+    color: white; padding:20px 30px; border-radius:var(--border-radius);
+    box-shadow:0 4px 20px rgba(0,0,0,0.1);
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:25px;
+  }
+  .dashboard-header .user-info { display:flex; align-items:center; gap:15px; }
+  .dashboard-header .user-info .avatar {
+    width:60px; height:60px; border-radius:50%; background:var(--accent);
+    display:flex; align-items:center; justify-content:center; font-size:24px;
+    color:white; box-shadow:0 4px 10px rgba(0,0,0,0.15);
+  }
+  .dashboard-header h3 { font-size:1.8rem; font-weight:700; }
+  .dashboard-header small { display:block; opacity:.85; margin-top:5px; }
+  .header-controls { display:flex; align-items:center; gap:15px; }
+  .date-display {
+    background: rgba(255,255,255,0.15); padding:8px 15px; border-radius:30px;
+    font-weight:500; display:flex; align-items:center; gap:8px;
+  }
+ 
+  .btn:hover { transform:translateY(-2px); box-shadow:0 6px 15px rgba(32,64,112,0.15); }
+  .admin-card {
+    background:white; border-radius:var(--border-radius); padding:25px;
+    box-shadow:0 8px 25px rgba(32,64,112,0.05); transition:var(--transition);
+  
+  }
+  .admin-card:hover { transform:translateY(-5px); box-shadow:0 12px 30px rgba(32,64,112,0.15); }
+  .row { display:flex; flex-wrap:wrap; margin:0 -12px; }
+  .col-md-3, .col-md-4, .col-md-8, .col-lg-4, .col-lg-8 { padding:0 12px; margin-bottom:24px; }
+  .col-md-3 { width:25%; } .col-md-4 { width:33.333%; } .col-md-8 { width:66.666%; }
+  .col-lg-4 { width:33.333%; } .col-lg-8 { width:66.666%; }
+  @media (max-width:1200px) { .col-md-3, .col-md-4, .col-md-8 { width:50%; } }
+  @media (max-width:768px) {
+    .col-md-3, .col-md-4, .col-md-8, .col-lg-4, .col-lg-8 { width:100%; }
+    .dashboard-header { flex-direction:column; text-align:center; gap:15px; }
+    .header-controls, .user-info { flex-direction:column; }
+  }
 
-/* ──────────────────────────────────────────────────────────────────────────────
-   CARD STYLES
-   ────────────────────────────────────────────────────────────────────────────── */
-.admin-card {
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 8px 20px rgba(32, 64, 112, 0.05);
-    padding: 25px;
-    margin-bottom: 25px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    height: 100%;
-}
-.admin-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(32, 64, 112, 0.15);
-}
+  /* Stat cards */
+  .stat-card { text-align:center; display:flex; flex-direction:column; justify-content:center; }
+  .stat-icon {
+    font-size:2.5rem; color:var(--accent);
+    background:rgba(109,149,255,0.1); width:80px; height:80px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; margin:0 auto 15px;
+    transition:var(--transition);
+  }
+  .stat-card:hover .stat-icon { transform:scale(1.1); }
+  .stat-value { font-size:2.8rem; font-weight:800; color:var(--primary); line-height:1; }
+  .stat-label { opacity:.7; margin-top:5px; }
 
-/* ──────────────────────────────────────────────────────────────────────────────
-   SECTION HEADINGS
-   ────────────────────────────────────────────────────────────────────────────── */
-.admin-card h2 {
-    color: var(--primary);
-    font-weight: 700;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid var(--light);
-}
+  /* Recent managers */
+  .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(0,0,0,0.05); padding-bottom:15px; }
+  .card-header h2 { display:flex; align-items:center; gap:10px; font-size:1.5rem; color:var(--dark); }
+  .manager-card {
+    display:flex; align-items:center; padding:15px; margin-bottom:15px;
+    background:rgba(248,251,255,1); border-radius:15px;
+    box-shadow:0 3px 8px rgba(0,0,0,0.03); transition:var(--transition);
+  }
+  .manager-card:hover { background:#E6F0FF; transform:translateX(5px); }
+  .manager-avatar {
+    width:60px; height:60px; border-radius:50%; background:rgba(32,64,112,0.05);
+    display:flex; align-items:center; justify-content:center; font-size:2rem; color:var(--secondary);
+    margin-right:15px;
+  }
+  .manager-name { font-weight:700; color:var(--dark); }
+  .manager-region { color:var(--secondary); font-size:.9rem; display:flex; align-items:center; gap:5px; }
+  .manager-region i { font-size:.8rem; }
 
-/* ──────────────────────────────────────────────────────────────────────────────
-   TOP-LEVEL STAT CARDS (Total Regions / Managers / Active Users / Online Users)
-   ────────────────────────────────────────────────────────────────────────────── */
-.stat-card {
-    text-align: center;
-}
-.stat-icon {
-    font-size: 2.5rem;
-    color: var(--accent);
-    background: rgba(109, 149, 255, 0.1);
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 15px auto;
-}
-.stat-value {
-    font-size: 2.8rem;
-    font-weight: 800;
-    color: var(--primary);
-    line-height: 1;
-}
-.stat-label {
-    font-size: 1.1rem;
-    color: #7A8CA5;
-    font-weight: 500;
-    margin-top: 5px;
-}
+  /* System chart */
+  .chart-container { height:250px; position:relative; margin-top:15px; }
 
-/* ──────────────────────────────────────────────────────────────────────────────
-   RECENT REGIONAL MANAGER CARDS
-   ────────────────────────────────────────────────────────────────────────────── */
-.manager-card {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 15px;
-    background: #F8FBFF;
-    transition: background 0.3s ease;
-}
-.manager-card:hover {
-    background: #E6F0FF;
-}
-.manager-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 15px;
-    border: 3px solid var(--accent);
-}
-.manager-info {
-    flex: 1;
-}
-.manager-name {
-    font-weight: 600;
-    color: var(--dark);
-    margin-bottom: 3px;
-    font-size: 1rem;
-}
-.manager-region {
-    color: var(--secondary);
-    font-size: 0.9rem;
-}
+  /* Online users */
+  .online-users-card { display:flex; flex-direction:column; }
+  .online-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
+  .online-count {
+    background:rgba(109,149,255,0.1); color:var(--accent);
+    padding:5px 15px; border-radius:20px; font-weight:600; font-size:.9rem;
+  }
+  .online-users-list { overflow-y:auto; max-height:300px; padding-right:5px; }
+  .online-user {
+    display:flex; align-items:center; padding:12px 15px; margin-bottom:10px;
+    background:rgba(240,246,252,0.5); border-radius:12px; transition:var(--transition);
+  }
+  .online-user:hover { background:rgba(109,149,255,0.1); transform:translateX(3px); }
+  .online-user-avatar {
+    width:45px; height:45px; border-radius:50%; background:var(--accent);
+    display:flex; align-items:center;  font-weight:600; color:white;
+    margin-right:15px;
+  }
+  .online-user-info { flex-grow:1; }
+  .online-user-name { font-weight:600; color:var(--dark); }
+  .online-user-role { font-size:.85rem; color:var(--secondary); display:flex; align-items:center; gap:5px; }
+  .online-user-role i { font-size:.9rem; }
+  .online-status {
+    font-size:.8rem; color:var(--success); font-weight:500; display:flex; align-items:center; gap:6px;
+  }
+  .online-status::before {
+    content:""; width:8px; height:8px; background:var(--success); border-radius:50%;
+  }
+  .online-user-actions { display:flex; gap:10px; margin-left:15px; }
+  .action-btn {
+    width:36px; height:36px; border:none; border-radius:50%; background:rgba(109,149,255,0.1);
+    display:flex; align-items:center; justify-content:center; color:var(--accent);
+    cursor:pointer; transition:var(--transition);
+  }
+  .action-btn:hover { background:var(--accent); color:white; transform:scale(1.1); }
 
-/* ──────────────────────────────────────────────────────────────────────────────
-   CHART CONTAINER
-   ────────────────────────────────────────────────────────────────────────────── */
-.chart-container {
-    height: 250px;
-    position: relative;
+  .quick-link {
+  display:flex; align-items:center; padding:12px 15px; margin-bottom:12px;
+  border-radius:12px; background:#F8FBFF; color:var(--dark); text-decoration:none;
+  transition:all .3s;
 }
-
-/* ──────────────────────────────────────────────────────────────────────────────
-   QUICK-LINK CARDS (List Managers / Manage Roles / View Users / …)
-   ────────────────────────────────────────────────────────────────────────────── */
-.quick-link {
-    display: flex;
-    align-items: center;
-    padding: 12px 15px;
-    margin-bottom: 12px;
-    border-radius: 12px;
-    background: #F8FBFF;
-    color: var(--dark);
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-.quick-link:hover {
-    background: var(--accent);
-    color: white;
-    transform: translateX(5px);
-}
-.quick-link i {
-    margin-right: 12px;
-    font-size: 1.2rem;
-    width: 30px;
-    text-align: center;
-}
-
-/* ──────────────────────────────────────────────────────────────────────────────
-   ACTIVITY BADGE (static “New / Completed / Update / Event” examples)
-   ────────────────────────────────────────────────────────────────────────────── */
-.activity-badge {
-    background: var(--accent);
-    color: white;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
-/* ──────────────────────────────────────────────────────────────────────────────
-   PROGRESS BARS (used under “Regional Progress”)
-   ────────────────────────────────────────────────────────────────────────────── */
-.progress-container {
-    height: 8px;
-    background: #E6F0FF;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-top: 8px;
-}
-.progress-bar {
-    height: 100%;
-    background: linear-gradient(to right, var(--accent), #3C6CFF);
-}
+.quick-link:hover { background:var(--accent); color:white; transform:translateX(5px); }
+.quick-link i { margin-right:12px; font-size:1.2rem; width:30px; text-align:center; }
 </style>
 
-
-<!-- ──────────────────────────────────────────────────────────────────────────────
-     MAIN DASHBOARD CONTENT BEGINS
-     ────────────────────────────────────────────────────────────────────────────── -->
 <div class="admin-container">
 
-  <!-- 1) DASHBOARD HEADER: Username + Date -->
-  <div class="dashboard-header mb-4">
-    <div class="d-flex align-items-center">
-      {{{userpicture}}}
-      <div class="ms-3">
-        <h3 class="mb-0">{{username}}</h3>
-        <small>Administrator Dashboard</small>
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="user-info my-1">
+      <div class="d-flex">
+         {{{userpicture}}}
+        <div>
+          <h3 style="color:white;">{{username}}</h3>
+          <small>Administrator Dashboard</small>
+        </div>
       </div>
     </div>
-    <div class="d-flex align-items-center">
-      <span class="me-3">Today: {{date}}</span>
-      <button class="btn btn-light btn-sm">
-        <i class="fas fa-cog"></i> Settings
-      </button>
+    <div class="header-controls">
+      <div class="date-display">
+        <i class="fas fa-calendar-day"></i> {{date}}
+      </div>
+    
     </div>
   </div>
 
-
-  <!-- ──────────────────────────────────────────────────────────────────────────────
-       2) TOP ROW: FOUR SMALL “STAT” CARDS
-       ────────────────────────────────────────────────────────────────────────────── -->
-  <div class="row g-3 mb-4">
-    <div class="col-md-3 col-sm-6">
+  <!-- Top Stats -->
+  <div class="row">
+    <div class="col-md-3">
       <div class="admin-card stat-card">
-        <div class="stat-icon">
-          <i class="fas fa-globe-americas"></i>
-        </div>
+        <div class="stat-icon"><i class="fas fa-globe-americas"></i></div>
         <div class="stat-value">{{regionCount}}</div>
         <div class="stat-label">Total Regions</div>
       </div>
     </div>
-    <div class="col-md-3 col-sm-6">
+    <div class="col-md-3">
       <div class="admin-card stat-card">
-        <div class="stat-icon">
-          <i class="fas fa-user-tie"></i>
-        </div>
+        <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
         <div class="stat-value">{{regionMgrCount}}</div>
         <div class="stat-label">Regional Managers</div>
       </div>
     </div>
-    <div class="col-md-3 col-sm-6">
-      <div class="admin-card stat-card">
-        <div class="stat-icon">
-          <i class="fas fa-users"></i>
+    <div class="col-md-3">
+      <a href="{{allUsersUrl}}" class="text-decoration-none">
+        <div class="admin-card stat-card">
+          <div class="stat-icon"><i class="fas fa-users"></i></div>
+          <div class="stat-value">{{activeUserCount}}</div>
+          <div class="stat-label">All Users</div>
         </div>
-        <div class="stat-value">{{activeUserCount}}</div>
-        <div class="stat-label">Active Users</div>
-      </div>
+      </a>
     </div>
-     <!-- … other three cards above … -->
-
-  <!-- 4) Online Users (single‐pass loop) -->
-  <div class="col-md-3 col-sm-6">
-    <div class="admin-card stat-card">
-      <div class="stat-icon">
-        <i class="fas fa-user-clock"></i>
+    <div class="col-md-3">
+      <div class="admin-card stat-card">
+        <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
+        <div class="stat-value">{{onlineUserCount}}</div>
+        <div class="stat-label">Online Users</div>
       </div>
-      <div class="stat-value">{{onlineUserCount}}</div>
-      <div class="stat-label">Online Users</div>
-
-      {{#onlineUsers}}
-        <ul class="online-user-list" style="margin-top:10px; padding-left:0; list-style:none;">
-          <li style="margin-bottom:6px;">
-            <a href="/message/index.php?user={{id}}" style="color: var(--primary); font-size:0.95rem; text-decoration:none;">
-              {{fullname}}
-            </a>
-          </li>
-        </ul>
-      {{/onlineUsers}}
-
     </div>
   </div>
 
-
-
-  <!-- ──────────────────────────────────────────────────────────────────────────────
-       3) MIDDLE ROW: (Left: Recent Managers + Chart)  (Right: Quick Links / Recent Activity / Progress)
-       ────────────────────────────────────────────────────────────────────────────── -->
-  <div class="row g-3">
-
-    <!-- ── LEFT COLUMN (8/12) ─────────────────────────────────────────────────────── -->
+  <div class="row">
+    <!-- Recent Managers -->
     <div class="col-lg-8">
-
-      <!-- 3a) Recent Regional Managers List -->
-      <!-- 3a) Recent Regional Managers List -->
-<div class="admin-card mb-3" style="height:60vh;">
-  <h2>Recent Regional Managers</h2>
-
-  {{#recentRegionManagers}}
-    <div class="manager-card">
-      <!-- Avatar/Icon on the left -->
-      <div class="manager-avatar bg-light d-flex align-items-center justify-content-center">
-        <i class="fas fa-user-circle fa-2x text-secondary"></i>
-      </div>
-
-      <!-- Info on the right: First show the manager’s name, then their region -->
-      <div class="manager-info">
-        <div class="manager-name">{{username}}</div>
-        <div class="manager-region">{{regionname}}</div>
-      </div>
-    </div>
-  {{/recentRegionManagers}}
-
-  {{^recentRegionManagers}}
-    <div class="text-center py-4 text-muted">
-      <i class="fas fa-user-tie fa-3x mb-3"></i>
-      <p>No regional managers found</p>
-    </div>
-  {{/recentRegionManagers}}
-</div>
-
-
-
-      <!-- 3b) System Activity Chart -->
-      <div class="admin-card" style="height:29vh;">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2 class="mb-0">System Activity</h2>
-          <div class="d-flex">
-            <button class="btn btn-sm btn-outline-primary me-2">
-              <i class="fas fa-sync"></i> Refresh
-            </button>
-            <div class="dropdown">
-              <button 
-                class="btn btn-sm btn-outline-primary dropdown-toggle" 
-                type="button" 
-                data-bs-toggle="dropdown" 
-                aria-expanded="false"
-              >
-                Last 7 days
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Last 24 hours</a></li>
-                <li><a class="dropdown-item" href="#">Last 7 days</a></li>
-                <li><a class="dropdown-item" href="#">Last 30 days</a></li>
-              </ul>
-            </div>
-          </div>
+      <div class="admin-card">
+        <div class="card-header">
+          <h2><i class="fas fa-user-tie"></i>Regional Managers</h2>
         </div>
+        {{#recentRegionManagers}}
+  <div class="manager-card">
+    {{{avatarhtml}}}
+    <div class="manager-info">
+      <div class="manager-name">{{username}}</div>
+      <div class="manager-region"><i class="fas fa-map-marker-alt"></i> {{regionname}}</div>
+    </div>
+  </div>
+{{/recentRegionManagers}}
 
+        {{^recentRegionManagers}}
+          <p class="no-online"><i class="fas fa-user-slash"></i><br>No managers found.</p>
+        {{/recentRegionManagers}}
+      </div>
+
+      <div class="admin-card">
+        <div class="card-header">
+          <h2><i class="fas fa-chart-line"></i> System Activity</h2>
+          <button class="btn"><i class="fas fa-sync"></i> Refresh</button>
+        </div>
         <div class="chart-container">
           <canvas id="systemActivityChart"></canvas>
         </div>
       </div>
-
     </div>
 
-
-    <!-- ── RIGHT COLUMN (4/12) ────────────────────────────────────────────────────── -->
-    <div class="col-lg-4 d-flex flex-column">
-
-      <!-- 3c) Quick Actions -->
-      <div class="admin-card mb-3 flex-grow-0">
-        <h2>Quick Actions</h2>
-        <a href="/user/index.php?roleid={{regionMgrRoleId}}" class="quick-link">
-          <i class="fas fa-list"></i>
-          <div>List Regional Managers</div>
-        </a>
-        <a href="/admin/roles/assign.php?contextid=1" class="quick-link">
-          <i class="fas fa-user-shield"></i>
-          <div>Manage Roles & Permissions</div>
-        </a>
-        <a href="/user/index.php" class="quick-link">
-          <i class="fas fa-users"></i>
-          <div>View All Users</div>
-        </a>
-        <a href="/report/outline/index.php" class="quick-link">
-          <i class="fas fa-chart-bar"></i>
-          <div>Global Course Report</div>
-        </a>
-        <a href="/report/log/index.php" class="quick-link">
-          <i class="fas fa-history"></i>
-          <div>View System Logs</div>
-        </a>
-        <a href="/course/index.php?categoryid=1" class="quick-link">
-          <i class="fas fa-book"></i>
-          <div>Manage Courses</div>
-        </a>
-      </div>
-
-      <!-- 3d) Recent Activity (static examples) -->
-      <div class="admin-card mb-3 flex-grow-0">
-        <h2>Recent Activity</h2>
-
-        <div class="d-flex mb-3">
-          <div class="activity-badge me-3">New</div>
-          <div>
-            <div class="fw-medium">North Region</div>
-            <small>12 new enrollments today</small>
-          </div>
+    <!-- Online Users + Quick Links -->
+    <div class="col-lg-4">
+      <div class="admin-card online-users-card">
+        <div class="card-header">
+          <h2><i class="fas fa-user-clock"></i> Online Users</h2>
+          <div class="online-count">{{onlineUserCount}} Active</div>
         </div>
-
-        <div class="d-flex mb-3">
-          <div class="activity-badge me-3" style="background:#28a745;">Completed</div>
-          <div>
-            <div class="fw-medium">Web Dev Course</div>
-            <small>35 users completed this week</small>
-          </div>
-        </div>
-
-        <div class="d-flex mb-3">
-          <div class="activity-badge me-3" style="background:#ffc107;">Update</div>
-          <div>
-            <div class="fw-medium">System Update</div>
-            <small>Moodle v4.1 installed</small>
-          </div>
-        </div>
-
-        <div class="d-flex">
-          <div class="activity-badge me-3" style="background:#6f42c1;">Event</div>
-          <div>
-            <div class="fw-medium">Training Session</div>
-            <small>Scheduled for June 15, 2025</small>
-          </div>
+       
+        <div class="online-users-list">
+          {{#onlineUsersData}}
+            <div class="online-user">
+              <div class="online-user-avatar">
+              {{{avatar}}}
+              </div>
+              
+              <div class="online-user-info">
+                <div class="online-user-name">{{fullname}}</div>
+                <div class="online-user-role">
+                  <i class="fas fa-user"></i> {{role}}
+                </div>
+              </div>
+              <div class="online-status">Online</div>
+              <div class="online-user-actions">
+                {{#canmessage}}
+                  <a class="action-btn" href="{{messageurl}}" title="Message {{fullname}}">
+                    <i class="fas fa-envelope"></i>
+                  </a>
+                {{/canmessage}}
+                <a href="{{profileurl}}" class="action-btn" title="View Profile">
+                  <i class="fas fa-user"></i>
+                </a>
+              </div>
+            </div>
+          {{/onlineUsersData}}
+          {{^onlineUsersData}}
+            <p class="no-online"><i class="fas fa-user-slash"></i><br>No one online.</p>
+          {{/onlineUsersData}}
         </div>
       </div>
 
-      <!-- 3e) Regional Progress Bars (static percentages) -->
-      <div class="admin-card flex-grow-1" style="height:70vh;">
-        <h2>Regional Progress</h2>
-
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-1">
-            <span>North Region</span>
-            <span>78%</span>
-          </div>
-          <div class="progress-container">
-            <div class="progress-bar" style="width: 78%;"></div>
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-1">
-            <span>South Region</span>
-            <span>65%</span>
-          </div>
-          <div class="progress-container">
-            <div class="progress-bar" style="width: 65%;"></div>
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-1">
-            <span>East Region</span>
-            <span>82%</span>
-          </div>
-          <div class="progress-container">
-            <div class="progress-bar" style="width: 82%;"></div>
-          </div>
-        </div>
-
-        <div>
-          <div class="d-flex justify-content-between mb-1">
-            <span>West Region</span>
-            <span>58%</span>
-          </div>
-          <div class="progress-container">
-            <div class="progress-bar" style="width: 58%;"></div>
-          </div>
-        </div>
+      <div class="admin-card">
+        <div class="card-header">
+  <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
       </div>
+       
+        <a href="/moodle/admin/category.php?category=roles" class="quick-link">
+          <i class="fas fa-user-shield"></i> Manage Roles & Permissions
+        </a>
+        <a href="/moodle/admin/user.php" class="quick-link">
+          <i class="fas fa-users"></i> View All Users
+        </a>
+        <a href="/moodle/report/modulecompletion/index.php" class="quick-link">
+          <i class="fas fa-chart-bar"></i> Global Course Report
+        </a>
+        <a href="/moodle/report/log/index.php" class="quick-link">
+          <i class="fas fa-history"></i> View System Logs
+        </a>
+        <a href="/moodle/course/management.php" class="quick-link">
+          <i class="fas fa-book"></i> Manage Courses
+        </a>
 
+      </div>
     </div>
   </div>
-
 </div>
-<!-- ──────────────────────────────────────────────────────────────────────────────
-     MAIN DASHBOARD CONTENT ENDS
-     Moodle’s own footer will appear directly below this—no overlaps. 
-     ────────────────────────────────────────────────────────────────────────────── -->
 
-
-<!-- ──────────────────────────────────────────────────────────────────────────────
-     Chart.js Initialization (placed after content so that <canvas> elements exist)
-     ────────────────────────────────────────────────────────────────────────────── -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Parse the JSON-encoded array passed from PHP
-    let dataArray = [];
-    try {
-        dataArray = JSON.parse('{{{globalHoursActivity}}}');
-    } catch (e) {
-        dataArray = [0,0,0,0,0,0,0];
+document.addEventListener('DOMContentLoaded', ()=>{
+  const ctx = document.getElementById('systemActivityChart').getContext('2d');
+  const data = JSON.parse('{{{globalHoursActivity}}}');
+  const grad = ctx.createLinearGradient(0,0,0,250);
+  grad.addColorStop(0,'rgba(109,149,255,0.3)');
+  grad.addColorStop(1,'rgba(109,149,255,0.05)');
+  new Chart(ctx, {
+    type:'line',
+    data:{
+      labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets:[{
+        data:data,
+        borderColor:'#6D95FF',
+        backgroundColor:grad,
+        tension:0.3,
+        fill:true,
+        pointRadius:5,
+        pointHoverRadius:7
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{
+        y:{ beginAtZero:true, grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#7A8CA5'} },
+        x:{ grid:{display:false}, ticks:{color:'#7A8CA5'} }
+      }
     }
-
-    const ctx = document.getElementById('systemActivityChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-            datasets: [{
-                label: 'Registrations/Enrollments (hrs)',
-                data: dataArray,
-                borderColor: getComputedStyle(document.documentElement).getPropertyValue('--primary').trim(),
-                backgroundColor: 'rgba(32,64,112,0.1)',
-                tension: 0.3,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { drawBorder: false }
-                },
-                x: {
-                    grid: { display: false }
-                }
-            }
-        }
-    });
+  });
 });
 </script>
