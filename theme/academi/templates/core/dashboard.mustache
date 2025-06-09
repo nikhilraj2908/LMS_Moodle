@@ -9,8 +9,7 @@
     <style>
         body {
             background-color: #f5f5f5;
-            font-family: Helvetica, Arial, sans-serif;
-
+            font-family: Arial, sans-serif;
         }
 
         .dashboard-header {
@@ -322,7 +321,7 @@
         #course-carousel {
             position: relative;
             width: 100%;
-            height: 200px;
+           
             overflow: hidden;
         }
 
@@ -1184,19 +1183,24 @@
             position: absolute;
         }
 
-        .badge-icon.locked {
-            opacity: 0.5;
-            filter: grayscale(100%);
+
+        .recentcourse-card-inner {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+           
         }
 
-        .badge-icon.unlocked {
-            opacity: 1;
-            filter: none;
-        }
 
         .pagelayout-mydashboard #region-main{
             padding: 0 0px;
         }
+
+    
+         
     </style>
 </head>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1210,31 +1214,26 @@
             </div>
         </div>
 
+
         <div class="container">
             <!-- First Row: User Stats, Course Enrolled, Learning Path -->
-            <div class="d-flex justify-content-between top-row " style="margin: 10px 30px;">
-                <!-- New Streaks Card -->
+           <!-- ============= First Row (All Cards the Same Size) ============= -->
+<div class="top-row d-flex" style="margin: 10px 30px; justify-content: center;">
 
 
-
-
-
-
-                <div class="learning-card">
-
-                    <div style="font-size: 25px; font-weight: 400; margin-bottom: 5px;">
-                        Start a daily&nbsp;<span style="font-weight: 700; color: #1c3c72;">Streak!</span>
-                    </div>
-                    <div style="font-size: 15px; font-weight: 400; margin-bottom: 30px;">
-                        You’re off to a great start!
-                    </div>
-
-                    <div class="streak-hover-container"
-                        style="position: relative; width: 180px; height: 180px; margin: 0 auto; margin-top: 60px;">
+  <!-- 1) Streak Card --><div class="learning-card" style="width:25%;">
+   <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+ <div class="card-header">
+      <h1 class="card-title">Start a daily Streak!</h1>
+      <p class="card-subtitle">You’re off to a great start!</p>
+    </div>
+                    <div class="streak-hover-container "
+                        style="position: relative; width: 230px; height: 230px; margin: 0 auto; margin-top: 60px;">
 
                         <!-- Your SVG flame -->
                         <div class="lift-flame"
-                            style="position: absolute; top: -48px; left: 47%; width: 60px; height: 80px; z-index: 3;">
+                            style="position: absolute; top: -48px; left: 52%; width: 60px; height: 80px; z-index: 3;">
 
                             <svg width="80" height="150" viewBox="0 0 298 600" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -1269,16 +1268,16 @@
 
                         <!-- Outer ring with light blue to white gradient -->
                         <div class="lift-circle"
-                            style="width: 180px; height: 180px; border-radius: 50%; background: linear-gradient(to bottom, #c6ddf8 0%, #ffffff 100%);  display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease;">
+                            style="width: 250px; height: 250px; border-radius: 50%; background: linear-gradient(to bottom, #c6ddf8 0%, #ffffff 100%);  display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease;">
 
 
                             <!-- Inner white circle -->
                             <div class="lift-inner-circle"
-                                style="width: 140px; height: 140px; background: #fff; border-radius: 50%; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                                style="width: 200px; height: 200px; background: #fff; border-radius: 50%; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
 
-                                <div id='streak-count'
+                                <div id="streak-count"
                                     style="font-size: 48px; font-weight: 700; color: #1c3c72; line-height: 1; user-select: none;">
-
+                                    
                                 </div>
 
                                 <div
@@ -1289,229 +1288,199 @@
                             </div>
                         </div>
 
-
-
                     </div>
 
-                    <div style="text-align: center; margin-top: 0px; font-size: 20px; font-weight: 400;">
+                    <div style="text-align: center; margin-top: 79px; font-size: 20px; font-weight: 400;">
                         1/1 Visit ✅ <span style="color: #28a745; font-weight: 700;"></span>
                     </div>
 
-                    <div id="quote-text" style="text-align: center; margin-top: 8px; font-size: 13px; color: #000;">
+                    <p id="quote-text" style="color: #7a8ca5; margin-bottom: 10px; text-align:center; margin-top:15px;">
                         Small steps every day lead to big achievements.
-                    </div>
-                    
-<!-- Combined progress bar and badge in one row -->
-<div style="display: flex; align-items: center; justify-content: space-between; margin: 20px auto 0; width: 100%;">
-    <div style="flex: 1; height: 12px; background: #eee; border-radius: 10px; overflow: hidden; margin-right: 10px;">
-        <div id="streak-progress-bar"
-            style="height: 100%; width: 0%; background: linear-gradient(90deg, #204070, #6d95ff); border-radius: 10px;">
-        </div>
-    </div>
-    <div id="earned-badge" style="font-size: 24px;">🔒</div>
-</div>
-
-<!-- Goal text below it -->
-<div id="streak-goal-text" style="font-size: 14px; color: #1c3c72; text-align: center; margin-top: 8px;">
-    Complete 10 days streak to earn a bronze badge!
-</div>
-
-
-
-
-
-
-
-                </div>
-
-
-                <!-- Continue Learning -->
-                <div class="learning-card">
-                    <div class="decoration decoration-1"></div>
-                    <div class="decoration decoration-2"></div>
-
-                    <div class="card-header">
-                        <h1 class="card-title">Continue Learning</h1>
-                        <p class="card-subtitle">Pick up where you left off</p>
-                    </div>
-
-                    <div class="card-content">
-                        {{#recentCourse}}
-                        <div class="course-meta">
-                            <div class="course-category">{{category}}</div>
-                            <div class="course-status">
-                                {{#is_completed}}✅ Completed{{/is_completed}}
-                                {{^is_completed}}⌛ Not Completed{{/is_completed}}
-                            </div>
-                        </div>
-
-                        <div class="course-image">
-                            <img src="{{course_image_url}}" alt="{{coursename}}">
-                        </div>
-
-                        <div class="course-name">{{coursename}}</div>
-
-                        <div class="progress-section">
-                            <div class="progress-header">
-                                <div class="progress-title">Course Progress</div>
-                                <div class="progress-percent">{{progressPercentage}}%</div>
-                            </div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar-fill" style="width: {{progressPercentage}}%;"></div>
-                            </div>
-                        </div>
-
-                        <div class="course-stats">
-                            <div class="stat-item">
-                                <div class="stat-value">{{total_modules}}</div>
-                                <div class="stat-label">Modules</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">{{progressPercentage}}%</div>
-                                <div class="stat-label">Complete</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">{{last_accessed_time}}</div>
-                                <div class="stat-label">Last Viewed</div>
-                            </div>
-                        </div>
-                        {{/recentCourse}}
-                        {{^recentCourse}}
-                        <div class="no-course">
-                            <i class="fas fa-book-open"></i>
-                            <p>No recently accessed course found</p>
-                        </div>
-                        {{/recentCourse}}
-                    </div>
-
-                    {{#recentCourse}}
-                    <a href="{{courseurl}}" class="continue-button">
-                        {{#is_completed}}Review Course{{/is_completed}}
-                        {{^is_completed}}Continue Learning →{{/is_completed}}
-                    </a>
-                    {{/recentCourse}}
-                </div>
-
-                <!-- Recently Enrolled Courses -->
-                <div class="dashboard-card flex-grow-1" style="max-width: 30%; border-radius: 20px; padding: 20px;">
-                    <div class="card-header">
-                        <h1 class="card-title">Recent Enrolled Courses</h1>
-                        <p class="card-subtitle">Explore your recently enrolled courses</p>
-                    </div>
-                    <div id="course-carousel" style="height: auto; position: relative; overflow: hidden;">
-                        {{#enrolledCourses}}
-                        <div class="course-item" style="display: none;">
-                            <div class="learning-card">
-                                <!-- Category + Completion Status -->
-                                <div class="course-meta">
-
-                                    <div class="course-category">{{category}}</div>
-                                    <div class="course-status"
-                                        style="color: {{#course_completion_status}}#28a745{{/course_completion_status}}{{^course_completion_status}}#ff6b6b{{/course_completion_status}}">
-                                        {{#course_completion_status}}✅ Completed{{/course_completion_status}}
-                                        {{^course_completion_status}}⌛ Not Completed{{/course_completion_status}}
-                                    </div>
-                                </div>
-
-                                <!-- Course Image -->
-                                <div class="course-image">
-                                    <img src="{{course_image_url}}" alt="{{course_name}}">
-                                </div>
-
-                                <!-- Course Name -->
-                                <div class="course-name">{{coursename}}</div>
-
-
-                                <!-- Progress Section -->
-                                <div class="progress-section">
-                                    <div class="progress-header">
-                                        <div class="progress-title">Course Progress</div>
-                                        <div class="progress-percent">{{progressPercentage}}%</div>
-                                    </div>
-                                    <div class="progress-bar-container">
-                                        <div class="progress-bar-fill" style="width: {{progressPercentage}}%;"></div>
-                                    </div>
-                                </div>
-
-                                <!-- Stats -->
-                                <div class="course-stats">
-                                    <div class="stat-item">
-                                        <div class="stat-value">{{total_modules}}</div>
-                                        <div class="stat-label">Modules</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-value">{{progressPercentage}}%</div>
-                                        <div class="stat-label">Complete</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-value">{{last_accessed_time}}</div>
-                                        <div class="stat-label">Last Viewed</div>
-                                    </div>
-                                </div>
-
-                                <!-- Button -->
-                                <a href="{{courseurl}}" class="continue-button">Go to Course →</a>
-                            </div>
-                        </div>
-                        {{/enrolledCourses}}
-
-                        {{^enrolledCourses}}
-                        <div class="no-course">
-                            <i class="fas fa-book-open"></i>
-                            <p>No recent courses enrolled</p>
-                        </div>
-                        {{/enrolledCourses}}
-                    </div>
-                </div>
-
-                <!-- Learning Path -->
-                <div class="learning-path-card">
-                    <div class="decoration decoration-1"></div>
-                    <div class="decoration decoration-2"></div>
-
-                    <div class="card-header">
-                        <h1 class="card-title">Learning Path</h1>
-                        <p class="card-subtitle">Track your progress and continue learning</p>
-                    </div>
-
-                    <div class="progress-container">
-                        <div class="progress-bg"></div>
-                        <div class="progress-circle">
-                            <div class="progress-fill"></div>
-                        </div>
-                        <div class="progress-inner">
-                            <div class="progress-value" id="progressValue">{{learningPathPercentage}}%</div>
-                            <div class="progress-label">Completed</div>
-                        </div>
-                    </div>
-
-                    <div class="progress-stats">
-                        <div class="stat-item">
-                            <div class="stat-value" id="modulesValue">{{totalModules}}</div>
-                            <div class="stat-label">Total</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="completedValue">{{completedCourses}}</div>
-                            <div class="stat-label">Completed</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="remainingValue">{{remainingCourses}}</div>
-                            <div class="stat-label">Remaining</div>
-                        </div>
-                    </div>
-
-                    <div class="progress-bar">
-                        <div class="progress-bar-fill" id="progressBarFill" style="width: {{learningPathPercentage}}%;">
-                        </div>
-                    </div>
-
-                    <p style="color: #7a8ca5; margin-bottom: 10px;">
-                        You've completed <span id="completedPercentText">{{learningPathPercentage}}%</span> of your
-                        learning path
                     </p>
+                     
 
+                    <!-- Progress Bar Container -->
+                    <div
+                        style="margin: 20px auto 0; width: 100%; height: 12px; background: #eee; border-radius: 10px; overflow: hidden;">
+                        <div
+                            style="width: 25%; height: 100%; background: linear-gradient(90deg, #204070, #6d95ff); border-radius: 10px;">
+                        </div>
+                    </div>
+
+                    <div id="streak-goal-text"
+                        style="text-align: center; margin-top: 30px; font-size: 15px; color: #1c3c72;">
+                        Complete 10 days streak to earn a bronze badge!
+                    </div>
                 </div>
+  <!-- 2) Continue Learning Card -->
+  <div class="card-equal learning-card" style="width:25%;">
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+    <div class="card-header">
+      <h1 class="card-title">Continue Learning</h1>
+      <p class="card-subtitle">Pick up where you left off</p>
+    </div>
+    <div class="card-content">
+      {{#recentCourse}}
+      <div class="course-meta">
+        <div class="course-category">{{category}}</div>
+        <div class="course-status">
+          {{#is_completed}}✅ Completed{{/is_completed}}
+          {{^is_completed}}⌛ Not Completed{{/is_completed}}
+        </div>
+      </div>
+      <div class="course-image">
+        <img src="{{course_image_url}}" alt="{{coursename}}">
+      </div>
+      <div class="course-name">{{coursename}}</div>
+      <div class="progress-section">
+        <div class="progress-header">
+          <div class="progress-title">Course Progress</div>
+          <div class="progress-percent">{{progressPercentage}}%</div>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" style="width: {{progressPercentage}}%;"></div>
+        </div>
+      </div>
+      <div class="course-stats">
+        <div class="stat-item">
+          <div class="stat-value">{{total_modules}}</div>
+          <div class="stat-label">Modules</div>
+        </div>
+        <div class="stat-item">
+          <div id="lastaccessedtime" class="stat-value">{{last_accessed_time}}</div>
+          <div class="stat-label">Last Viewed</div>
+        </div>
+      </div>
+      {{/recentCourse}}
+      {{^recentCourse}}
+      <div class="no-course">
+        <i class="fas fa-book-open"></i>
+        <p>No recently accessed course found</p>
+      </div>
+      {{/recentCourse}}
+    </div>
+    {{#recentCourse}}
+    <a href="{{courseurl}}" class="continue-button">
+      {{#is_completed}}Review Course{{/is_completed}}
+      {{^is_completed}}Continue Learning →{{/is_completed}}
+    </a>
+    {{/recentCourse}}
+  </div>
+  <!-- /.Continue Learning Card -->
+
+  <!-- 3) Recent Enrollments Card -->
+  <div class="card-equal learning-card "style="width:25%;">
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+    <div class="card-header">
+      <h1 class="card-title">Recent Enrollments</h1>
+      <p class="card-subtitle">Explore your recently enrolled courses</p>
+    </div>
+    <div id="course-carousel" style="flex: 1; position: relative; overflow: hidden;">
+      {{#enrolledCourses}}
+      <div class="course-item" style="display: none;">
+        <div class="recentcourse-card-inner">
+          <div class="course-meta">
+            <div class="course-category">{{category}}</div>
+            <div class="course-status" style="color: {{#course_completion_status}}#28a745{{/course_completion_status}}{{^course_completion_status}}#ff6b6b{{/course_completion_status}};">
+              {{#course_completion_status}}✅ Completed{{/course_completion_status}}
+              {{^course_completion_status}}⌛ Not Completed{{/course_completion_status}}
             </div>
+          </div>
+          <div class="course-image" style="border-radius: 12px; overflow: hidden; margin-bottom: 15px;">
+            <img src="{{course_image_url}}" alt="{{course_name}}" style="width: 100%; height: 170px; object-fit: cover; display: block;">
+          </div>
+          <div class="course-name" style="font-size: 22px; font-weight: 700; color: #204070; margin-bottom: 20px; text-align: center;">
+            {{coursename}}
+          </div>
+          <div class="progress-section" style="background: #f8fbff; border-radius: 15px; padding: 15px; margin-bottom: 10px; border: 1px solid #e6f0ff;">
+            <div class="progress-header" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <div class="progress-title" style="font-size: 16px; font-weight: 600; color: #204070;">
+                Course Progress
+              </div>
+              <div class="progress-percent" style="font-size: 18px; font-weight: 700; color: #3c6cff;">
+                {{progressPercentage}}%
+              </div>
+            </div>
+            <div class="progress-bar-container" style="background: #e6f0ff; height: 10px; border-radius: 5px; margin-bottom: 5px; overflow: hidden;">
+              <div class="progress-bar-fill" style="height: 100%; background: linear-gradient(to right, #3c6cff, #6d95ff); width: {{progressPercentage}}%; border-radius: 5px; transition: width 0.5s ease;"></div>
+            </div>
+          </div>
+          <div class="course-stats" style="display: flex; justify-content: space-between; margin-top: 10px;">
+            <div class="stat-item" style="text-align: center; padding: 10px; flex: 1; background: #f8fbff; border-radius: 10px; margin: 0 5px;">
+              <div class="stat-value" style="font-size: 18px; font-weight: 700; color: #204070; margin-bottom: 5px;">
+                {{total_modules}}
+              </div>
+              <div class="stat-label" style="font-size: 13px; color: #7a8ca5;">Modules</div>
+            </div>
+            <div class="stat-item" style="text-align: center; padding: 10px; flex: 1; background: #f8fbff; border-radius: 10px; margin: 0 5px;">
+              <div id="lastaccessedtime" class="stat-value" style="font-size: 18px; font-weight: 700; color: #204070; margin-bottom: 5px;">
+                {{last_accessed_time}}
+              </div>
+              <div class="stat-label" style="font-size: 13px; color: #7a8ca5;">Last Viewed</div>
+            </div>
+          </div>
+          <a href="{{courseurl}}" class="continue-button" style="background: linear-gradient(to right, #3c6cff, #6d95ff); color: white; border: none; border-radius: 30px; padding: 14px 30px; font-size: 18px; font-weight: 600; text-align: center; text-decoration: none; display: block; margin-top: 15px; width: 100%; box-shadow: 0 5px 15px rgba(60,108,255,0.3); transition: all 0.3s ease;">
+            Go to Course →
+          </a>
+        </div>
+      </div>
+      {{/enrolledCourses}}
+      {{^enrolledCourses}}
+      <div class="no-course" style="text-align: center; padding: 30px 0; color: #7a8ca5;">
+        <i class="fas fa-book-open" style="font-size: 48px; margin-bottom: 15px; color: #e6f0ff;"></i>
+        <p>No recent courses enrolled</p>
+      </div>
+      {{/enrolledCourses}}
+    </div>
+  </div>
+  <!-- /.Recent Enrollments Card -->
+
+  <!-- 4) Learning Path Card -->
+  <div class="card-equal learning-card"style="width:23%;">
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+    <div class="card-header">
+      <h1 class="card-title">Learning Path</h1>
+      <p class="card-subtitle">Track your progress and continue learning</p>
+    </div>
+    <div class="progress-container" style="margin: 60px auto 60px;">
+      <div class="progress-bg"></div>
+      <div class="progress-circle">
+        <div class="progress-fill"></div>
+      </div>
+      <div class="progress-inner">
+        <div class="progress-value" id="progressValue">{{learningPathPercentage}}%</div>
+        <div class="progress-label">Completed</div>
+      </div>
+    </div>
+    <div class="progress-stats" style="display: flex; justify-content: space-around; margin-top: 10px;">
+      <div class="stat-item">
+        <div class="stat-value" id="modulesValue">{{totalModules}}</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="completedValue">{{completedCourses}}</div>
+        <div class="stat-label">Completed</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="remainingValue">{{remainingCourses}}</div>
+        <div class="stat-label">Remaining</div>
+      </div>
+    </div>
+    <div class="progress-bar" style="height: 10px; background: #f0f3f8; border-radius: 5px; margin: 25px 0 15px; overflow: hidden;">
+      <div class="progress-bar-fill" id="progressBarFill" style="width: {{learningPathPercentage}}%; background: linear-gradient(to right, #3c6cff, #6d95ff); height: 100%; border-radius: 5px;"></div>
+    </div>
+    <p style="color: #7a8ca5; margin-bottom: 10px;">
+      You've completed <span id="completedPercentText">{{learningPathPercentage}}%</span> of your learning path
+    </p>
+  </div>
+  <!-- /.Learning Path Card -->
+
+</div>
+<!-- =========== End of First Row ============ -->
+
 
             <!-- Second Row: Hours Activity, Earned Points, Course Enrolled -->
             <div class="d-flex justify-content-between top-row mb-4">
@@ -1765,47 +1734,6 @@
                         streakCountElement.textContent = data.streakCount + " ";
                     }
 
-                    // 🔁 NEW: Handle progress bar and badge logic
-                    const streak = data.streakCount || 0;
-                    const progressBar = document.getElementById('streak-progress-bar');
-                    const earnedBadge = document.getElementById('earned-badge');
-                    const streakGoalText = document.getElementById('streak-goal-text');
-
-                    // Determine milestone and set badge
-                    let phaseMax = 10;
-                    let phaseProgress = streak;
-                    let badge = "🔒";
-                    let goalText = "Complete 10 days streak to earn a bronze badge!";
-
-                    if (streak >= 40) {
-                        badge = "🥇";
-                        phaseMax = 40;
-                        phaseProgress = streak - 40; // show 0 after gold
-                        goalText = "You've earned the Gold badge!";
-                    } else if (streak >= 25) {
-                        badge = "🥈";
-                        phaseMax = 15;
-                        phaseProgress = streak - 25;
-                        goalText = "Continue for 40 days to earn a gold badge!";
-                    } else if (streak >= 10) {
-                        badge = "🥉";
-                        phaseMax = 15;
-                        phaseProgress = streak - 10;
-                        goalText = "Continue for 25 days to earn a silver badge!";
-                    }
-
-                    // Update badge and goal text
-                    earnedBadge.textContent = badge;
-                    streakGoalText.textContent = goalText;
-
-                    // Resetting the progress bar per phase
-                    const percentage = Math.min((phaseProgress / phaseMax) * 100, 100);
-                    if (progressBar) {
-                        progressBar.style.width = `${percentage}%`;
-                    }
-
-
-
                     // Update visit status text
                     const visitStatus = document.getElementById('visit-status');
                     if (visitStatus) {
@@ -1890,9 +1818,21 @@
             }, 10000); // Change every 5 seconds
         });
 
+ document.addEventListener('DOMContentLoaded', function() {
+    
+    const elem = document.getElementById("lastaccessedtime");
+    if (!elem) return;
 
+    // 2) Get its full text, e.g. "2025-05-30 15:56:06"
+    const fullText = elem.textContent.trim();
 
+    // 3) Split on the first space, keep only the date portion
+    //    fullText.split(' ')[0] yields "2025-05-30"
+    const dateOnly = fullText.split(' ')[0];
 
+    // 4) Write it back to the same element
+    elem.textContent = dateOnly;
+  });
 
     </script>
 </body>

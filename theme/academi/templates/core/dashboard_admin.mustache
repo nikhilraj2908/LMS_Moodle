@@ -1,0 +1,320 @@
+{{! Dynamic Administrator Dashboard — templates/core/dashboard_admin.mustache }}
+
+<style>
+  :root {
+    --primary: #204070;
+    --secondary: #3C6894;
+    --accent: #6D95FF;
+    --light: #F0F6FC;
+    --dark: #1C3C72;
+    --success: #28a745;
+    --border-radius: 16px;
+    --transition: all 0.3s ease;
+  }
+  * { box-sizing: border-box; margin:0; padding:0; font-family: 'Segoe UI',sans-serif; }
+  
+  .admin-container { max-width:1800px; margin:30px auto; padding:0 20px 40px; }
+  .dashboard-header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white; padding:20px 30px; border-radius:var(--border-radius);
+    box-shadow:0 4px 20px rgba(0,0,0,0.1);
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:25px;
+  }
+  .dashboard-header .user-info { display:flex; align-items:center; gap:15px; }
+  .dashboard-header .user-info .avatar {
+    width:60px; height:60px; border-radius:50%; background:var(--accent);
+    display:flex; align-items:center; justify-content:center; font-size:24px;
+    color:white; box-shadow:0 4px 10px rgba(0,0,0,0.15);
+  }
+  .dashboard-header h3 { font-size:1.8rem; font-weight:700; }
+  .dashboard-header small { display:block; opacity:.85; margin-top:5px; }
+  .header-controls { display:flex; align-items:center; gap:15px; }
+  .date-display {
+    background: rgba(255,255,255,0.15); padding:8px 15px; border-radius:30px;
+    font-weight:500; display:flex; align-items:center; gap:8px;
+  }
+ 
+  .btn:hover { transform:translateY(-2px); box-shadow:0 6px 15px rgba(32,64,112,0.15); }
+  .admin-card {
+    background:white; border-radius:var(--border-radius); padding:25px;
+    box-shadow:0 8px 25px rgba(32,64,112,0.05); transition:var(--transition);
+  
+  }
+  .admin-card:hover { transform:translateY(-5px); box-shadow:0 12px 30px rgba(32,64,112,0.15); }
+  .row { display:flex; flex-wrap:wrap; margin:0 -12px; }
+  .col-md-3, .col-md-4, .col-md-8, .col-lg-4, .col-lg-8 { padding:0 12px; margin-bottom:24px; }
+  .col-md-3 { width:25%; } .col-md-4 { width:33.333%; } .col-md-8 { width:66.666%; }
+  .col-lg-4 { width:33.333%; } .col-lg-8 { width:66.666%; }
+  @media (max-width:1200px) { .col-md-3, .col-md-4, .col-md-8 { width:50%; } }
+  @media (max-width:768px) {
+    .col-md-3, .col-md-4, .col-md-8, .col-lg-4, .col-lg-8 { width:100%; }
+    .dashboard-header { flex-direction:column; text-align:center; gap:15px; }
+    .header-controls, .user-info { flex-direction:column; }
+  }
+
+  /* Stat cards */
+  .stat-card { text-align:center; display:flex; flex-direction:column; justify-content:center; }
+  .stat-icon {
+    font-size:2.5rem; color:var(--accent);
+    background:rgba(109,149,255,0.1); width:80px; height:80px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; margin:0 auto 15px;
+    transition:var(--transition);
+  }
+  .stat-card:hover .stat-icon { transform:scale(1.1); }
+  .stat-value { font-size:2.8rem; font-weight:800; color:var(--primary); line-height:1; }
+  .stat-label { opacity:.7; margin-top:5px; }
+
+  /* Recent managers */
+  .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(0,0,0,0.05); padding-bottom:15px; }
+  .card-header h2 { display:flex; align-items:center; gap:10px; font-size:1.5rem; color:var(--dark); }
+  .manager-card {
+    display:flex; align-items:center; padding:15px; margin-bottom:15px;
+    background:rgba(248,251,255,1); border-radius:15px;
+    box-shadow:0 3px 8px rgba(0,0,0,0.03); transition:var(--transition);
+  }
+  .manager-card:hover { background:#E6F0FF; transform:translateX(5px); }
+  .manager-avatar {
+    width:60px; height:60px; border-radius:50%; background:rgba(32,64,112,0.05);
+    display:flex; align-items:center; justify-content:center; font-size:2rem; color:var(--secondary);
+    margin-right:15px;
+  }
+  .manager-name { font-weight:700; color:var(--dark); }
+  .manager-region { color:var(--secondary); font-size:.9rem; display:flex; align-items:center; gap:5px; }
+  .manager-region i { font-size:.8rem; }
+
+  /* System chart */
+  .chart-container { height:250px; position:relative; margin-top:15px; }
+
+  /* Online users */
+  .online-users-card { display:flex; flex-direction:column; }
+  .online-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
+  .online-count {
+    background:rgba(109,149,255,0.1); color:var(--accent);
+    padding:5px 15px; border-radius:20px; font-weight:600; font-size:.9rem;
+  }
+  .online-users-list { overflow-y:auto; max-height:300px; padding-right:5px; }
+  .online-user {
+    display:flex; align-items:center; padding:12px 15px; margin-bottom:10px;
+    background:rgba(240,246,252,0.5); border-radius:12px; transition:var(--transition);
+  }
+  .online-user:hover { background:rgba(109,149,255,0.1); transform:translateX(3px); }
+  .online-user-avatar {
+    width:45px; height:45px; border-radius:50%; background:var(--accent);
+    display:flex; align-items:center;  font-weight:600; color:white;
+    margin-right:15px;
+  }
+  .online-user-info { flex-grow:1; }
+  .online-user-name { font-weight:600; color:var(--dark); }
+  .online-user-role { font-size:.85rem; color:var(--secondary); display:flex; align-items:center; gap:5px; }
+  .online-user-role i { font-size:.9rem; }
+  .online-status {
+    font-size:.8rem; color:var(--success); font-weight:500; display:flex; align-items:center; gap:6px;
+  }
+  .online-status::before {
+    content:""; width:8px; height:8px; background:var(--success); border-radius:50%;
+  }
+  .online-user-actions { display:flex; gap:10px; margin-left:15px; }
+  .action-btn {
+    width:36px; height:36px; border:none; border-radius:50%; background:rgba(109,149,255,0.1);
+    display:flex; align-items:center; justify-content:center; color:var(--accent);
+    cursor:pointer; transition:var(--transition);
+  }
+  .action-btn:hover { background:var(--accent); color:white; transform:scale(1.1); }
+
+  .quick-link {
+  display:flex; align-items:center; padding:12px 15px; margin-bottom:12px;
+  border-radius:12px; background:#F8FBFF; color:var(--dark); text-decoration:none;
+  transition:all .3s;
+}
+.quick-link:hover { background:var(--accent); color:white; transform:translateX(5px); }
+.quick-link i { margin-right:12px; font-size:1.2rem; width:30px; text-align:center; }
+</style>
+
+<div class="admin-container">
+
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="user-info my-1">
+      <div class="d-flex">
+         {{{userpicture}}}
+        <div>
+          <h3 style="color:white;">{{username}}</h3>
+          <small>Administrator Dashboard</small>
+        </div>
+      </div>
+    </div>
+    <div class="header-controls">
+      <div class="date-display">
+        <i class="fas fa-calendar-day"></i> {{date}}
+      </div>
+    
+    </div>
+  </div>
+
+  <!-- Top Stats -->
+  <div class="row">
+    <div class="col-md-3">
+      <div class="admin-card stat-card">
+        <div class="stat-icon"><i class="fas fa-globe-americas"></i></div>
+        <div class="stat-value">{{regionCount}}</div>
+        <div class="stat-label">Total Regions</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="admin-card stat-card">
+        <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
+        <div class="stat-value">{{regionMgrCount}}</div>
+        <div class="stat-label">Regional Managers</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <a href="{{allUsersUrl}}" class="text-decoration-none">
+        <div class="admin-card stat-card">
+          <div class="stat-icon"><i class="fas fa-users"></i></div>
+          <div class="stat-value">{{activeUserCount}}</div>
+          <div class="stat-label">All Users</div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-3">
+      <div class="admin-card stat-card">
+        <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
+        <div class="stat-value">{{onlineUserCount}}</div>
+        <div class="stat-label">Online Users</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Recent Managers -->
+    <div class="col-lg-8">
+      <div class="admin-card">
+        <div class="card-header">
+          <h2><i class="fas fa-user-tie"></i>Regional Managers</h2>
+        </div>
+        {{#recentRegionManagers}}
+  <div class="manager-card">
+    {{{avatarhtml}}}
+    <div class="manager-info">
+      <div class="manager-name">{{username}}</div>
+      <div class="manager-region"><i class="fas fa-map-marker-alt"></i> {{regionname}}</div>
+    </div>
+  </div>
+{{/recentRegionManagers}}
+
+        {{^recentRegionManagers}}
+          <p class="no-online"><i class="fas fa-user-slash"></i><br>No managers found.</p>
+        {{/recentRegionManagers}}
+      </div>
+
+      <div class="admin-card">
+        <div class="card-header">
+          <h2><i class="fas fa-chart-line"></i> System Activity</h2>
+          <button class="btn"><i class="fas fa-sync"></i> Refresh</button>
+        </div>
+        <div class="chart-container">
+          <canvas id="systemActivityChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Online Users + Quick Links -->
+    <div class="col-lg-4">
+      <div class="admin-card online-users-card">
+        <div class="card-header">
+          <h2><i class="fas fa-user-clock"></i> Online Users</h2>
+          <div class="online-count">{{onlineUserCount}} Active</div>
+        </div>
+       
+        <div class="online-users-list">
+          {{#onlineUsersData}}
+            <div class="online-user">
+              <div class="online-user-avatar">
+              {{{avatar}}}
+              </div>
+              
+              <div class="online-user-info">
+                <div class="online-user-name">{{fullname}}</div>
+                <div class="online-user-role">
+                  <i class="fas fa-user"></i> {{role}}
+                </div>
+              </div>
+              <div class="online-status">Online</div>
+              <div class="online-user-actions">
+                {{#canmessage}}
+                  <a class="action-btn" href="{{messageurl}}" title="Message {{fullname}}">
+                    <i class="fas fa-envelope"></i>
+                  </a>
+                {{/canmessage}}
+                <a href="{{profileurl}}" class="action-btn" title="View Profile">
+                  <i class="fas fa-user"></i>
+                </a>
+              </div>
+            </div>
+          {{/onlineUsersData}}
+          {{^onlineUsersData}}
+            <p class="no-online"><i class="fas fa-user-slash"></i><br>No one online.</p>
+          {{/onlineUsersData}}
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="card-header">
+  <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+      </div>
+       
+        <a href="/moodle/admin/category.php?category=roles" class="quick-link">
+          <i class="fas fa-user-shield"></i> Manage Roles & Permissions
+        </a>
+        <a href="/moodle/admin/user.php" class="quick-link">
+          <i class="fas fa-users"></i> View All Users
+        </a>
+        <a href="/moodle/report/modulecompletion/index.php" class="quick-link">
+          <i class="fas fa-chart-bar"></i> Global Course Report
+        </a>
+        <a href="/moodle/report/log/index.php" class="quick-link">
+          <i class="fas fa-history"></i> View System Logs
+        </a>
+        <a href="/moodle/course/management.php" class="quick-link">
+          <i class="fas fa-book"></i> Manage Courses
+        </a>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', ()=>{
+  const ctx = document.getElementById('systemActivityChart').getContext('2d');
+  const data = JSON.parse('{{{globalHoursActivity}}}');
+  const grad = ctx.createLinearGradient(0,0,0,250);
+  grad.addColorStop(0,'rgba(109,149,255,0.3)');
+  grad.addColorStop(1,'rgba(109,149,255,0.05)');
+  new Chart(ctx, {
+    type:'line',
+    data:{
+      labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets:[{
+        data:data,
+        borderColor:'#6D95FF',
+        backgroundColor:grad,
+        tension:0.3,
+        fill:true,
+        pointRadius:5,
+        pointHoverRadius:7
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{
+        y:{ beginAtZero:true, grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#7A8CA5'} },
+        x:{ grid:{display:false}, ticks:{color:'#7A8CA5'} }
+      }
+    }
+  });
+});
+</script>

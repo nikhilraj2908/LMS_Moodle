@@ -168,7 +168,7 @@
                 WHERE deleted = 0 AND suspended = 0 AND id <> 1 AND id <> :guestid";
         
         $usercount = $DB->count_records_sql($sql, ['guestid' => $CFG->siteguest]);
-        $maxusers = 6;
+        $maxusers = 100;
         
         if ($usercount < $maxusers) {
             echo html_writer::start_div('d-flex mb-2');
