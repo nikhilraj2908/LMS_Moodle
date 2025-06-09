@@ -33,6 +33,78 @@ require_login();
 
 // bring in globals
 global $DB, $USER, $OUTPUT, $CFG;
+// In your index.php
+// Add this in your index.php file// == Only allow site admins ==
+// if (!is_siteadmin()) {
+//     http_response_code(403);
+//     header('Content-Type: application/json; charset=utf-8');
+//     echo json_encode(['error' => 'Access denied']);
+//     exit;
+// }
+
+// == AJAX log endpoint ==
+$ajax = optional_param('ajaxlogs', 0, PARAM_BOOL);
+if ($ajax) {
+    global $DB;
+    $range = optional_param('range', 60, PARAM_INT);
+    $endtime = time();
+    $start = $endtime - ($range * 60);
+
+    try {
+        $records = $DB->get_records_sql("
+            SELECT
+                l.timecreated         AS timestmp,
+                l.eventname           AS eventname,
+                COALESCE(l.other, '') AS details,
+                l.ip                  AS ip,
+                u.firstname,
+                u.lastname,
+                u.firstnamephonetic,
+                u.lastnamephonetic,
+                u.middlename,
+                u.alternatename
+              FROM {logstore_standard_log} l
+              JOIN {user} u ON u.id = l.userid
+             WHERE l.timecreated BETWEEN :start AND :end
+             ORDER BY l.timecreated DESC
+        ", ['start' => $start, 'end' => $endtime]);
+
+        $logData = [];
+        foreach ($records as $r) {
+    $details = json_decode($r->details, true);
+    $description = "The user viewed the log report.";
+    if (!empty($details['modaction']) && $details['modaction'] !== '-') {
+        $description = "The user performed '{$details['modaction']}' on the log report.";
+    }
+    $logData[] = [
+        'time' => userdate($r->timestmp, get_string('strftimedatetime', 'langconfig')),
+        'user' => fullname((object)[
+            'firstname' => $r->firstname,
+            'lastname' => $r->lastname,
+            'firstnamephonetic' => $r->firstnamephonetic,
+            'lastnamephonetic' => $r->lastnamephonetic,
+            'middlename' => $r->middlename,
+            'alternatename' => $r->alternatename
+        ]),
+        'event' => $r->eventname,
+        'description' => $description,
+        'ip' => $r->ip
+    ];
+}
+
+        ob_clean();
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($logData);
+    } catch (Exception $e) {
+        error_log("AJAX log error: " . $e->getMessage());
+        ob_clean();
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['error' => 'Failed to fetch logs: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
 
 // Load a *complete* user record so fullname() has all name fields.
 $completeuser = $DB->get_record('user', [
@@ -1026,12 +1098,19 @@ $templatecontext['allUsersUrl'] = (new moodle_url('/admin/user.php'))->out();
 }
     $templatecontext['recentRegionManagers'] = $recentManagers;
 
-    // global hours data (dummy)
-    $globalHours = [];
-    for ($i=0; $i<7; $i++) {
-        $globalHours[] = rand(0,10);
-    }
-    $templatecontext['globalHoursActivity'] = json_encode($globalHours);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // link roleid
     $templatecontext['regionMgrRoleId'] = $regionalmgrroleid;
@@ -1079,6 +1158,10 @@ $templatecontext['allUsersUrl'] = (new moodle_url('/admin/user.php'))->out();
 // =================================
 // 5. RENDER THE CHOSEN TEMPLATE
 // =================================
+
+$event = \core\event\dashboard_viewed::create(['context' => $context]);
+$event->trigger();
+
 echo $OUTPUT->header();
 
 if (core_userfeedback::should_display_reminder()) {
@@ -1092,7 +1175,3 @@ echo $OUTPUT->render_from_template($templatecontext['template'], $templatecontex
 
 echo $OUTPUT->custom_block_region('content');
 echo $OUTPUT->footer();
-
-// trigger event
-$event = \core\event\dashboard_viewed::create(['context'=>$context]);
-$event->trigger();
