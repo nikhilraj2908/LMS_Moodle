@@ -42,27 +42,29 @@ global $DB, $USER, $OUTPUT, $CFG;
 //     exit;
 // }
 
-// == AJAX log endpoint ==
-$ajax = optional_param('ajaxlogs', 0, PARAM_BOOL);
+// == AJAX log endpoint ==// more robust AJAX detection
+$isxhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH'])
+       && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+$ajax  = optional_param('ajaxlogs', 0, PARAM_BOOL) || $isxhr;
+
 if ($ajax) {
-    global $DB;
-    $range = optional_param('range', 60, PARAM_INT);
+    global $DB, $USER;
+
+    // pull the range in minutes (default to 60 if missing)
+    $range   = optional_param('range', 60, PARAM_INT);
     $endtime = time();
-    $start = $endtime - ($range * 60);
+    $start   = $endtime - ($range * 60);
 
     try {
         $records = $DB->get_records_sql("
             SELECT
-                l.timecreated         AS timestmp,
-                l.eventname           AS eventname,
+                l.timecreated AS timestmp,
+                l.eventname   AS eventname,
                 COALESCE(l.other, '') AS details,
-                l.ip                  AS ip,
-                u.firstname,
-                u.lastname,
-                u.firstnamephonetic,
-                u.lastnamephonetic,
-                u.middlename,
-                u.alternatename
+                l.ip          AS ip,
+                u.firstname, u.lastname,
+                u.firstnamephonetic, u.lastnamephonetic,
+                u.middlename, u.alternatename
               FROM {logstore_standard_log} l
               JOIN {user} u ON u.id = l.userid
              WHERE l.timecreated BETWEEN :start AND :end
@@ -71,39 +73,40 @@ if ($ajax) {
 
         $logData = [];
         foreach ($records as $r) {
-    $details = json_decode($r->details, true);
-    $description = "The user viewed the log report.";
-    if (!empty($details['modaction']) && $details['modaction'] !== '-') {
-        $description = "The user performed '{$details['modaction']}' on the log report.";
-    }
-    $logData[] = [
-        'time' => userdate($r->timestmp, get_string('strftimedatetime', 'langconfig')),
-        'user' => fullname((object)[
-            'firstname' => $r->firstname,
-            'lastname' => $r->lastname,
-            'firstnamephonetic' => $r->firstnamephonetic,
-            'lastnamephonetic' => $r->lastnamephonetic,
-            'middlename' => $r->middlename,
-            'alternatename' => $r->alternatename
-        ]),
-        'event' => $r->eventname,
-        'description' => $description,
-        'ip' => $r->ip
-    ];
-}
+            $details    = json_decode($r->details, true);
+            $description = "The user viewed the log report.";
+            if (!empty($details['modaction']) && $details['modaction'] !== '-') {
+                $description = "The user performed '{$details['modaction']}' on the log report.";
+            }
+            $logData[] = [
+                'time'        => userdate($r->timestmp, get_string('strftimedatetime', 'langconfig')),
+                'user'        => fullname((object)[
+                    'firstname' => $r->firstname,
+                    'lastname'  => $r->lastname,
+                    'firstnamephonetic' => $r->firstnamephonetic,
+                    'lastnamephonetic'  => $r->lastnamephonetic,
+                    'middlename'        => $r->middlename,
+                    'alternatename'     => $r->alternatename
+                ]),
+                'event'       => $r->eventname,
+                'description' => $description,
+                'ip'          => $r->ip
+            ];
+        }
 
-        ob_clean();
+        // make absolutely sure nothing else gets sent
+        @ob_end_clean();
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($logData);
     } catch (Exception $e) {
-        error_log("AJAX log error: " . $e->getMessage());
-        ob_clean();
+        @ob_end_clean();
         http_response_code(500);
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['error' => 'Failed to fetch logs: ' . $e->getMessage()]);
     }
     exit;
 }
+
 
 
 // Load a *complete* user record so fullname() has all name fields.
@@ -1163,6 +1166,8 @@ $event = \core\event\dashboard_viewed::create(['context' => $context]);
 $event->trigger();
 
 echo $OUTPUT->header();
+$templatecontext['course_award_url'] = $CFG->wwwroot . '/theme/academi/pix/award.gif';
+$templatecontext['course_enrolled_url']=$CFG->wwwroot.'/theme/academi/pix/graduate.gif';
 
 if (core_userfeedback::should_display_reminder()) {
     core_userfeedback::print_reminder_block();
