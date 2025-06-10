@@ -129,6 +129,70 @@
 }
 .quick-link:hover { background:var(--accent); color:white; transform:translateX(5px); }
 .quick-link i { margin-right:12px; font-size:1.2rem; width:30px; text-align:center; }
+
+
+/* Add these new styles to your existing CSS */
+  .log-table-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 20px;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: var(--border-radius);
+    background: white;
+  }
+  
+  .log-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .log-table th {
+    position: sticky;
+    top: 0;
+    background: var(--light);
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--dark);
+    border-bottom: 2px solid rgba(0,0,0,0.05);
+  }
+  
+  .log-table td {
+    padding: 10px 15px;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
+  }
+  
+  .log-table tr:hover {
+    background: rgba(109,149,255,0.03);
+  }
+  
+  .log-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 15px;
+  }
+  
+  .log-duration-select {
+    background: rgba(109,149,255,0.1);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 30px;
+    color: var(--dark);
+    font-weight: 500;
+  }
+  
+  .log-duration-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(109,149,255,0.3);
+  }
+  
+  .no-logs {
+    text-align: center;
+    padding: 30px;
+    color: var(--secondary);
+    opacity: 0.7;
+  }
 </style>
 
 <div class="admin-container">
@@ -208,19 +272,45 @@
         {{/recentRegionManagers}}
       </div>
 
-      <div class="admin-card">
-        <div class="card-header">
-          <h2><i class="fas fa-chart-line"></i> System Activity</h2>
-          <button class="btn"><i class="fas fa-sync"></i> Refresh</button>
-        </div>
-        <div class="chart-container">
-          <canvas id="systemActivityChart"></canvas>
-        </div>
-      </div>
+      
+<div class="admin-card mt-4">
+  <div class="card-header">
+    <h2><i class="fas fa-history"></i> System Logs</h2>
+    <div class="log-controls">
+      <select id="logDuration" class="log-duration-select">
+        <option value="1">Last 1 Minute</option>
+        <option value="60" selected>Last 1 Hour</option>
+        <option value="1440">Last 1 Day</option>
+      </select>
+      <button id="getLogsBtn" class="btn btn-sm"><i class="fas fa-sync"></i> Get Logs</button>
+    </div>
+  </div>
+  
+  <div class="log-table-container">
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>User</th>
+          <th>Event</th>
+          <th>Description</th>
+          <th>IP Address</th>
+        </tr>
+      </thead>
+      <tbody id="logTableBody">
+        <!-- Logs will be dynamically inserted here -->
+      </tbody>
+    </table>
+    <div id="noLogsMessage" class="no-logs" style="display: none;">
+      <i class="fas fa-info-circle fa-2x mb-2"></i><br>
+      No logs found for the selected time range
+    </div>
+  </div>
+</div>
     </div>
 
     <!-- Online Users + Quick Links -->
-    <div class="col-lg-4">
+    <div class="col-lg-4 " >
       <div class="admin-card online-users-card">
         <div class="card-header">
           <h2><i class="fas fa-user-clock"></i> Online Users</h2>
@@ -259,7 +349,7 @@
         </div>
       </div>
 
-      <div class="admin-card">
+      <div class="admin-card mt-4">
         <div class="card-header">
   <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
       </div>
@@ -285,36 +375,92 @@
   </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', ()=>{
-  const ctx = document.getElementById('systemActivityChart').getContext('2d');
-  const data = JSON.parse('{{{globalHoursActivity}}}');
-  const grad = ctx.createLinearGradient(0,0,0,250);
-  grad.addColorStop(0,'rgba(109,149,255,0.3)');
-  grad.addColorStop(1,'rgba(109,149,255,0.05)');
-  new Chart(ctx, {
-    type:'line',
-    data:{
-      labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-      datasets:[{
-        data:data,
-        borderColor:'#6D95FF',
-        backgroundColor:grad,
-        tension:0.3,
-        fill:true,
-        pointRadius:5,
-        pointHoverRadius:7
-      }]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      plugins:{ legend:{display:false} },
-      scales:{
-        y:{ beginAtZero:true, grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#7A8CA5'} },
-        x:{ grid:{display:false}, ticks:{color:'#7A8CA5'} }
+<script>document.addEventListener('DOMContentLoaded', function() {
+  // Chart initialization
+  const ctx = document.getElementById('systemActivityChart');
+  if (ctx) {
+    const data = JSON.parse('{{{globalHoursActivity}}}');
+    const grad = ctx.getContext('2d').createLinearGradient(0, 0, 0, 250);
+    grad.addColorStop(0, 'rgba(109,149,255,0.3)');
+    grad.addColorStop(1, 'rgba(109,149,255,0.05)');
+    new Chart(ctx.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          data: data,
+          borderColor: '#6D95FF',
+          backgroundColor: grad,
+          tension: 0.3,
+          fill: true,
+          pointRadius: 5,
+          pointHoverRadius: 7
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#7A8CA5' } },
+          x: { grid: { display: false }, ticks: { color: '#7A8CA5' } }
+        }
       }
+    });
+  } else {
+    console.warn('System activity chart not found. Ensure admin dashboard is rendered.');
+  }
+
+  // Log table functionality
+  const logDuration = document.getElementById('logDuration');
+  const getLogsBtn = document.getElementById('getLogsBtn');
+  const logTableBody = document.getElementById('logTableBody');
+  const noLogsMessage = document.getElementById('noLogsMessage');
+
+  if (!logDuration || !getLogsBtn || !logTableBody || !noLogsMessage) {
+    console.warn('Log table elements not found. Ensure user has admin privileges and template is rendered.');
+    return;
+  }
+
+  async function fetchLogs() {
+    const minutes = logDuration.value;
+    try {
+      logTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Loading logs...</td></tr>';
+      const response = await fetch(
+        location.pathname.split('?')[0] + '?ajaxlogs=1&range=' + minutes,
+        { credentials: 'same-origin' }
+      );
+      const text = await response.text();
+      console.log('Raw response:', text);
+      if (!response.ok) {
+        throw new Error(`Server returned ${response.status}`);
+      }
+      const logs = JSON.parse(text);
+      logTableBody.innerHTML = '';
+      if (logs.length === 0) {
+        noLogsMessage.style.display = 'block';
+        return;
+      }
+      noLogsMessage.style.display = 'none';
+      logs.forEach(log => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${log.time}</td>
+          <td>${log.user}</td>
+          <td>${log.event}</td>
+          <td>${log.description}</td>
+          <td>${log.ip}</td>
+        `;
+        logTableBody.appendChild(row);
+      });
+    } catch (error) {
+      logTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Error loading logs: ${error.message}</td></tr>`;
+      console.error('Error fetching logs:', error);
     }
-  });
+  }
+
+  fetchLogs();
+  getLogsBtn.addEventListener('click', fetchLogs);
+  logDuration.addEventListener('change', fetchLogs);
 });
 </script>

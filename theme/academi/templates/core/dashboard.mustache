@@ -1199,7 +1199,37 @@
             padding: 0 0px;
         }
 
-    
+        .earned-badge {
+  animation: floatBadge 2s ease-in-out infinite;
+  filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
+  transform: translateY(0);
+}
+
+@keyframes floatBadge {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+
+    @keyframes badgePop {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.badge-show {
+  animation: badgePop 0.8s ease-out forwards;
+}
+
          
     </style>
 </head>
@@ -1298,14 +1328,38 @@
                         Small steps every day lead to big achievements.
                     </p>
                      
+<!-- All Badges Preview -->
+<div id="badge-preview" style="display: flex; justify-content: center; gap: 20px; margin-top: 30px;">
+  <div class="badge-wrapper" id="badge-preview-bronze">
+    <img src="/moodle/theme/academi/pix/bronze-badge.png" alt="Bronze" style="width: 50px; " />
+    <div style="font-size: 12px; text-align: center; color: #cc7a00;">Bronze</div>
+  </div>
+  <div class="badge-wrapper" id="badge-preview-silver">
+    <img src="/moodle/theme/academi/pix/silver-badge.png" alt="Silver" style="width: 50px; " />
+    <div style="font-size: 12px; text-align: center; color: #b0b0b0;">Silver</div>
+  </div>
+  <div class="badge-wrapper" id="badge-preview-gold">
+    <img src="/moodle/theme/academi/pix/gold-badge.png" alt="Gold" style="width: 50px; " />
+    <div style="font-size: 12px; text-align: center; color: #FFD700;">Gold</div>
+  </div>
+  <div class="badge-wrapper" id="badge-preview-platinum">
+    <img src="/moodle/theme/academi/pix/platinum-badge.png" alt="Platinum" style="width: 50px; " />
+    <div style="font-size: 12px; text-align: center; color: #00BFFF;">Platinum</div>
+  </div>
+</div>
 
-                    <!-- Progress Bar Container -->
-                    <div
-                        style="margin: 20px auto 0; width: 100%; height: 12px; background: #eee; border-radius: 10px; overflow: hidden;">
-                        <div
-                            style="width: 25%; height: 100%; background: linear-gradient(90deg, #204070, #6d95ff); border-radius: 10px;">
-                        </div>
-                    </div>
+
+
+
+               <!-- Progress Bar Container -->
+<div
+    style="margin: 20px auto 0; width: 100%; height: 12px; background: #eee; border-radius: 10px; overflow: hidden;">
+    <div id="streak-progress-bar"
+        style="width: 0%; height: 100%; background: linear-gradient(90deg, #204070, #6d95ff); border-radius: 10px;">
+    </div>
+</div>
+
+
 
                     <div id="streak-goal-text"
                         style="text-align: center; margin-top: 30px; font-size: 15px; color: #1c3c72;">
@@ -1721,31 +1775,74 @@
         });
 
 
-        document.addEventListener('DOMContentLoaded', function () {
-            fetch('/moodle/theme/academi/streak.php', {
-                method: 'POST',
-                credentials: 'same-origin'
-            })
-                .then(response => response.json())
-                .then(data => {
-                    // Update streak count
-                    const streakCountElement = document.getElementById('streak-count');
-                    if (streakCountElement) {
-                        streakCountElement.textContent = data.streakCount + " ";
-                    }
 
-                    // Update visit status text
-                    const visitStatus = document.getElementById('visit-status');
-                    if (visitStatus) {
-                        if (data.visitDone) {
-                            visitStatus.innerHTML = '<span>✅</span> 1/1 visit';
-                        } else {
-                            visitStatus.innerHTML = '<span>❌</span> 0/1 visit';
-                        }
-                    }
-                })
-                .catch(console.error);
-        });
+
+// Update earned badge preview visibility (opacity)
+const badgeThresholds = {
+    bronze: 10,
+    silver: 30,
+    gold: 50,
+    platinum: 80
+};
+
+fetch('/moodle/theme/academi/streak.php', {
+    method: 'POST',
+    credentials: 'same-origin'
+})
+.then(response => response.json())
+.then(data => {
+    const streakCount = data.streakCount || 0;
+
+    // Update circle count
+    document.getElementById('streak-count').textContent = streakCount;
+
+    // Update progress bar
+    const progressBar = document.getElementById('streak-progress-bar');
+    const progressPercent = Math.min((streakCount / 10) * 100, 100);
+    if (progressBar) {
+        progressBar.style.width = `${progressPercent}%`;
+    }
+
+    // 🌟 Moved here: control opacity + animation of badges
+    const badgeThresholds = {
+        bronze: 10,
+        silver: 30,
+        gold: 50,
+        platinum: 80
+    };
+
+    Object.entries(badgeThresholds).forEach(([badge, threshold]) => {
+        const previewEl = document.querySelector(`#badge-preview-${badge} img`);
+        if (previewEl) {
+            if (streakCount >= threshold) {
+                previewEl.style.opacity = '1';
+                previewEl.classList.add('earned-badge');
+            } else {
+                previewEl.style.opacity = '0.2';
+                previewEl.classList.remove('earned-badge');
+            }
+        }
+    });
+
+    // Show main badge (if any)
+    const badges = ['bronze', 'silver', 'gold', 'platinum'];
+    badges.forEach(b => {
+        const el = document.getElementById(`${b}-badge`);
+        if (el) el.style.display = 'none';
+    });
+
+    if (streakCount >= 80) {
+        document.getElementById('platinum-badge')?.classList.add('badge-show');
+    } else if (streakCount >= 50) {
+        document.getElementById('gold-badge')?.classList.add('badge-show');
+    } else if (streakCount >= 30) {
+        document.getElementById('silver-badge')?.classList.add('badge-show');
+    } else if (streakCount >= 10) {
+        document.getElementById('bronze-badge')?.classList.add('badge-show');
+    }
+})
+.catch(console.error);
+
 
 
 
@@ -1806,7 +1903,8 @@
             const streakGoals = [
                 "Complete 10 days streak to earn a bronze badge!",
                 "Continue for 25 days to earn a silver badge!",
-                "Continue for 40 days to earn a gold badge!"
+                "Continue for 40 days to earn a gold badge!",
+                "Continue for 100 days to earn a Platinum badge!"
             ];
 
             let streakIndex = 0;

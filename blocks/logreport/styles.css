@@ -1,0 +1,13 @@
+.block_logreport .chart-area {
+    width:622px;
+    height: 350px;
+}
+.block_logreport #viewreport{
+    float: right;
+}
+#page-blocks-logreport-index form.logselecform {
+    margin-bottom: 10px;
+}
+#page-blocks-logreport-index .dataTables_length select {
+    padding: 5px;
+}
