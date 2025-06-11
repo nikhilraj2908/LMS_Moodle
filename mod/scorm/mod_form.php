@@ -35,7 +35,6 @@ class mod_scorm_mod_form extends moodleform_mod {
 
         // Package section at top after general header
         $mform->addElement('header', 'packagehdr', get_string('packagehdr', 'scorm'));
-        
         $mform->setExpanded('packagehdr', true);
 
         $filemanageroptions = array();
@@ -178,9 +177,6 @@ class mod_scorm_mod_form extends moodleform_mod {
         $mform->hideIf('maxgrade', 'grademethod', 'eq', GRADESCOES);
 
         // Attempts management.
-        // $mform->addElement('header', 'attemptsmanagementhdr', get_string('attemptsmanagement', 'scorm'));
-
-        // Max Attempts.
         $mform->addElement('select', 'maxattempt', get_string('maximumattempts', 'scorm'), scorm_get_attempts_array());
         $mform->addHelpButton('maxattempt', 'maximumattempts', 'scorm');
         $mform->setDefault('maxattempt', $cfgscorm->maxattempt);
@@ -202,11 +198,8 @@ class mod_scorm_mod_form extends moodleform_mod {
         $mform->addHelpButton('lastattemptlock', 'lastattemptlock', 'scorm');
         $mform->setDefault('lastattemptlock', $cfgscorm->lastattemptlock);
 
-        // Compatibility settings.
-        // $mform->addElement('header', 'compatibilitysettingshdr', get_string('compatibilitysettings', 'scorm'));
-
         // Hidden Settings.
-         $mform->addElement('hidden', 'datadir', null);
+        $mform->addElement('hidden', 'datadir', null);
         $mform->setType('datadir', PARAM_RAW);
         $mform->addElement('hidden', 'pkgtype', null);
         $mform->setType('pkgtype', PARAM_RAW);
@@ -314,19 +307,15 @@ class mod_scorm_mod_form extends moodleform_mod {
         global $CFG, $USER;
         $errors = parent::validation($data, $files);
 
-        $type = $data['scormtype'];
-
+       
+         $type = $data['scormtype'] ?? SCORM_TYPE_LOCAL;
         if ($type === SCORM_TYPE_LOCAL) {
             if (empty($data['packagefile'])) {
                 $errors['packagefile'] = get_string('required');
-
             } else {
                 $draftitemid = file_get_submitted_draft_itemid('packagefile');
-
-                file_prepare_draft_area($draftitemid, $this->context->id, 'mod_scorm', 'packagefilecheck', null,
-                    array('subdirs' => 0, 'maxfiles' => 1));
-
-                // Get file from users draft area.
+                
+                // Get file from users draft area without preparing draft area
                 $usercontext = context_user::instance($USER->id);
                 $fs = get_file_storage();
                 $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id', false);
@@ -496,7 +485,7 @@ class mod_scorm_mod_form extends moodleform_mod {
         $suffix = $this->get_suffix();
         $status = !empty($data['completionstatusrequired' . $suffix]);
         $score = !empty($data['completionscoreenabled' . $suffix]) &&
-                strlen($data['completionscorerequired' . $suffix] && $data['completionscorerequired' . $suffix] > 0);
+                strlen($data['completionscorerequired' . $suffix]) && $data['completionscorerequired' . $suffix] > 0;
 
         return $status || $score;
     }

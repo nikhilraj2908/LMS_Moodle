@@ -421,21 +421,24 @@
     console.warn('Log table elements not found. Ensure user has admin privileges and template is rendered.');
     return;
   }
-
-  async function fetchLogs() {
-    const minutes = logDuration.value;
-    try {
-      logTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Loading logs...</td></tr>';
-      const response = await fetch(
-        location.pathname.split('?')[0] + '?ajaxlogs=1&range=' + minutes,
-        { credentials: 'same-origin' }
-      );
-      const text = await response.text();
-      console.log('Raw response:', text);
-      if (!response.ok) {
-        throw new Error(`Server returned ${response.status}`);
-      }
-      const logs = JSON.parse(text);
+async function fetchLogs() {
+  const minutes = logDuration.value;
+  try {
+    logTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Loading logs...</td></tr>';
+    const response = await fetch(
+      location.pathname.split('?')[0] + '?ajaxlogs=1&range=' + minutes,
+      { credentials: 'same-origin' }
+    );
+    const text = await response.text();
+    
+    // Extract JSON from response text
+    let jsonStart = text.lastIndexOf('[');
+    let jsonEnd = text.lastIndexOf(']');
+    
+    if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+      const jsonText = text.substring(jsonStart, jsonEnd + 1);
+      const logs = JSON.parse(jsonText);
+      
       logTableBody.innerHTML = '';
       if (logs.length === 0) {
         noLogsMessage.style.display = 'block';
@@ -453,12 +456,14 @@
         `;
         logTableBody.appendChild(row);
       });
-    } catch (error) {
-      logTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Error loading logs: ${error.message}</td></tr>`;
-      console.error('Error fetching logs:', error);
+    } else {
+      throw new Error('Invalid response format from server');
     }
+  } catch (error) {
+    logTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Error loading logs: ${error.message}</td></tr>`;
+    console.error('Error fetching logs:', error);
   }
-
+}
   fetchLogs();
   getLogsBtn.addEventListener('click', fetchLogs);
   logDuration.addEventListener('change', fetchLogs);
