@@ -42,15 +42,29 @@ global $DB, $USER, $OUTPUT, $CFG;
 //     exit;
 // }
 
-// == AJAX log endpoint ==// more robust AJAX detection
-$isxhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH'])
-       && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-$ajax  = optional_param('ajaxlogs', 0, PARAM_BOOL) || $isxhr;
+// == AJAX log endpoint ==// more robust AJAX detection<?php
+// … your existing require_once() and redirect_if_major_upgrade_required() …
 
-if ($ajax) {
-    global $DB, $USER;
+require_once(__DIR__ . '/../config.php');
+require_once($CFG->dirroot . '/my/lib.php');
+redirect_if_major_upgrade_required();
+require_login();
 
-    // pull the range in minutes (default to 60 if missing)
+global $DB, $USER, $OUTPUT, $CFG;
+
+// Detect XMLHttpRequest
+// ================================
+$ajaxLogs = optional_param('ajaxlogs', 0, PARAM_BOOL);
+if ($ajaxLogs) {
+    // Only allow site admins
+    if (!is_siteadmin()) {
+        http_response_code(403);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['error' => 'Access denied']);
+        exit;
+    }
+
+    // Pull the range in minutes (default to 60 if missing)
     $range   = optional_param('range', 60, PARAM_INT);
     $endtime = time();
     $start   = $endtime - ($range * 60);
@@ -73,7 +87,7 @@ if ($ajax) {
 
         $logData = [];
         foreach ($records as $r) {
-            $details    = json_decode($r->details, true);
+            $details     = json_decode($r->details, true);
             $description = "The user viewed the log report.";
             if (!empty($details['modaction']) && $details['modaction'] !== '-') {
                 $description = "The user performed '{$details['modaction']}' on the log report.";
@@ -94,7 +108,6 @@ if ($ajax) {
             ];
         }
 
-        // make absolutely sure nothing else gets sent
         @ob_end_clean();
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($logData);
@@ -107,23 +120,14 @@ if ($ajax) {
     exit;
 }
 
-
-
-// Load a *complete* user record so fullname() has all name fields.
-$completeuser = $DB->get_record('user', [
-    'id' => $USER->id
-], 'id, firstname, lastname, firstnamephonetic, lastnamephonetic, middlename, alternatename');
-
 // ================================
-// 1. AJAX SEARCH (if requested)
+// 2. AJAX SEARCH ENDPOINT
 // ================================
 $searchquery = optional_param('search', '', PARAM_TEXT);
-if (
-    !empty($searchquery)
-    && !empty($_SERVER['HTTP_X_REQUESTED_WITH'])
-    && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
-) {
-    ob_start();
+$isxhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+         strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
+if ($searchquery && $isxhr) {
     try {
         $searchsql = "
             SELECT 
@@ -160,25 +164,26 @@ if (
             ];
         }
 
-        ob_clean();
+        @ob_end_clean();
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode([
             'success'       => true,
             'searchResults' => $formatted,
             'searchQuery'   => $searchquery
-        ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
+        ]);
         exit;
 
     } catch (Exception $e) {
-        ob_clean();
+        @ob_end_clean();
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode([
             'success' => false,
             'error'   => 'An error occurred while searching. Please try again.'
-        ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
+        ]);
         exit;
     }
 }
+
 
 // =================================
 // 2. UPGRADE / GUEST REDIRECTS
@@ -281,6 +286,10 @@ if (empty($CFG->forcedefaultmymoodle) && $PAGE->user_allowed_editing()) {
 // =================================
 // 3. PREPARE DASHBOARD DATA
 // =================================
+$completeuser = $DB->get_record('user', [
+    'id' => $USER->id
+], 'id, firstname, lastname, firstnamephonetic, lastnamephonetic, middlename, alternatename');
+
 $templatecontext = [
     'username'               => fullname($completeuser),
     'completedCourses'       => 0,

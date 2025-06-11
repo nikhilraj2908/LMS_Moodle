@@ -643,3 +643,6 @@ body#page-login-forgot_password {
 .custom-load-more{
     text-align: center;
 }  */
+    #user-menu-toggle{
+    border: none !important;
+  }

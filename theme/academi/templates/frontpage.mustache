@@ -1464,26 +1464,33 @@ const MOODLE_WWWROOT = '{{config.wwwroot}}';
 
     // Limit to first 4 courses
     const limitedCourses = courses.slice(0, 4);
+limitedCourses.forEach(course => {
+    const courseCard = document.createElement('div');
+    courseCard.className = 'custom-course-card';
+    courseCard.style.cursor = 'pointer';  // show it’s clickable
 
-    limitedCourses.forEach(course => {
-        const courseCard = document.createElement('div');
-        courseCard.className = 'custom-course-card';
+    courseCard.innerHTML = `
+        <div class="custom-course-card-image">
+            <img src="${course.course_image_url}" alt="${course.course_name}">
+        </div>
+        <div class="custom-course-content">
+            <h3 class="custom-course-title">${course.course_name}</h3>
+            <a href="${course.course_url}" class="course-card-link"><span>Explore Course</span></a>
+        </div>
+    `;
 
-        courseCard.innerHTML = `
-            <div class="custom-course-card-image">
-                <img src="${course.course_image_url}" alt="${course.course_name}">
-            </div>
-            <div class="custom-course-content">
-                <h3 class="custom-course-title">${course.course_name}</h3>
-                <a href="${course.course_url}" class="course-card-link"><span>Explore Course</span></a>
-            </div>
-        `;
-        courseGrid.appendChild(courseCard);
+    // Redirect when anywhere on the card is clicked
+    courseCard.addEventListener('click', () => {
+        window.location.href = course.course_url;
     });
+
+    courseGrid.appendChild(courseCard);
+});
+
 }
 
 
-    // Set active button
+    // Set active button    
     function setActiveButton(activeBtn) {
         document.querySelectorAll('.carousel-course-btn button').forEach(btn => {
             btn.classList.remove('active');
