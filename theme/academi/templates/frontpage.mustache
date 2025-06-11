@@ -1209,8 +1209,13 @@ body, #page-wrapper {
             <div class="carousel-inner">
                 {{#banners}}
                 <div class="carousel-item {{#is_active}}active{{/is_active}}" style="background-image: url('{{image_url}}');">
-                <div class="carousel-overlay-box">
-    <h2>Transform your Learning Journey<br>With <span style="color: #003366; font-weight: 700;">ALOGICDATA</span></h2>
+
+                </div>
+                {{/banners}}
+            </div>
+
+            <div class="carousel-overlay-box">
+    <h2>Transform your <br>  <span style="color: #003366; font-weight: 750; font-size: 50px;">Learning Journey</span> <br> With <span style="color: #003366; font-weight: 700;">ALOGICDATA</span></h2>
     <p>Bringing Education to Your Fingertips</p>
     <div>
         <!-- Admin buttons -->
@@ -1224,9 +1229,9 @@ body, #page-wrapper {
         <a href="{{config.wwwroot}}/calendar/view.php?view=month" class="btn-figma btn-outline-figma btn-user">My Calendar</a>
     </div>
 </div>
-                </div>
-                {{/banners}}
-            </div>
+
+</div>
+            
             <a class="carousel-control-prev" href="#heroCarousel" role="button" data-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="sr-only">Previous</span>
