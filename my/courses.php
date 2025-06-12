@@ -10,6 +10,12 @@
     margin-bottom: 0rem !important;
     /* flex: 1 0 auto; */
 }
+
+
+.edit-toggle-wrapper{
+    margin-top:20px;
+}
+
 </style>
 <?php
 // Moodle My Courses Page

@@ -646,3 +646,7 @@ body#page-login-forgot_password {
     #user-menu-toggle{
     border: none !important;
   }
+  .modal.show .modal-dialog {
+    transform: none;
+    margin-top: 6% !important;
+}

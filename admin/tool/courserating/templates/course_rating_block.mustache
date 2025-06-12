@@ -1,31 +1,31 @@
 {{!
     This file is part of Moodle - http://moodle.org/
-
+ 
     Moodle is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
+ 
     Moodle is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
+ 
     You should have received a copy of the GNU General Public License
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
     @template tool_courserating/course_rating_block
-
+ 
     Example context (json):
     {
     }
-
+ 
 }}
 <style>
-
+ 
 .tool_courserating-widget{
-
+ 
     z-index:1000
 }
 </style>
@@ -59,12 +59,12 @@ require(['jquery'], function($) {
                 console.error('Rating initialization failed:', e);
             }
         }
-
+ 
         // Move rating widget with error handling
         const moveRatingWidget = function() {
             const ratingWidget = $(".tool_courserating-widget");
             const targetLocation = $("#page-header .header-sub-section");
-            
+           
             if (ratingWidget.length && targetLocation.length) {
                 try {
                     ratingWidget.detach().prependTo(targetLocation);
@@ -74,10 +74,10 @@ require(['jquery'], function($) {
                 }
             }
         };
-
+ 
         // Initial attempt
         moveRatingWidget();
-
+ 
     });
 });
 {{/js}}
