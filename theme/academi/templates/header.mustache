@@ -32,7 +32,7 @@
 .header-main {
     position: sticky;
     top: 0;
-    z-index: 199;
+    z-index: 1099;
     background: linear-gradient(to bottom, #ffffff 0%, rgb(204 242 255) 100%);
 }
 
@@ -136,11 +136,7 @@
     border-radius: 50%;
     padding: 2px 5px;
 }
-
-.btn:not(:disabled):not(.disabled) {
-     border-color: #ffffff;
-}
-
+    
 
 .primary-navigation .nav-link {
     position: relative;
@@ -155,21 +151,46 @@
     font-weight: bold;
 }
 
-.primary-navigation .nav-link::after {
-    content: "";
-    position: absolute;
-    bottom: -6px;
-    left: 0;
-    width: 0%;
-    height: 2px;
-    background-color: #204070;
-    transition: width 0.3s ease-in-out;
+/* make sure the link is positioned relatively so ::after lines up */
+.primary-navigation .nav-link {
+  position: relative;
+  background: transparent !important;
 }
+
+/* your existing underline setup */
+.primary-navigation .nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;           /* adjust to sit just below the text */
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #204070;
+  transition: width 0.3s ease-in-out;
+}
+
+/* expand the underline on hover/focus */
+.primary-navigation .nav-link:hover::after,
+.primary-navigation .nav-link:focus::after {
+  width: 100%;
+}
+
+/* keep the underline in place when that item is “active” */
+.primary-navigation .nav-item.active .nav-link::after {
+  width: 100%;
+}
+
 
 .primary-navigation .nav-link.active::after {
     width: 100%;
 }
+.moremenu .nav-link.active:focus, .moremenu .nav-link.active:hover {
 
+    border-bottom-color: #204070;
+}
+.header-main .navbar.navbar-light .primary-navigation .navigation .nav-link:hover {
+
+}
 </style>
 
 
