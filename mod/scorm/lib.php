@@ -208,6 +208,11 @@ function scorm_update_instance($scorm, $mform=null) {
     if (empty($scorm->completionstatusallscos)) {
         $scorm->completionstatusallscos = 0;
     }
+    
+    if (!isset($scorm->scormtype)) {
+    $scorm->scormtype = SCORM_TYPE_LOCAL; // Fallback default
+}
+
 
     $cmid       = $scorm->coursemodule;
     $cmidnumber = $scorm->cmidnumber;

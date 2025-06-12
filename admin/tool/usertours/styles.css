@@ -8,6 +8,7 @@ div[data-flexitour="backdrop"] {
 
 span[data-flexitour="container"] .modal-dialog {
     max-width: 400px;
+    margin-top: 5%;
 }
 
 span[data-flexitour="container"] .modal-dialog .modal-content .modal-header {

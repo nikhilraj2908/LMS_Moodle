@@ -18665,6 +18665,7 @@ a.close.disabled, a.disabled.btn-close {
 }
 .modal.show .modal-dialog {
   transform: none;
+  margin-top: 5%;
 }
 .modal.modal-static .modal-dialog {
   transform: scale(1.02);
@@ -18720,6 +18721,7 @@ a.close.disabled, a.disabled.btn-close {
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 0.3rem;
   outline: 0;
+  margin-top: 10%;
 }
 
 .modal-backdrop {
