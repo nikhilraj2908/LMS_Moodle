@@ -5167,6 +5167,7 @@ a.badge-dark:focus, a.badge-dark.focus {
 }
 .modal.show .modal-dialog {
     transform: none;
+    margin-top: 5%;
 }
 .modal.modal-static .modal-dialog {
     transform: scale(1.02);
