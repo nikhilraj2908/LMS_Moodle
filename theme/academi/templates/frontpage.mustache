@@ -1687,38 +1687,7 @@ limitedCourses.forEach(course => {
         createGaugeChart('curriculumChart', 'curriculumText');
     });
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const courses = document.querySelectorAll(".custom-course-card");
-        const loadMoreBtn = document.getElementById("loadMoreBtn");
-        let visibleCourses = 4;
-        courses.forEach((course, index) => {
-            if (index >= visibleCourses) {
-                course.style.display = "none";
-            }
-        });
-        loadMoreBtn.addEventListener("click", function () {
-            if (loadMoreBtn.innerText === "Load More") {
-                let nextCourses = visibleCourses + 4;
-                courses.forEach((course, index) => {
-                    if (index < nextCourses) {
-                        course.style.display = "flex";
-                    }
-                });
-                visibleCourses = nextCourses;
-                if (visibleCourses >= courses.length) {
-                    loadMoreBtn.innerText = "See Less";
-                }
-            } else {
-                visibleCourses = 4;
-                courses.forEach((course, index) => {
-                    if (index >= visibleCourses) {
-                        course.style.display = "none";
-                    }
-                });
-                loadMoreBtn.innerText = "Load More";
-            }
-        });
-    });
+   
  
     document.querySelectorAll('.carousel-course-btn button').forEach(btn => {
         btn.addEventListener('click', () => {
