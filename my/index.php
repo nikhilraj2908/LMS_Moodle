@@ -1126,6 +1126,54 @@ $templatecontext['allUsersUrl'] = (new moodle_url('/admin/user.php'))->out();
 
     // link roleid
     $templatecontext['regionMgrRoleId'] = $regionalmgrroleid;
+   $reportData = $DB->get_records_sql("
+    SELECT
+        CONCAT(u.id, '-', c.id) AS uniqueid, -- ✅ Unique key as required by Moodle
+        u.id AS userid,
+        CONCAT(u.firstname, ' ', u.lastname) AS username,
+        c.fullname AS coursename,
+        cat.name AS region,
+        ROUND(g.finalgrade, 0) AS score,
+        ROUND(g.finalgrade / g.rawgrademax * 5) AS rating,
+        ROUND(
+            (SELECT COUNT(*) FROM {course_modules_completion} cmc
+             JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
+             WHERE cm.course = c.id AND cmc.userid = u.id AND cmc.completionstate = 1)
+            /
+            (SELECT COUNT(*) FROM {course_modules} cm WHERE cm.course = c.id) * 100
+        ) AS progress,
+        CASE
+            WHEN cc.timecompleted > 0 THEN 'Completed'
+            WHEN g.finalgrade IS NULL THEN 'Needs Review'
+            ELSE 'In Progress'
+        END AS status
+    FROM {user} u
+    JOIN {user_enrolments} ue ON ue.userid = u.id
+    JOIN {enrol} e ON e.id = ue.enrolid
+    JOIN {course} c ON c.id = e.courseid
+    LEFT JOIN {grade_items} gi ON gi.courseid = c.id AND gi.itemtype = 'course'
+    LEFT JOIN {grade_grades} g ON g.itemid = gi.id AND g.userid = u.id
+    LEFT JOIN {course_completions} cc ON cc.course = c.id AND cc.userid = u.id
+    LEFT JOIN {course_categories} cat ON c.category = cat.id
+    WHERE c.visible = 1
+    ORDER BY u.firstname
+");
+
+$templatecontext['reportData'] = array_map(function($row) {
+    return [
+        'username'    => $row->username,
+        'coursename'  => $row->coursename,
+        'region'      => $row->region,
+        'score'       => $row->score !== null ? $row->score . '%' : 'N/A',
+        'rating'      => $row->rating ?? 0,
+        'progress'    => $row->progress ?? 0,
+        'is_completed'=> $row->status === 'Completed',
+        'is_progress' => $row->status === 'In Progress',
+        'is_review'   => $row->status === 'Needs Review',
+    ];
+}, $reportData);
+
+
 
 } else if ($isregionmgr && $regioncategory !== null) {
     // REGIONAL MANAGER DASHBOARD
