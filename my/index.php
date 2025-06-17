@@ -1125,55 +1125,163 @@ $templatecontext['allUsersUrl'] = (new moodle_url('/admin/user.php'))->out();
 
 
     // link roleid
-    $templatecontext['regionMgrRoleId'] = $regionalmgrroleid;
-   $reportData = $DB->get_records_sql("
-    SELECT
-        CONCAT(u.id, '-', c.id) AS uniqueid, -- ✅ Unique key as required by Moodle
-        u.id AS userid,
-        CONCAT(u.firstname, ' ', u.lastname) AS username,
-        c.fullname AS coursename,
-        cat.name AS region,
-        ROUND(g.finalgrade, 0) AS score,
-        ROUND(g.finalgrade / g.rawgrademax * 5) AS rating,
-        ROUND(
-            (SELECT COUNT(*) FROM {course_modules_completion} cmc
-             JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
-             WHERE cm.course = c.id AND cmc.userid = u.id AND cmc.completionstate = 1)
-            /
-            (SELECT COUNT(*) FROM {course_modules} cm WHERE cm.course = c.id) * 100
-        ) AS progress,
-        CASE
-            WHEN cc.timecompleted > 0 THEN 'Completed'
-            WHEN g.finalgrade IS NULL THEN 'Needs Review'
-            ELSE 'In Progress'
-        END AS status
-    FROM {user} u
-    JOIN {user_enrolments} ue ON ue.userid = u.id
-    JOIN {enrol} e ON e.id = ue.enrolid
-    JOIN {course} c ON c.id = e.courseid
-    LEFT JOIN {grade_items} gi ON gi.courseid = c.id AND gi.itemtype = 'course'
-    LEFT JOIN {grade_grades} g ON g.itemid = gi.id AND g.userid = u.id
-    LEFT JOIN {course_completions} cc ON cc.course = c.id AND cc.userid = u.id
-    LEFT JOIN {course_categories} cat ON c.category = cat.id
-    WHERE c.visible = 1
-    ORDER BY u.firstname
-");
+$allRegionsCategory = $DB->get_record('course_categories', ['name' => 'All Regions']);
+if (!$allRegionsCategory) {
+    $allRegionsCategory = new stdClass();
+    $allRegionsCategory->id = 0;
+}
 
-$templatecontext['reportData'] = array_map(function($row) {
-    return [
-        'username'    => $row->username,
-        'coursename'  => $row->coursename,
-        'region'      => $row->region,
-        'score'       => $row->score !== null ? $row->score . '%' : 'N/A',
-        'rating'      => $row->rating ?? 0,
-        'progress'    => $row->progress ?? 0,
-        'is_completed'=> $row->status === 'Completed',
-        'is_progress' => $row->status === 'In Progress',
-        'is_review'   => $row->status === 'Needs Review',
+// Get all regions and subcategories under "All Regions"
+$regions = $DB->get_records('course_categories', ['parent' => $allRegionsCategory->id], 'name');
+$regionsArray = [];
+
+foreach ($regions as $region) {
+    // For each region, get its subcategories
+    $subRegions = $DB->get_records('course_categories', ['parent' => $region->id], 'name');
+    $regionData = [
+        'id' => $region->id,
+        'name' => $region->name,
+        'subregions' => []
     ];
-}, $reportData);
 
+    // Add subregions to the region
+    foreach ($subRegions as $subRegion) {
+        $regionData['subregions'][] = [
+            'id' => $subRegion->id,
+            'name' => $subRegion->name
+        ];
+    }
 
+    $regionsArray[] = $regionData;
+}
+
+$templatecontext['regions'] = $regionsArray;
+
+    // Get selected region from URL
+$selectedRegionId = optional_param('regionid', 0, PARAM_INT);
+$templatecontext['selectedRegionId'] = $selectedRegionId;
+
+// Region-based report logic
+if ($selectedRegionId) {
+    // Fetch report data based on selected region
+    $reportData = $DB->get_records_sql("
+        SELECT 
+            CONCAT(u.id, '-', c.id) AS uniqueid,
+            u.id AS userid,
+            CONCAT(u.firstname, ' ', u.lastname) AS username,
+            c.fullname AS coursename,
+            cat.name AS region,
+            ROUND(gg.finalgrade, 0) AS score,
+            ROUND((gg.finalgrade / NULLIF(gi.grademax, 0)) * 5) AS rating,
+            ROUND(
+                (SELECT COUNT(*)
+                 FROM {course_modules_completion} cmc
+                 JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
+                 WHERE cm.course = c.id AND cmc.userid = u.id AND cmc.completionstate = 1) 
+                / 
+                NULLIF(
+                    (SELECT COUNT(*) 
+                     FROM {course_modules} cm 
+                     WHERE cm.course = c.id AND cm.completion > 0),
+                    0
+                ) * 100
+            ) AS progress,
+            CASE
+                WHEN cc.timecompleted IS NOT NULL THEN 1
+                ELSE 0
+            END AS is_completed,
+            CASE
+                WHEN cc.timecompleted IS NULL AND gg.finalgrade IS NOT NULL THEN 1
+                ELSE 0
+            END AS is_progress,
+            CASE
+                WHEN gg.finalgrade IS NULL THEN 1
+                ELSE 0
+            END AS is_review
+        FROM {user} u
+        JOIN {user_enrolments} ue ON ue.userid = u.id
+        JOIN {enrol} e ON e.id = ue.enrolid
+        JOIN {course} c ON c.id = e.courseid
+        JOIN {course_categories} cat ON c.category = cat.id
+        LEFT JOIN {grade_items} gi ON gi.courseid = c.id AND gi.itemtype = 'course'
+        LEFT JOIN {grade_grades} gg ON gg.itemid = gi.id AND gg.userid = u.id
+        LEFT JOIN {course_completions} cc ON cc.course = c.id AND cc.userid = u.id
+        WHERE c.visible = 1
+        AND cat.id = :regionid
+        ORDER BY username
+        LIMIT 500
+    ", ['regionid' => $selectedRegionId]);
+} else {
+    // Show all regions if no region selected
+    $reportData = $DB->get_records_sql("
+        SELECT 
+            CONCAT(u.id, '-', c.id) AS uniqueid,
+            u.id AS userid,
+            CONCAT(u.firstname, ' ', u.lastname) AS username,
+            c.fullname AS coursename,
+            cat.name AS region,
+            ROUND(gg.finalgrade, 0) AS score,
+            ROUND((gg.finalgrade / NULLIF(gi.grademax, 0)) * 5) AS rating,
+            ROUND(
+                (SELECT COUNT(*)
+                 FROM {course_modules_completion} cmc
+                 JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
+                 WHERE cm.course = c.id AND cmc.userid = u.id AND cmc.completionstate = 1) 
+                / 
+                NULLIF(
+                    (SELECT COUNT(*) 
+                     FROM {course_modules} cm 
+                     WHERE cm.course = c.id AND cm.completion > 0),
+                    0
+                ) * 100
+            ) AS progress,
+            CASE
+                WHEN cc.timecompleted IS NOT NULL THEN 1
+                ELSE 0
+            END AS is_completed,
+            CASE
+                WHEN cc.timecompleted IS NULL AND gg.finalgrade IS NOT NULL THEN 1
+                ELSE 0
+            END AS is_progress,
+            CASE
+                WHEN gg.finalgrade IS NULL THEN 1
+                ELSE 0
+            END AS is_review
+        FROM {user} u
+        JOIN {user_enrolments} ue ON ue.userid = u.id
+        JOIN {enrol} e ON e.id = ue.enrolid
+        JOIN {course} c ON c.id = e.courseid
+        JOIN {course_categories} cat ON c.category = cat.id
+        LEFT JOIN {grade_items} gi ON gi.courseid = c.id AND gi.itemtype = 'course'
+        LEFT JOIN {grade_grades} gg ON gg.itemid = gi.id AND gg.userid = u.id
+        LEFT JOIN {course_completions} cc ON cc.course = c.id AND cc.userid = u.id
+        WHERE c.visible = 1
+        AND cat.parent = :parentid
+        ORDER BY region, username
+        LIMIT 500
+    ", ['parentid' => $allRegionsCategory->id]);
+}
+
+// Process results
+$processedData = [];
+foreach ($reportData as $record) {
+    $processedData[] = [
+        'username' => $record->username,
+        'coursename' => $record->coursename,
+        'region' => $record->region,
+        'score' => $record->score ?: 0,
+        'rating' => min(5, max(0, $record->rating ?: 0)),
+        'progress' => $record->progress ?: 0,
+        'is_completed' => (bool)($record->is_completed ?? false),
+        'is_progress' => (bool)($record->is_progress ?? false),
+        'is_review' => (bool)($record->is_review ?? false)
+    ];
+}
+
+$templatecontext['reportData'] = $processedData;
+
+// Add export URL with region parameter
+$templatecontext['exportUrl'] = (new moodle_url('/my/export.php', ['regionid' => $selectedRegionId]))->out();
 
 } else if ($isregionmgr && $regioncategory !== null) {
     // REGIONAL MANAGER DASHBOARD

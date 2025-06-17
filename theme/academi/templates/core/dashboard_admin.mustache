@@ -273,6 +273,85 @@
       </div>
 
       
+
+<div class="admin-card mt-4">
+  <div class="card-header">
+    <h2><i class="fas fa-chart-line"></i> Region-Based User Report</h2>
+  </div>
+
+  <!-- Region Selection -->
+  <div class="d-flex gap-2 flex-wrap mb-3 align-items-center">
+    <div class="d-flex gap-2 align-items-center">
+      <label for="regionSelect" class="form-label mb-0">Select Region:</label>
+      <select id="regionSelect" class="form-select  form-select-lg p-1 ms-2" style="width: 200px;">
+    <option value="0" {{^selectedRegionId}}selected{{/selectedRegionId}}>All Regions</option>
+    {{#regions}}
+        <option value="{{id}}" {{#selected}}selected{{/selected}}>{{name}}</option>
+        {{#subregions}}
+            <option value="{{id}}" {{#selected}}selected{{/selected}}>&nbsp;&nbsp;&nbsp;{{name}}</option>
+        {{/subregions}}
+    {{/regions}}
+</select>
+    </div>
+    <a href="{{exportUrl}}" class="btn btn-sm btn-danger ms-auto">
+      <i class="fas fa-download"></i> Export Report
+    </a>
+  </div>
+
+  <!-- Report Table -->
+  <div class="log-table-container">
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Course</th>
+          <th>Region</th>
+          <th>Score</th>
+          <th>Rating</th>
+          <th>Progress</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="reportTableBody">
+        {{#reportData}}
+        <tr>
+          <td>{{username}}</td>
+          <td>{{coursename}}</td>
+          <td>{{region}}</td>
+          <td>{{score}}%</td>
+          <td>
+            {{#rating}}
+              {{rating}} ★
+            {{/rating}}
+            {{^rating}}N/A{{/rating}}
+          </td>
+          <td>
+            <div style="width:100px; background:#eee; border-radius:10px;">
+              <div style="width:{{progress}}%; background:#ff4081; height:8px; border-radius:10px;"></div>
+            </div>
+            <small>{{progress}}%</small>
+          </td>
+          <td>
+            {{#is_completed}}<span style="color:green;">Completed</span>{{/is_completed}}
+            {{#is_progress}}<span style="color:orange;">In Progress</span>{{/is_progress}}
+            {{#is_review}}<span style="color:red;">Needs Review</span>{{/is_review}}
+          </td>
+        </tr>
+        {{/reportData}}
+
+        {{^reportData}}
+          <tr>
+            <td colspan="7" style="text-align:center; padding:20px;">
+              No users found in selected region
+            </td>
+          </tr>
+        {{/reportData}}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
 <div class="admin-card mt-4">
   <div class="card-header">
     <h2><i class="fas fa-history"></i> System Logs</h2>
@@ -307,70 +386,6 @@
     </div>
   </div>
 </div>
-<div class="admin-card mt-4">
-  <div class="card-header">
-    <h2><i class="fas fa-chart-line"></i> Generate Reports</h2>
-  </div>
-
-  <!-- Report Filter Buttons -->
-  <div class="d-flex gap-2 flex-wrap mb-3">
-    <button class="btn btn-sm btn-primary" onclick="filterReport('all')">All Users Report</button>
-    <button class="btn btn-sm btn-secondary" onclick="filterReport('region')">Region-wise Report</button>
-    <button class="btn btn-sm btn-info" onclick="filterReport('software')">Software Courses</button>
-    <button class="btn btn-sm btn-danger ms-auto"><i class="fas fa-download"></i> Export Report</button>
-  </div>
-
-  <!-- Report Table -->
-  <div class="log-table-container">
-    <table class="log-table">
-      <thead>
-        <tr>
-          <th>User</th>
-          <th>Course</th>
-          <th>Region</th>
-          <th>Score</th>
-          <th>Rating</th>
-          <th>Progress</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-     <tbody id="reportTableBody">
-  {{#reportData}}
-    <tr>
-      <td>{{username}}</td>
-      <td>{{coursename}}</td>
-      <td>{{region}}</td>
-      <td>{{score}}</td>
-      <td>
-        {{#rating}}
-          {{rating}} ★
-        {{/rating}}
-        {{^rating}}N/A{{/rating}}
-      </td>
-      <td>
-        <div style="width:100px; background:#eee; border-radius:10px;">
-          <div style="width:{{progress}}%; background:#ff4081; height:8px; border-radius:10px;"></div>
-        </div>
-        <small>{{progress}}%</small>
-      </td>
-      <td>
-        {{#is_completed}}<span style="color:green;">Completed</span>{{/is_completed}}
-        {{#is_progress}}<span style="color:orange;">In Progress</span>{{/is_progress}}
-        {{#is_review}}<span style="color:red;">Needs Review</span>{{/is_review}}
-      </td>
-    </tr>
-  {{/reportData}}
-
-  {{^reportData}}
-    <tr>
-      <td colspan="7" style="text-align:center; padding:20px;">No records found</td>
-    </tr>
-  {{/reportData}}
-</tbody>
-    </table>
-  </div>
-</div>
-
     </div>
 
     <!-- Online Users + Quick Links -->
@@ -440,6 +455,10 @@
 </div>
 
 <script>document.addEventListener('DOMContentLoaded', function() {
+   const exportBtn = document.querySelector('.btn.btn-sm.btn-danger.ms-auto');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', exportReport);
+    }
   // Chart initialization
   const ctx = document.getElementById('systemActivityChart');
   if (ctx) {
@@ -531,5 +550,63 @@ async function fetchLogs() {
   fetchLogs();
   getLogsBtn.addEventListener('click', fetchLogs);
   logDuration.addEventListener('change', fetchLogs);
+});
+function filterReport(type) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('report', type);
+    window.location.href = url.toString();
+}
+function exportReport() {
+    // Get report type from URL or default to 'all'
+    const urlParams = new URLSearchParams(window.location.search);
+    const reportType = urlParams.get('report') || 'all';
+    
+    // Prepare data for export
+    const rows = [];
+    
+    // Add header row
+    rows.push(['User', 'Course', 'Region', 'Score', 'Rating', 'Progress', 'Status']);
+    
+    // Add data rows
+    {{#reportData}}
+    rows.push([
+        `"{{username}}"`,
+        `"{{coursename}}"`,
+        `"{{region}}"`,
+        `"{{score}}%"`,
+        `"{{#rating}}{{rating}} ★{{/rating}}{{^rating}}N/A{{/rating}}"`,
+        `"{{progress}}%"`,
+        `"{{#is_completed}}Completed{{/is_completed}}{{#is_progress}}In Progress{{/is_progress}}{{#is_review}}Needs Review{{/is_review}}"`
+    ]);
+    {{/reportData}}
+    
+    // Convert to CSV string
+    const csvContent = "data:text/csv;charset=utf-8," + 
+        rows.map(e => e.join(",")).join("\n");
+    
+    // Create download link
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `report_${reportType}_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    
+    // Trigger download
+    link.click();
+    document.body.removeChild(link);
+}
+document.getElementById('regionSelect').addEventListener('change', function() {
+    const regionId = this.value;
+    const url = new URL(window.location.href);
+    url.searchParams.set('regionid', regionId);
+    window.location.href = url.toString();
+});
+
+// Update export button URL when region changes
+document.getElementById('regionSelect').addEventListener('change', function() {
+    const regionId = this.value;
+    const exportBtn = document.querySelector('.btn.btn-sm.btn-danger');
+    const baseUrl = exportBtn.href.split('?')[0];
+    exportBtn.href = `${baseUrl}?regionid=${regionId}`;
 });
 </script>
