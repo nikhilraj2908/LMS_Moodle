@@ -293,7 +293,7 @@
     {{/regions}}
 </select>
     </div>
-    <a href="{{exportUrl}}" class="btn btn-sm btn-danger ms-auto">
+    <a  class="btn btn-sm btn-danger ms-auto">
       <i class="fas fa-download"></i> Export Report
     </a>
   </div>
@@ -453,160 +453,136 @@
     </div>
   </div>
 </div>
-
-<script>document.addEventListener('DOMContentLoaded', function() {
-   const exportBtn = document.querySelector('.btn.btn-sm.btn-danger.ms-auto');
-    if (exportBtn) {
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const exportBtn = document.querySelector('.btn.btn-sm.btn-danger.ms-auto');
+      if (exportBtn) {
         exportBtn.addEventListener('click', exportReport);
-    }
-  // Chart initialization
-  const ctx = document.getElementById('systemActivityChart');
-  if (ctx) {
-    const data = JSON.parse('{{{globalHoursActivity}}}');
-    const grad = ctx.getContext('2d').createLinearGradient(0, 0, 0, 250);
-    grad.addColorStop(0, 'rgba(109,149,255,0.3)');
-    grad.addColorStop(1, 'rgba(109,149,255,0.05)');
-    new Chart(ctx.getContext('2d'), {
-      type: 'line',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          data: data,
-          borderColor: '#6D95FF',
-          backgroundColor: grad,
-          tension: 0.3,
-          fill: true,
-          pointRadius: 5,
-          pointHoverRadius: 7
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#7A8CA5' } },
-          x: { grid: { display: false }, ticks: { color: '#7A8CA5' } }
+      }
+
+      // Log table functionality
+      const logDuration = document.getElementById('logDuration');
+      const getLogsBtn = document.getElementById('getLogsBtn');
+      const logTableBody = document.getElementById('logTableBody');
+      const noLogsMessage = document.getElementById('noLogsMessage');
+
+      if (logDuration && getLogsBtn && logTableBody && noLogsMessage) {
+        async function fetchLogs() {
+          const minutes = logDuration.value;
+          try {
+            logTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Loading logs...</td></tr>';
+            const response = await fetch(
+              location.pathname.split('?')[0] + '?ajaxlogs=1&range=' + minutes,
+              { credentials: 'same-origin' }
+            );
+            const text = await response.text();
+            
+            // Extract JSON from response text
+            let jsonStart = text.lastIndexOf('[');
+            let jsonEnd = text.lastIndexOf(']');
+            
+            if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+              const jsonText = text.substring(jsonStart, jsonEnd + 1);
+              const logs = JSON.parse(jsonText);
+              
+              logTableBody.innerHTML = '';
+              if (logs.length === 0) {
+                noLogsMessage.style.display = 'block';
+                return;
+              }
+              noLogsMessage.style.display = 'none';
+              logs.forEach(log => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                  <td>${log.time}</td>
+                  <td>${log.user}</td>
+                  <td>${log.event}</td>
+                  <td>${log.description}</td>
+                  <td>${log.ip}</td>
+                `;
+                logTableBody.appendChild(row);
+              });
+            } else {
+              throw new Error('Invalid response format from server');
+            }
+          } catch (error) {
+            logTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Error loading logs: ${error.message}</td></tr>`;
+            console.error('Error fetching logs:', error);
+          }
         }
+        
+        fetchLogs();
+        getLogsBtn.addEventListener('click', fetchLogs);
+        logDuration.addEventListener('change', fetchLogs);
+      }
+      
+      // Region selection handler - FIXED
+      const regionSelect = document.getElementById('regionSelect');
+      if (regionSelect) {
+        // Set current selection from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedRegionId = urlParams.get('regionid');
+        if (selectedRegionId) {
+          regionSelect.value = selectedRegionId;
+        }
+        
+        // Handle selection change
+        regionSelect.addEventListener('change', function() {
+          const regionId = this.value;
+          const url = new URL(window.location.href);
+          url.searchParams.set('regionid', regionId);
+          window.location.href = url.toString();
+        });
       }
     });
-  } else {
-    console.warn('System activity chart not found. Ensure admin dashboard is rendered.');
-  }
 
-  // Log table functionality
-  const logDuration = document.getElementById('logDuration');
-  const getLogsBtn = document.getElementById('getLogsBtn');
-  const logTableBody = document.getElementById('logTableBody');
-  const noLogsMessage = document.getElementById('noLogsMessage');
-
-  if (!logDuration || !getLogsBtn || !logTableBody || !noLogsMessage) {
-    console.warn('Log table elements not found. Ensure user has admin privileges and template is rendered.');
-    return;
-  }
-async function fetchLogs() {
-  const minutes = logDuration.value;
-  try {
-    logTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Loading logs...</td></tr>';
-    const response = await fetch(
-      location.pathname.split('?')[0] + '?ajaxlogs=1&range=' + minutes,
-      { credentials: 'same-origin' }
-    );
-    const text = await response.text();
-    
-    // Extract JSON from response text
-    let jsonStart = text.lastIndexOf('[');
-    let jsonEnd = text.lastIndexOf(']');
-    
-    if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-      const jsonText = text.substring(jsonStart, jsonEnd + 1);
-      const logs = JSON.parse(jsonText);
+    function exportReport() {
+      const regionSelect = document.getElementById('regionSelect');
+      const selectedOption = regionSelect.options[regionSelect.selectedIndex];
       
-      logTableBody.innerHTML = '';
-      if (logs.length === 0) {
-        noLogsMessage.style.display = 'block';
-        return;
-      }
-      noLogsMessage.style.display = 'none';
-      logs.forEach(log => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${log.time}</td>
-          <td>${log.user}</td>
-          <td>${log.event}</td>
-          <td>${log.description}</td>
-          <td>${log.ip}</td>
-        `;
-        logTableBody.appendChild(row);
-      });
-    } else {
-      throw new Error('Invalid response format from server');
+      // Get region name from selected option
+      let regionName = selectedOption.textContent.trim();
+      
+      // Clean region name for filename (remove indentation spaces)
+      regionName = regionName.replace(/\s+/g, '_').replace(/&nbsp;/g, '');
+      
+      // Prepare data for export
+      const rows = [];
+      
+      // Add header row
+      rows.push(['User', 'Course', 'Region', 'Score', 'Rating', 'Progress', 'Status']);
+      
+      // Add data rows
+      {{#reportData}}
+      rows.push([
+          `"{{username}}"`,
+          `"{{coursename}}"`,
+          `"{{region}}"`,
+          `"{{score}}%"`,
+          `"{{#rating}}{{rating}} ★{{/rating}}{{^rating}}N/A{{/rating}}"`,
+          `"{{progress}}%"`,
+          `"{{#is_completed}}Completed{{/is_completed}}{{#is_progress}}In Progress{{/is_progress}}{{#is_review}}Needs Review{{/is_review}}"`
+      ]);
+      {{/reportData}}
+      
+      // Convert to CSV string
+      const csvContent = "data:text/csv;charset=utf-8," + 
+          rows.map(e => e.join(",")).join("\n");
+      
+      // Create download link
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      
+      // Create filename with region name
+      const dateStr = new Date().toISOString().slice(0,10);
+      const filename = `report_${regionName}_${dateStr}.csv`;
+      
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      
+      // Trigger download
+      link.click();
+      document.body.removeChild(link);
     }
-  } catch (error) {
-    logTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Error loading logs: ${error.message}</td></tr>`;
-    console.error('Error fetching logs:', error);
-  }
-}
-  fetchLogs();
-  getLogsBtn.addEventListener('click', fetchLogs);
-  logDuration.addEventListener('change', fetchLogs);
-});
-function filterReport(type) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('report', type);
-    window.location.href = url.toString();
-}
-function exportReport() {
-    // Get report type from URL or default to 'all'
-    const urlParams = new URLSearchParams(window.location.search);
-    const reportType = urlParams.get('report') || 'all';
-    
-    // Prepare data for export
-    const rows = [];
-    
-    // Add header row
-    rows.push(['User', 'Course', 'Region', 'Score', 'Rating', 'Progress', 'Status']);
-    
-    // Add data rows
-    {{#reportData}}
-    rows.push([
-        `"{{username}}"`,
-        `"{{coursename}}"`,
-        `"{{region}}"`,
-        `"{{score}}%"`,
-        `"{{#rating}}{{rating}} ★{{/rating}}{{^rating}}N/A{{/rating}}"`,
-        `"{{progress}}%"`,
-        `"{{#is_completed}}Completed{{/is_completed}}{{#is_progress}}In Progress{{/is_progress}}{{#is_review}}Needs Review{{/is_review}}"`
-    ]);
-    {{/reportData}}
-    
-    // Convert to CSV string
-    const csvContent = "data:text/csv;charset=utf-8," + 
-        rows.map(e => e.join(",")).join("\n");
-    
-    // Create download link
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `report_${reportType}_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link);
-    
-    // Trigger download
-    link.click();
-    document.body.removeChild(link);
-}
-document.getElementById('regionSelect').addEventListener('change', function() {
-    const regionId = this.value;
-    const url = new URL(window.location.href);
-    url.searchParams.set('regionid', regionId);
-    window.location.href = url.toString();
-});
-
-// Update export button URL when region changes
-document.getElementById('regionSelect').addEventListener('change', function() {
-    const regionId = this.value;
-    const exportBtn = document.querySelector('.btn.btn-sm.btn-danger');
-    const baseUrl = exportBtn.href.split('?')[0];
-    exportBtn.href = `${baseUrl}?regionid=${regionId}`;
-});
-</script>
+  </script>
