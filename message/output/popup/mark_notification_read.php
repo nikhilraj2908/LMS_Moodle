@@ -37,6 +37,13 @@ $notification = $DB->get_record('notifications', array('id' => $notificationid))
 // If the redirect URL after filtering is empty, or it was never passed, then redirect to the notification page.
 if (!empty($notification->contexturl)) {
     $redirecturl = new moodle_url($notification->contexturl);
+    
+    // FIX: Always redirect to course page, not user profiles
+    if ($redirecturl->compare(new moodle_url('/user/view.php'), URL_MATCH_BASE) && 
+        $redirecturl->param('course')) {
+        $courseid = $redirecturl->param('course');
+        $redirecturl = new moodle_url('/course/view.php', ['id' => $courseid]);
+    }
 } else {
     $redirecturl = new moodle_url('/message/output/popup/notifications.php', ['notificationid' => $notificationid]);
 }
