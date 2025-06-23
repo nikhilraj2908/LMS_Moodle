@@ -40,7 +40,7 @@
     border: 2px solid #204070;
     border-radius: 15px;
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 3%;
     transform: translateY(-50%);
     max-width: 50%; 
@@ -49,7 +49,7 @@
 }
 
 /* 2XL screens and above (1536px+) - original styling */
-@media (min-width: 1536px) {
+@media (min-width: 1556px) {
     .carousel-overlay-box {
         width: 32%;
         max-width: 50%;
@@ -59,7 +59,7 @@
 }
 
 /* XL screens (1280px to 1535px) */
-@media (min-width: 1280px) and (max-width: 1535px) {
+@media (min-width: 1280px) and (max-width: 1555px) {
     .carousel-overlay-box {
         width: 38%;
         max-width: 35%;
@@ -1086,10 +1086,11 @@ body, #page-wrapper {
 
 
 
+/* General Layout for the Newsletter */
 .newsletter-wrapper {
   display: flex;
   flex-wrap: wrap;
-  margin:2%;
+  margin: 2%;
   align-items: stretch;
 }
 
@@ -1099,7 +1100,7 @@ body, #page-wrapper {
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  height:100%;
+  height: 100%;
 }
 
 .newsletter-box .bg-texture {
@@ -1124,36 +1125,92 @@ body, #page-wrapper {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Make sure announcements don't overflow */
+/* For Mobile (smaller devices) */
+@media (max-width: 767px) {
+  .newsletter-wrapper {
+    flex-direction: column;
+    margin: 0;
+  }
+
+  .col-md-5, .col-md-7 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .newsletter-box .bg-texture {
+    background-size: contain;
+    background-position: center;
+  }
+
+  .newsletter-img {
+    height: 25vh;
+    max-width: 100%;
+  }
+
+  .newsletter-box h2 {
+    font-size: 1.5rem;
+  }
+
+  .newsletter-posts {
+    padding: 15px;
+  }
+}
+
+/* For Laptop and Desktop (larger screens) */
+@media (min-width: 768px) {
+  .newsletter-img {
+    height: 30vh;
+    max-width: 100%;
+  }
+
+  .col-md-5 {
+    height: 59vh;
+    flex: 0 0 41.66666667%;
+    max-width: 41.66666667%;
+  }
+
+  .col-md-7 {
+    padding: 0 15px;
+  }
+
+  .newsletter-box h2 {
+    font-size: 2rem;
+  }
+}
+
+/* Adjust the columns at 1200px */
+@media (max-width: 1200px) {
+  .col-md-5 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+
+  .col-md-7 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+/* Ensure posts cards fit inside */
 .newsletter-posts .card {
   margin-bottom: 1rem;
   border-radius: 12px;
 }
-    .col-md-5 {
-        height: 59vh;
-        flex: 0 0 41.66666667%;
-        max-width: 41.66666667%;
-    }
-.newsletter-img-wrapper {
-  width: 100%;
-  max-width: 300px;
-  height: 220px; /* adjust height as needed */
-  overflow: hidden;
-  border-radius: 20px;
-  margin: 0 auto;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
-}
 
-.newsletter-img {
-  transition: transform 0.3s ease;
+/* Default button style for subscription */
+.subscription-toggle-btn {
+  padding: 12px 20px;
+  border-radius: 30px;
+  font-size: 16px;
+  background-color: #003366;
+  color: #fff;
+  border: none;
   cursor: pointer;
-  display: block;
-  margin: 0 auto;
+  transition: background-color 0.3s;
 }
 
-.newsletter-img:hover {
-  transform: translateY(-10px);
+.subscription-toggle-btn:hover {
+  background-color: #002244;
 }
 
 
@@ -1294,44 +1351,41 @@ body, #page-wrapper {
     </div>
     </div>
     <div class="container my-5">
-  <div class="row align-items-start newsletter-wrapper">
-    
-    <!-- Left Side: Subscribe Box -->
-    <div class="col-md-5">
-      <div class="newsletter-box text-center p-4 rounded-4 shadow">
-        <div class="bg-texture rounded-4"></div>
-        <div class="position-relative z-2">
+ <div class="row align-items-start newsletter-wrapper">
+  <!-- Left Side: Subscribe Box -->
+  <div class="col-md-5 col-12">
+    <div class="newsletter-box text-center p-4 rounded-4 shadow">
+      <div class="bg-texture rounded-4"></div>
+      <div class="position-relative z-2">
         <img src="{{config.wwwroot}}/theme/academi/pix/Newsletter.png" alt="Newsletter Icon" 
-     class=" newsletter-img top-0 start-50  mb-3" 
-     style="z-index: 2; height:30vh; max-width: 100%;">
+          class="newsletter-img mb-3" 
+          style="z-index: 2; height:30vh; max-width: 100%;">
 
-          <h5 class="mb-2 fw-semibold">Subscribe To</h5>
-          <h2 class="fw-bold mb-4 text-primary">Our Newsletter!</h2>
-     <div class="forum-subscription-btn mb-3">
-  {{#forumsubscription}}
-    <form class="forum-subscription-form" data-cmid="{{cmid}}">
-      <input type="hidden" name="id" value="{{cmid}}">
-      <input type="hidden" name="sesskey" value="{{sesskey}}">
-      <input type="hidden" name="returnurl" value="{{config.wwwroot}}/">
-      <button type="button" class="btn btn-primary px-4 py-2 rounded-pill subscription-toggle-btn"
+        <h5 class="mb-2 fw-semibold">Subscribe To</h5>
+        <h2 class="fw-bold mb-4 text-primary">Our Newsletter!</h2>
+        <div class="forum-subscription-btn mb-3">
+          {{#forumsubscription}}
+          <form class="forum-subscription-form" data-cmid="{{cmid}}">
+            <input type="hidden" name="id" value="{{cmid}}">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="returnurl" value="{{config.wwwroot}}/">
+            <button type="button" class="btn btn-primary px-4 py-2 rounded-pill subscription-toggle-btn"
               data-action="{{#subscribed}}unsubscribe{{/subscribed}}{{^subscribed}}subscribe{{/subscribed}}">
-        {{#subscribed}}{{#str}}unsubscribe, mod_forum{{/str}}{{/subscribed}}
-        {{^subscribed}}{{#str}}subscribe, mod_forum{{/str}}{{/subscribed}}
-      </button>
-    </form>
-  {{/forumsubscription}}
-</div>
+              {{#subscribed}}{{#str}}unsubscribe, mod_forum{{/str}}{{/subscribed}}
+              {{^subscribed}}{{#str}}subscribe, mod_forum{{/str}}{{/subscribed}}
+            </button>
+          </form>
+          {{/forumsubscription}}
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Right Side: Forum Newsletter Items -->
-    <div class="col-md-7">
-      <div class="newsletter-posts px-2">
-        {{{newsitems_html}}}
-      </div>
+  <!-- Right Side: Forum Newsletter Items -->
+  <div class="col-md-7 col-12">
+    <div class="newsletter-posts px-2">
+      {{{newsitems_html}}}
     </div>
-
   </div>
 </div>
 
