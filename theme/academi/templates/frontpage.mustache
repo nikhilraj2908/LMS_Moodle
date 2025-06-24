@@ -83,14 +83,10 @@
 /* MD screens (768px to 1023px) */
 @media (min-width: 768px) and (max-width: 1023px) {
     .carousel-overlay-box {
-        position: relative;
-        top: auto;
-        left: auto;
-        transform: none;
+       
+        top:37%;
         width: 80%;
-        max-width: 90%;
-        margin: 20px auto;
-        padding: 18px;
+      
         border-radius: 10px;
         border-width: 1.5px;
     }
@@ -100,12 +96,9 @@
 @media (max-width: 767px) {
     .carousel-overlay-box {
         position: relative;
-        top: auto;
-        left: auto;
-        transform: none;
-        width: 90%;
+        top:-70%;
+        width: 100%;
         max-width: 95%;
-        margin: 15px auto;
         padding: 15px;
         border-radius: 8px;
         border-width: 1px;
@@ -487,7 +480,7 @@ body.has-admin-menu .btn-user {
         gap: 8px;
         margin-bottom: 12px;
         flex-direction: column; /* Stack buttons vertically */
-        margin-left: 0; /* Remove left margin for full width */
+        margin-top: -48%; /* Remove left margin for full width */
         align-items: stretch;
     }
 }
@@ -674,6 +667,64 @@ body, #page-wrapper {
     box-sizing: border-box;
     z-index: 0;       /* behind main card */
 }
+
+
+
+
+@media (max-width: 480px) {
+  .performers-carousel {
+    gap: 1rem;
+    padding: 20px 5px !important;
+  }
+
+  .performer-card {
+    flex: 0 0 95% !important;
+    padding: 15px 15px 15px 20px !important;
+    border-radius: 12px;
+    margin: 0 auto;
+  }
+
+  .performer-pic {
+    top: 10px !important;
+    left: 10px !important;
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .performer-content {
+    padding-left: 75px !important; /* to avoid overlap with image */
+  }
+
+  .quote-mark.single-quote {
+    font-size: 40px !important;
+    top: -20px !important;
+    right: 10px !important;
+  }
+
+  .view-profile-link {
+    font-size: 0.8rem !important;
+    padding: 5px 12px !important;
+  }
+      
+  .performer-name {
+    font-size: 1.1rem !important;
+  }
+
+  .testimonial-text {
+    font-size: 0.85rem !important;
+  }
+
+  .points {
+    font-size: 0.75rem !important;
+  }
+
+  .carousel-nav {
+    width: 35px !important;
+    height: 35px !important;
+    font-size: 1.5rem !important;
+  }
+}
+
 
 .quote-mark.single-quote {
     position: absolute;
@@ -1085,7 +1136,6 @@ body, #page-wrapper {
 
 
 
-
 /* General Layout for the Newsletter */
 .newsletter-wrapper {
   display: flex;
@@ -1125,37 +1175,6 @@ body, #page-wrapper {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* For Mobile (smaller devices) */
-@media (max-width: 767px) {
-  .newsletter-wrapper {
-    flex-direction: column;
-    margin: 0;
-  }
-
-  .col-md-5, .col-md-7 {
-    flex: 0 0 100%;
-    max-width: 100%;
-  }
-
-  .newsletter-box .bg-texture {
-    background-size: contain;
-    background-position: center;
-  }
-
-  .newsletter-img {
-    height: 25vh;
-    max-width: 100%;
-  }
-
-  .newsletter-box h2 {
-    font-size: 1.5rem;
-  }
-
-  .newsletter-posts {
-    padding: 15px;
-  }
-}
-
 /* For Laptop and Desktop (larger screens) */
 @media (min-width: 768px) {
   .newsletter-img {
@@ -1164,8 +1183,6 @@ body, #page-wrapper {
   }
 
   .col-md-5 {
-    height: 59vh;
-    flex: 0 0 41.66666667%;
     max-width: 41.66666667%;
   }
 
@@ -1212,6 +1229,39 @@ body, #page-wrapper {
 .subscription-toggle-btn:hover {
   background-color: #002244;
 }
+
+/* For Mobile (smaller devices) */
+@media (max-width: 767px) {
+  .newsletter-wrapper {
+    flex-direction: column;
+    margin: 0;
+  }
+
+  .col-md-5, .col-md-7 {
+            margin-bottom: 10px;
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .newsletter-box .bg-texture {
+    background-size: contain;
+    background-position: center;
+  }
+
+  .newsletter-img {
+    height: 25vh;
+    max-width: 100%;
+  }
+
+  .newsletter-box h2 {
+    font-size: 1.5rem;
+  }
+
+  .newsletter-posts {
+    padding: 15px;
+  }
+}
+
 
 
     </style>
@@ -1260,7 +1310,7 @@ body, #page-wrapper {
         {{> theme_academi/header }}
 
         <!-- Carousel Section -->
-       <div class="main-container">
+       <div class="main-container ">
 
                  <div id="heroCarousel" class="carousel slide" data-ride="carousel" data-interval="3000">
             <div class="carousel-inner">
@@ -1351,7 +1401,7 @@ body, #page-wrapper {
     </div>
     </div>
     <div class="container my-5">
- <div class="row align-items-start newsletter-wrapper">
+ <div class=" align-items-start newsletter-wrapper">
   <!-- Left Side: Subscribe Box -->
   <div class="col-md-5 col-12">
     <div class="newsletter-box text-center p-4 rounded-4 shadow">

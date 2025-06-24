@@ -944,118 +944,129 @@ if (isloggedin() && !isguestuser()) {
 // ======================================
 // 4. WHO SEES WHAT? Admin / Manager / Student
 // ======================================
+// ======================================
+// 4. WHO SEES WHAT? Admin / Manager / Student
+// ======================================
 $isadmin        = is_siteadmin($USER->id);
 $isregionmgr    = false;
 $regioncategory = null;
 
-// check regional manager role capability
+// FIXED: Correct regional manager role check with proper parameters
+$regionalmanagerrole = 'regionalmanager';
 $sql = "
     SELECT ctx.instanceid AS categoryid
       FROM {context} ctx
-      JOIN {role_assignments} ra ON ra.contextid=ctx.id
-      JOIN {role_capabilities} rc ON rc.roleid=ra.roleid
-     WHERE rc.capability = :capability
-       AND rc.permission = :allow
+      JOIN {role_assignments} ra ON ra.contextid = ctx.id
+      JOIN {role} r ON r.id = ra.roleid
+     WHERE r.shortname = :shortname
        AND ctx.contextlevel = :ctxlevel
        AND ra.userid = :userid
      LIMIT 1
 ";
+
+// CORRECTED: All 3 parameters properly defined
 $params = [
-    'capability'=>'moodle/category:create',
-    'allow'=>CAP_ALLOW,
-    'ctxlevel'=>CONTEXT_COURSECAT,
-    'userid'=>$USER->id
+    'shortname' => $regionalmanagerrole,
+    'ctxlevel' => CONTEXT_COURSECAT,
+    'userid' => $USER->id
 ];
-if ($row = $DB->get_record_sql($sql,$params)) {
-    $isregionmgr    = true;
+
+if ($row = $DB->get_record_sql($sql, $params)) {
+    $isregionmgr = true;
     $regioncategory = (int)$row->categoryid;
 }
 
+// FIXED: Online users query for admin dashboard
 if ($isadmin) {
     // ADMIN DASHBOARD
     $templatecontext['template'] = 'theme_academi/core/dashboard_admin';
 
     // active users
-    $templatecontext['activeUserCount'] = $DB->count_records('user',['deleted'=>0,'suspended'=>0]);
-    // ── Online users count + details (with roles and avatars) ──
-// … up above, inside the if ($isadmin) { … } block …
+    $templatecontext['activeUserCount'] = $DB->count_records('user', ['deleted' => 0, 'suspended' => 0]);
+    
+    // Online users count + details
+    $fiveMinutesAgo = time() - 300;
 
-// ── Online users count + details ──
-$fiveMinutesAgo = time() - 300;
+    // FIXED: Use proper IN clause handling
+    $contextlevels = [CONTEXT_SYSTEM, CONTEXT_COURSECAT, CONTEXT_COURSE];
+    list($insql, $inparams) = $DB->get_in_or_equal($contextlevels, SQL_PARAMS_NAMED);
 
-$sql = "
-    SELECT
-        u.id,
-        u.firstname,
-        u.lastname,
-        u.firstnamephonetic,
-        u.lastnamephonetic,
-        u.middlename,
-        u.alternatename,
-        u.lastaccess,
-        GROUP_CONCAT(DISTINCT r.shortname ORDER BY r.shortname SEPARATOR ', ') AS roles
-      FROM {user} u
-      JOIN {role_assignments} ra ON ra.userid    = u.id
-      JOIN {context}         ctx ON ctx.id       = ra.contextid
-      JOIN {role}            r   ON r.id         = ra.roleid
-     WHERE
-        u.lastaccess > :since
-        AND u.deleted   = 0
-        AND u.suspended = 0
-        AND ctx.contextlevel IN (:system, :category, :course)
-     GROUP BY u.id
-     ORDER BY u.lastaccess DESC
-     LIMIT 20
-";
+    $sql = "
+        SELECT
+            u.id,
+            u.firstname,
+            u.lastname,
+            u.firstnamephonetic,
+            u.lastnamephonetic,
+            u.middlename,
+            u.alternatename,
+            u.lastaccess,
+            GROUP_CONCAT(DISTINCT r.shortname ORDER BY r.shortname SEPARATOR ', ') AS roles
+        FROM {user} u
+        JOIN {role_assignments} ra ON ra.userid = u.id
+        JOIN {context} ctx ON ctx.id = ra.contextid
+        JOIN {role} r ON r.id = ra.roleid
+        WHERE
+            u.lastaccess > :since
+            AND u.deleted = 0
+            AND u.suspended = 0
+            AND ctx.contextlevel $insql
+        GROUP BY u.id
+        ORDER BY u.lastaccess DESC
+        LIMIT 20
+    ";
 
-$params = [
-    'since'    => $fiveMinutesAgo,
-    'system'   => CONTEXT_SYSTEM,
-    'category' => CONTEXT_COURSECAT,
-    'course'   => CONTEXT_COURSE
-];
+    $params = ['since' => $fiveMinutesAgo];
+    $params = array_merge($params, $inparams);
 
-/** @var stdClass[] $onlineRecs */
-$onlineRecs = $DB->get_records_sql($sql, $params);
+    try {
+        $onlineRecs = $DB->get_records_sql($sql, $params);
+    } catch (dml_exception $e) {
+        error_log("Online users query failed: " . $e->getMessage());
+        $onlineRecs = [];
+    }
 
-$sysctx = context_system::instance();
-$onlineUsersData = [];
+    $sysctx = context_system::instance();
+    $onlineUsersData = [];
 
-foreach ($onlineRecs as $u) {
-    $fullname = fullname($u);
-    $avatar   = $OUTPUT->user_picture(
-        $DB->get_record('user',['id'=>$u->id]),
-        ['size'=>45,'link'=>false,'class'=>'online-user-avatar']
-    );
+    foreach ($onlineRecs as $u) {
+        $fullname = fullname($u);
+        $avatar = $OUTPUT->user_picture(
+            $DB->get_record('user', ['id' => $u->id]),
+            ['size' => 45, 'link' => false, 'class' => 'online-user-avatar']
+        );
 
-    $canmessage = (
-        isloggedin()
-        && !isguestuser()
-        && !empty($CFG->messaging)
-        && has_capability('moodle/site:sendmessage', $sysctx)
-    );
-    $messageurl = (new moodle_url('/message/index.php', ['id' => $u->id]))->out();
-    $profileurl = (new moodle_url('/user/profile.php', ['id' => $u->id]))->out();
-    // ** only keep the first role **
-    $rolesarr    = explode(',', $u->roles);
-    $primaryrole = trim($rolesarr[0]);
+        $canmessage = (
+            isloggedin() &&
+            !isguestuser() &&
+            !empty($CFG->messaging) &&
+            has_capability('moodle/site:sendmessage', $sysctx)
+        );
+        
+        $messageurl = (new moodle_url('/message/index.php', ['id' => $u->id]))->out();
+        $profileurl = (new moodle_url('/user/profile.php', ['id' => $u->id]))->out();
+        
+        // Only keep the first role
+        $rolesarr = explode(',', $u->roles);
+        $primaryrole = trim($rolesarr[0]);
 
-    $onlineUsersData[] = [
-        'id'         => $u->id,
-        'avatar'     => $avatar,
-        'fullname'   => $fullname,
-        'role'       => $primaryrole,
-        'lastaccess' => userdate($u->lastaccess),
-        'messageurl' => $messageurl,
-        'profileurl'   => $profileurl, 
-        'canmessage' => $canmessage
-    ];
-}
+        $onlineUsersData[] = [
+            'id' => $u->id,
+            'avatar' => $avatar,
+            'fullname' => $fullname,
+            'role' => $primaryrole,
+            'lastaccess' => userdate($u->lastaccess),
+            'messageurl' => $messageurl,
+            'profileurl' => $profileurl,
+            'canmessage' => $canmessage
+        ];
+    }
 
+    $templatecontext['onlineUserCount'] = count($onlineUsersData);
+    $templatecontext['onlineUsersData'] = $onlineUsersData;
+    $templatecontext['allUsersUrl'] = (new moodle_url('/admin/user.php'))->out();
 
-$templatecontext['onlineUserCount'] = count($onlineUsersData);
-$templatecontext['onlineUsersData'] = $onlineUsersData;
-$templatecontext['allUsersUrl'] = (new moodle_url('/admin/user.php'))->out();
+ 
 // … then later echo $OUTPUT->render_from_template() as before …
 
 
@@ -1283,44 +1294,151 @@ $templatecontext['reportData'] = $processedData;
 // Add export URL with region parameter
 $templatecontext['exportUrl'] = (new moodle_url('/my/export.php', ['regionid' => $selectedRegionId]))->out();
 
-} else if ($isregionmgr && $regioncategory !== null) {
+}  else if ($isregionmgr && $regioncategory !== null) {
     // REGIONAL MANAGER DASHBOARD
     $templatecontext['template'] = 'theme_academi/core/dashboard_manager';
+    
+    // Get region details
+    $cat = $DB->get_record('course_categories', ['id' => $regioncategory]);
+    $templatecontext['regionname'] = format_string($cat->name);
+    $templatecontext['regionid'] = $regioncategory;
 
-    $cat = $DB->get_record('course_categories',['id'=>$regioncategory]);
-    $templatecontext['regionname'] = $cat->name;
-    $templatecontext['regionid']   = $regioncategory;
+    // 1. Active Users in Region
+    $activeUserCount = $DB->count_records_sql("
+        SELECT COUNT(DISTINCT u.id)
+        FROM {user} u
+        JOIN {user_enrolments} ue ON ue.userid = u.id
+        JOIN {enrol} e ON e.id = ue.enrolid
+        JOIN {course} c ON c.id = e.courseid
+        WHERE c.category = :catid
+        AND u.deleted = 0
+        AND u.suspended = 0
+    ", ['catid' => $regioncategory]);
+    $templatecontext['activeUserCount'] = $activeUserCount;
 
-    // active users under region
-    $templatecontext['activeUserCount'] = (int)$DB->get_field_sql("
-        SELECT COUNT(DISTINCT ue.userid)
-          FROM {enrol} e
-          JOIN {user_enrolments} ue ON ue.enrolid=e.id
-          JOIN {course} c ON c.id=e.courseid
-         WHERE c.category=:catid
-    ", ['catid'=>$regioncategory]);
-
-    $templatecontext['totalCoursesInRegion'] = $DB->count_records('course',[
-        'category'=>$regioncategory,'visible'=>1
-    ]);
-
-    $templatecontext['avgCompletionRate'] = round(rand(50,90),1);
-    $templatecontext['newEnrollments7d'] = rand(0,20);
-    $templatecontext['topCourses'] = [
-        ['coursename'=>'Course A','completionPercentage'=>82],
-        ['coursename'=>'Course B','completionPercentage'=>75],
-        ['coursename'=>'Course C','completionPercentage'=>63]
-    ];
-
-    $regionHours = [];
-    for ($i=0; $i<7; $i++) {
-        $regionHours[] = rand(0,8);
+    // 2. Online Users in Region (last 5 minutes)
+    $fiveMinutesAgo = time() - 300;
+    $onlineUsers = $DB->get_records_sql("
+        SELECT DISTINCT u.id, u.firstname, u.lastname
+        FROM {user} u
+        JOIN {logstore_standard_log} l ON l.userid = u.id
+        JOIN {course} c ON c.id = l.courseid
+        WHERE c.category = :catid
+        AND l.timecreated > :since
+        AND u.deleted = 0
+        AND u.suspended = 0
+        ORDER BY l.timecreated DESC
+    ", ['catid' => $regioncategory, 'since' => $fiveMinutesAgo]);
+    
+    $onlineUsersData = [];
+    foreach ($onlineUsers as $user) {
+        $onlineUsersData[] = [
+            'name' => fullname($user),
+            'profileurl' => new moodle_url('/user/profile.php', ['id' => $user->id]),
+            'avatar' => $OUTPUT->user_picture($user, ['size' => 35, 'link' => false])
+        ];
     }
-    $templatecontext['regionHoursActivity'] = json_encode($regionHours);
+    $templatecontext['onlineUsers'] = $onlineUsersData;
 
-} else {
+    // 3. Student Progress Report
+    $studentsReport = $DB->get_records_sql("
+        SELECT 
+            u.id AS userid,
+            CONCAT(u.firstname, ' ', u.lastname) AS username,
+            c.fullname AS coursename,
+            ROUND((
+                SELECT COUNT(*)
+                FROM {course_modules_completion} cmc
+                JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
+                WHERE cm.course = c.id AND cmc.userid = u.id AND cmc.completionstate = 1
+            ) * 100.0 / NULLIF((
+                SELECT COUNT(*)
+                FROM {course_modules} cm 
+                WHERE cm.course = c.id AND cm.completion > 0
+            ), 0), 1) AS progress
+        FROM {user} u
+        JOIN {user_enrolments} ue ON ue.userid = u.id
+        JOIN {enrol} e ON e.id = ue.enrolid
+        JOIN {course} c ON c.id = e.courseid
+        WHERE c.category = :catid
+        AND u.deleted = 0
+        AND u.suspended = 0
+        ORDER BY username, coursename
+    ", ['catid' => $regioncategory]);
+    
+    $studentsData = [];
+    foreach ($studentsReport as $record) {
+        $studentsData[] = [
+            'student' => $record->username,
+            'course' => $record->coursename,
+            'progress' => $record->progress,
+            'progressClass' => $record->progress >= 80 ? 'bg-success' : 
+                              ($record->progress >= 50 ? 'bg-warning' : 'bg-danger')
+        ];
+    }
+    $templatecontext['studentsData'] = $studentsData;
+
+    // 4. Course Completion Summary
+    $coursesSummary = $DB->get_records_sql("
+        SELECT 
+            c.id,
+            c.fullname AS coursename,
+            COUNT(ue.id) AS enrolled,
+            COUNT(cc.id) AS completed,
+            ROUND(COUNT(cc.id) * 100.0 / NULLIF(COUNT(ue.id), 0), 1) AS completion_rate
+        FROM {course} c
+        JOIN {enrol} e ON e.courseid = c.id
+        JOIN {user_enrolments} ue ON ue.enrolid = e.id
+        LEFT JOIN {course_completions} cc ON cc.course = c.id AND cc.userid = ue.userid
+        WHERE c.category = :catid
+        GROUP BY c.id, c.fullname
+        ORDER BY completion_rate DESC
+    ", ['catid' => $regioncategory]);
+    
+    $coursesData = [];
+    foreach ($coursesSummary as $course) {
+        $coursesData[] = [
+            'course' => $course->coursename,
+            'enrolled' => $course->enrolled,
+            'completed' => $course->completed,
+            'completion_rate' => $course->completion_rate,
+            'statusClass' => $course->completion_rate >= 70 ? 'bg-success' : 
+                            ($course->completion_rate >= 40 ? 'bg-warning' : 'bg-danger')
+        ];
+    }
+    $templatecontext['coursesData'] = $coursesData;
+
+    // 5. Recent Activity
+    $recentActivity = $DB->get_records_sql("
+        SELECT 
+            u.firstname, 
+            u.lastname,
+            c.fullname AS coursename,
+            FROM_UNIXTIME(l.timecreated) AS time,
+            l.action
+        FROM {logstore_standard_log} l
+        JOIN {user} u ON u.id = l.userid
+        JOIN {course} c ON c.id = l.courseid
+        WHERE c.category = :catid
+        ORDER BY l.timecreated DESC
+        LIMIT 10
+    ", ['catid' => $regioncategory]);
+    
+    $activityData = [];
+    foreach ($recentActivity as $activity) {
+        $activityData[] = [
+            'user' => fullname($activity),
+            'course' => $activity->coursename,
+            'time' => $activity->time,
+            'action' => $activity->action
+        ];
+    }
+    $templatecontext['recentActivity'] = $activityData;
+}
+else {
     // STUDENT DASHBOARD
     $templatecontext['template'] = 'core/dashboard';
+    
 }
 
 // =================================
