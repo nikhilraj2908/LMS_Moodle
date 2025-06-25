@@ -1317,19 +1317,19 @@ $templatecontext['exportUrl'] = (new moodle_url('/my/export.php', ['regionid' =>
     $templatecontext['activeUserCount'] = $activeUserCount;
 
     // 2. Online Users in Region (last 5 minutes)
-    $fiveMinutesAgo = time() - 300;
-    $onlineUsers = $DB->get_records_sql("
-        SELECT DISTINCT u.id, u.firstname, u.lastname
-        FROM {user} u
-        JOIN {logstore_standard_log} l ON l.userid = u.id
-        JOIN {course} c ON c.id = l.courseid
-        WHERE c.category = :catid
-        AND l.timecreated > :since
-        AND u.deleted = 0
-        AND u.suspended = 0
-        ORDER BY l.timecreated DESC
-    ", ['catid' => $regioncategory, 'since' => $fiveMinutesAgo]);
-    
+$fiveMinutesAgo = time() - 300;
+$userfieldssql = \core_user\fields::for_name()->get_sql('u');
+$onlineUsers = $DB->get_records_sql("
+    SELECT DISTINCT u.id {$userfieldssql->selects}
+    FROM {user} u
+    JOIN {logstore_standard_log} l ON l.userid = u.id
+    JOIN {course} c ON c.id = l.courseid
+    WHERE c.category = :catid
+    AND l.timecreated > :since
+    AND u.deleted = 0
+    AND u.suspended = 0
+    ORDER BY l.timecreated DESC
+", array_merge(['catid' => $regioncategory, 'since' => $fiveMinutesAgo], $userfieldssql->params));
     $onlineUsersData = [];
     foreach ($onlineUsers as $user) {
         $onlineUsersData[] = [
@@ -1341,41 +1341,46 @@ $templatecontext['exportUrl'] = (new moodle_url('/my/export.php', ['regionid' =>
     $templatecontext['onlineUsers'] = $onlineUsersData;
 
     // 3. Student Progress Report
-    $studentsReport = $DB->get_records_sql("
-        SELECT 
-            u.id AS userid,
-            CONCAT(u.firstname, ' ', u.lastname) AS username,
-            c.fullname AS coursename,
-            ROUND((
-                SELECT COUNT(*)
-                FROM {course_modules_completion} cmc
-                JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
-                WHERE cm.course = c.id AND cmc.userid = u.id AND cmc.completionstate = 1
-            ) * 100.0 / NULLIF((
-                SELECT COUNT(*)
-                FROM {course_modules} cm 
-                WHERE cm.course = c.id AND cm.completion > 0
-            ), 0), 1) AS progress
-        FROM {user} u
-        JOIN {user_enrolments} ue ON ue.userid = u.id
-        JOIN {enrol} e ON e.id = ue.enrolid
-        JOIN {course} c ON c.id = e.courseid
-        WHERE c.category = :catid
-        AND u.deleted = 0
-        AND u.suspended = 0
-        ORDER BY username, coursename
-    ", ['catid' => $regioncategory]);
-    
-    $studentsData = [];
-    foreach ($studentsReport as $record) {
-        $studentsData[] = [
-            'student' => $record->username,
-            'course' => $record->coursename,
-            'progress' => $record->progress,
-            'progressClass' => $record->progress >= 80 ? 'bg-success' : 
-                              ($record->progress >= 50 ? 'bg-warning' : 'bg-danger')
-        ];
-    }
+  // 3. Student Progress Report
+$userfieldssql = \core_user\fields::for_name()->get_sql('u', false, '', 'userid', false);
+$studentsReport = $DB->get_recordset_sql("
+    SELECT
+    CONCAT(u.id, '-', c.id) AS uniquekey,
+    u.id AS userid,
+    u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename, u.firstname, u.lastname,
+    c.fullname AS coursename,
+    ROUND((
+        SELECT COUNT(*)
+        FROM mdl_course_modules_completion cmc
+        JOIN mdl_course_modules cm ON cm.id = cmc.coursemoduleid
+        WHERE cm.course = c.id AND cmc.userid = u.id AND cmc.completionstate = 1
+    ) * 100.0 / NULLIF((
+        SELECT COUNT(*)
+        FROM mdl_course_modules cm
+        WHERE cm.course = c.id AND cm.completion > 0
+    ), 0), 1) AS progress
+FROM mdl_user u
+JOIN mdl_user_enrolments ue ON ue.userid = u.id
+JOIN mdl_enrol e ON e.id = ue.enrolid
+JOIN mdl_course c ON c.id = e.courseid
+WHERE c.category = ?
+AND u.deleted = 0
+AND u.suspended = 0
+ORDER BY u.lastname, u.firstname, coursename
+
+", array_merge(['catid' => $regioncategory], $userfieldssql->params));
+
+$studentsData = [];
+foreach ($studentsReport as $record) {
+    $studentsData[] = [
+        'student' => fullname($record),
+        'course' => $record->coursename,
+        'progress' => $record->progress,
+        'progressClass' => $record->progress >= 80 ? 'bg-success' : 
+                          ($record->progress >= 50 ? 'bg-warning' : 'bg-danger')
+    ];
+}
+$studentsReport->close();
     $templatecontext['studentsData'] = $studentsData;
 
     // 4. Course Completion Summary
@@ -1409,30 +1414,34 @@ $templatecontext['exportUrl'] = (new moodle_url('/my/export.php', ['regionid' =>
     $templatecontext['coursesData'] = $coursesData;
 
     // 5. Recent Activity
-    $recentActivity = $DB->get_records_sql("
-        SELECT 
-            u.firstname, 
-            u.lastname,
-            c.fullname AS coursename,
-            FROM_UNIXTIME(l.timecreated) AS time,
-            l.action
-        FROM {logstore_standard_log} l
-        JOIN {user} u ON u.id = l.userid
-        JOIN {course} c ON c.id = l.courseid
-        WHERE c.category = :catid
-        ORDER BY l.timecreated DESC
-        LIMIT 10
-    ", ['catid' => $regioncategory]);
-    
-    $activityData = [];
-    foreach ($recentActivity as $activity) {
-        $activityData[] = [
-            'user' => fullname($activity),
-            'course' => $activity->coursename,
-            'time' => $activity->time,
-            'action' => $activity->action
-        ];
-    }
+ $userfieldssql = \core_user\fields::for_name()->get_sql('u', false, '', 'userid', false);
+$recentActivity = $DB->get_recordset_sql("
+   SELECT
+    l.id AS logid,
+    u.id AS userid,
+    u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename, u.firstname, u.lastname,
+    c.fullname AS coursename,
+    l.timecreated,
+    l.action
+FROM mdl_logstore_standard_log l
+JOIN mdl_user u ON u.id = l.userid
+JOIN mdl_course c ON c.id = l.courseid
+WHERE c.category = ?
+ORDER BY l.timecreated DESC
+LIMIT 10
+
+", array_merge(['catid' => $regioncategory], $userfieldssql->params));
+
+$activityData = [];
+foreach ($recentActivity as $activity) {
+    $activityData[] = [
+        'user' => fullname($activity),
+        'course' => $activity->coursename,
+        'time' => userdate($activity->timecreated),
+        'action' => $activity->action
+    ];
+}
+$recentActivity->close(); // Always close recordset
     $templatecontext['recentActivity'] = $activityData;
 }
 else {

@@ -1,10 +1,180 @@
+
+<style>
+    /* General Styling for Dashboard */
+
+.dashboard-header {
+    background-color: #007bff;
+    color: white;
+    border-radius: 0.5rem;
+}
+
+.dashboard-header .row {
+    margin-bottom: 1.5rem;
+}
+
+.dashboard-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.dashboard-header p {
+    font-size: 1rem;
+}
+
+.dashboard-header .col-md-4 p {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+/* Online Users Section */
+.card-header {
+    background-color: #007bff;
+    color: white;
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.card-body {
+    background-color: #ffffff;
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.online-user {
+    max-width: 100px;
+    text-align: center;
+}
+
+.online-user a {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #343a40;
+}
+
+.online-user a:hover {
+    color: #007bff;
+    text-decoration: underline;
+}
+
+/* Progress Bar */
+.progress {
+    height: 20px;
+    margin-bottom: 0.75rem;
+    border-radius: 0.5rem;
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    border-radius: 0.5rem;
+}
+
+/* Student Progress Table */
+.table {
+    margin-top: 1.5rem;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    padding: 1rem;
+}
+
+.table th {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.table td {
+    font-size: 0.9rem;
+}
+
+.progress-bar.bg-success {
+    background-color: #28a745;
+}
+
+.progress-bar.bg-warning {
+    background-color: #ffc107;
+}
+
+.progress-bar.bg-danger {
+    background-color: #dc3545;
+}
+
+/* Course Completion Summary Table */
+.badge {
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+}
+
+.badge.bg-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107;
+    color: white;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Recent Activity Section */
+.list-group-item {
+    font-size: 0.9rem;
+    padding: 1rem;
+    border: none;
+}
+
+.list-group-item .d-flex {
+    align-items: center;
+}
+
+.list-group-item .d-flex div {
+    max-width: 85%;
+}
+
+.list-group-item .text-muted {
+    font-size: 0.8rem;
+}
+
+/* Responsive Design */
+@media (max-width: 767px) {
+    .dashboard-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .dashboard-header p {
+        font-size: 0.9rem;
+    }
+
+    .online-user {
+        max-width: 80px;
+    }
+
+    .table th, .table td {
+        padding: 0.75rem;
+    }
+}
+
+</style>
 <div class="regional-manager-dashboard container-fluid py-4">
     <!-- Dashboard Header -->
     <div class="dashboard-header bg-primary text-white p-4 rounded mb-4">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h1 class="mb-1">{{regionname}} Region Dashboard</h1>
-                <p class="mb-0">Regional Manager: {{username}}</p>
+                <h1 class="mb-1 text-light">{{regionname}} Dashboard</h1>
+                <p class="mb-0 ">Regional Manager: {{username}}</p>
             </div>
             <div class="col-md-4 text-md-end">
                 <p class="mb-0"><i class="fas fa-calendar me-1"></i> {{date}}</p>
@@ -16,7 +186,7 @@
     <!-- Online Users -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
-            <h3 class="card-title mb-0"><i class="fas fa-user-clock me-2"></i> Currently Online ({{onlineUsers.length}})</h3>
+            <h3 class="card-title text-light mb-0"><i class="fas fa-user-clock me-2"></i> Currently Online ({{onlineUsers.length}})</h3>
         </div>
         <div class="card-body">
             <div class="d-flex flex-wrap">
@@ -36,7 +206,7 @@
     <!-- Student Progress Report -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
-            <h3 class="card-title mb-0"><i class="fas fa-user-graduate me-2"></i> Student Progress Report</h3>
+            <h3 class="card-title mb-0 text-light"><i class="fas fa-user-graduate me-2"></i> Student Progress Report</h3>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -81,7 +251,7 @@
     <!-- Course Completion Summary -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
-            <h3 class="card-title mb-0"><i class="fas fa-book me-2"></i> Course Completion Summary</h3>
+            <h3 class="card-title mb-0 text-light"><i class="fas fa-book me-2"></i> Course Completion Summary</h3>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -121,7 +291,7 @@
     <!-- Recent Activity -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
-            <h3 class="card-title mb-0"><i class="fas fa-history me-2"></i> Recent Activity</h3>
+            <h3 class="card-title mb-0 text-light"><i class="fas fa-history me-2"></i> Recent Activity</h3>
         </div>
         <div class="card-body">
             <ul class="list-group">
