@@ -951,6 +951,14 @@ $isadmin        = is_siteadmin($USER->id);
 $isregionmgr    = false;
 $regioncategory = null;
 
+
+$regionalManagerUser = $USER; // or fetch specific user
+$regionalManager = [
+    'name' => fullname($regionalManagerUser),
+    'profile' => new moodle_url('/user/profile.php', ['id' => $regionalManagerUser->id]),
+    'avatar' => $OUTPUT->user_picture($regionalManagerUser, ['size' => 55, 'link' => false])
+];
+$templatecontext['regionalManager'] = $regionalManager;
 // FIXED: Correct regional manager role check with proper parameters
 $regionalmanagerrole = 'regionalmanager';
 $sql = "
@@ -1302,6 +1310,7 @@ $templatecontext['exportUrl'] = (new moodle_url('/my/export.php', ['regionid' =>
     $cat = $DB->get_record('course_categories', ['id' => $regioncategory]);
     $templatecontext['regionname'] = format_string($cat->name);
     $templatecontext['regionid'] = $regioncategory;
+   
 
     // 1. Active Users in Region
     $activeUserCount = $DB->count_records_sql("
@@ -1317,30 +1326,85 @@ $templatecontext['exportUrl'] = (new moodle_url('/my/export.php', ['regionid' =>
     $templatecontext['activeUserCount'] = $activeUserCount;
 
     // 2. Online Users in Region (last 5 minutes)
-$fiveMinutesAgo = time() - 300;
-$userfieldssql = \core_user\fields::for_name()->get_sql('u');
-$onlineUsers = $DB->get_records_sql("
-    SELECT DISTINCT u.id {$userfieldssql->selects}
-    FROM {user} u
-    JOIN {logstore_standard_log} l ON l.userid = u.id
-    JOIN {course} c ON c.id = l.courseid
-    WHERE c.category = :catid
-    AND l.timecreated > :since
-    AND u.deleted = 0
-    AND u.suspended = 0
-    ORDER BY l.timecreated DESC
-", array_merge(['catid' => $regioncategory, 'since' => $fiveMinutesAgo], $userfieldssql->params));
-    $onlineUsersData = [];
-    foreach ($onlineUsers as $user) {
-        $onlineUsersData[] = [
-            'name' => fullname($user),
-            'profileurl' => new moodle_url('/user/profile.php', ['id' => $user->id]),
-            'avatar' => $OUTPUT->user_picture($user, ['size' => 35, 'link' => false])
-        ];
-    }
-    $templatecontext['onlineUsers'] = $onlineUsersData;
+    // 2. Online Users in Region (last 5 minutes)
 
-    // 3. Student Progress Report
+// 2a) Build the list of categories: the region itself + any immediate subcategories.
+$regionids = [$regioncategory];
+$subcats   = $DB->get_records('course_categories', ['parent' => $regioncategory], 'id');
+foreach ($subcats as $sc) {
+    $regionids[] = $sc->id;
+}
+// generate SQL fragment and params for IN (...).
+list($catsql, $catparams) = $DB->get_in_or_equal($regionids, SQL_PARAMS_NAMED);
+
+// 2b) Five minutes ago:
+$since = time() - 300;
+
+// 2c) Run the query:
+$sql = "
+    SELECT DISTINCT
+    u.*
+  FROM {user} u
+      JOIN {logstore_standard_log} l
+        ON l.userid = u.id
+      JOIN {course} c
+        ON c.id = l.courseid
+     WHERE l.timecreated > :since
+       AND c.category $catsql
+       AND u.deleted   = 0
+       AND u.suspended = 0
+     ORDER BY l.timecreated DESC
+";
+
+$params = array_merge(['since' => $since], $catparams);
+$onlineUsers = $DB->get_records_sql($sql, $params);
+
+// 2d) Massage for the template:
+$onlineUsersData = [];
+foreach ($onlineUsers as $u) {
+    $onlineUsersData[] = [
+        'id'         => $u->id,
+        'name'       => fullname($u),
+        'email'      => $u->email,
+        'profileurl' => (new moodle_url('/user/profile.php', ['id' => $u->id]))->out(),
+        'avatar'     => $OUTPUT->user_picture($u, ['size' => 35, 'link' => false]),
+    ];
+}
+
+$templatecontext['onlineUsers']      = $onlineUsersData;
+$templatecontext['onlineUsersCount'] = count($onlineUsersData);
+    // 3. Progress Report downlodable
+    $regionId = optional_param('regionid', 0, PARAM_INT); // Region ID from the filter
+
+$sql = "
+    SELECT u.id AS userid,
+           CONCAT(u.firstname, ' ', u.lastname) AS username,
+           c.fullname AS course_name,
+           cat.name AS region,
+           gg.finalgrade AS score,
+           gi.gradepass AS rating,
+           ROUND((gg.finalgrade / gi.gradepass) * 100) AS progress,
+           CASE 
+               WHEN gg.finalgrade < gi.gradepass THEN 'In Progress'
+               WHEN gg.finalgrade = gi.gradepass THEN 'Needs Review'
+               ELSE 'Completed'
+           END AS status
+    FROM mdl_user u
+    JOIN mdl_user_enrolments ue ON ue.userid = u.id
+    JOIN mdl_enrol e ON e.id = ue.enrolid
+    JOIN mdl_course c ON c.id = e.courseid
+    JOIN mdl_course_categories cat ON c.category = cat.id
+    LEFT JOIN mdl_grade_items gi ON gi.courseid = c.id
+    LEFT JOIN mdl_grade_grades gg ON gg.itemid = gi.id AND gg.userid = u.id
+    WHERE cat.id = :regionid
+    ORDER BY u.lastname, u.firstname
+";
+
+$params = ['regionid' => $regionId];
+
+$reportData = $DB->get_records_sql($sql, $params);
+$templatecontext['reportData'] = $reportData;
+
   // 3. Student Progress Report
 $userfieldssql = \core_user\fields::for_name()->get_sql('u', false, '', 'userid', false);
 $studentsReport = $DB->get_recordset_sql("
@@ -1384,21 +1448,32 @@ $studentsReport->close();
     $templatecontext['studentsData'] = $studentsData;
 
     // 4. Course Completion Summary
-    $coursesSummary = $DB->get_records_sql("
+$coursesSummary = $DB->get_records_sql("
+    SELECT 
+        c.id,
+        c.fullname AS coursename,
+        COUNT(DISTINCT ue.userid) AS enrolled,
+        COUNT(DISTINCT CASE WHEN comp.completed_activities = comp.total_activities THEN ue.userid END) AS completed,
+        ROUND(COUNT(DISTINCT CASE WHEN comp.completed_activities = comp.total_activities THEN ue.userid END) * 100.0 / COUNT(DISTINCT ue.userid), 1) AS completion_rate
+    FROM {course} c
+    JOIN {enrol} e ON e.courseid = c.id
+    JOIN {user_enrolments} ue ON ue.enrolid = e.id
+    LEFT JOIN (
         SELECT 
-            c.id,
-            c.fullname AS coursename,
-            COUNT(ue.id) AS enrolled,
-            COUNT(cc.id) AS completed,
-            ROUND(COUNT(cc.id) * 100.0 / NULLIF(COUNT(ue.id), 0), 1) AS completion_rate
-        FROM {course} c
-        JOIN {enrol} e ON e.courseid = c.id
-        JOIN {user_enrolments} ue ON ue.enrolid = e.id
-        LEFT JOIN {course_completions} cc ON cc.course = c.id AND cc.userid = ue.userid
-        WHERE c.category = :catid
-        GROUP BY c.id, c.fullname
-        ORDER BY completion_rate DESC
-    ", ['catid' => $regioncategory]);
+            ec.id AS courseid,
+            cmc.userid,
+            COUNT(DISTINCT cmc.id) AS completed_activities,
+            COUNT(DISTINCT cm.id) AS total_activities
+        FROM {course} ec
+        JOIN {course_modules} cm ON cm.course = ec.id AND cm.completion > 0
+        LEFT JOIN {course_modules_completion} cmc ON cmc.coursemoduleid = cm.id AND cmc.completionstate > 0
+        WHERE ec.category = :catid
+        GROUP BY ec.id, cmc.userid
+    ) comp ON comp.courseid = c.id AND comp.userid = ue.userid
+    WHERE c.category = :catid2
+    GROUP BY c.id, c.fullname
+    ORDER BY completion_rate DESC
+", ['catid' => $regioncategory, 'catid2' => $regioncategory]);
     
     $coursesData = [];
     foreach ($coursesSummary as $course) {

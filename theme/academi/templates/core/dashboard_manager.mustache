@@ -3,14 +3,18 @@
     /* General Styling for Dashboard */
 
 .dashboard-header {
-    background-color: #007bff;
-    color: white;
-    border-radius: 0.5rem;
+    background: linear-gradient(135deg , var(--primary), #386f81);
+    color: white !important;
+    padding: 20px 30px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
 }
 
-.dashboard-header .row {
-    margin-bottom: 1.5rem;
-}
+
 
 .dashboard-header h1 {
     font-size: 2rem;
@@ -28,14 +32,30 @@
 
 /* Online Users Section */
 .card-header {
-    background-color: #007bff;
+        background: linear-gradient(135deg , var(--primary), #386f81);
     color: white;
     border-radius: 0.5rem 0.5rem 0 0;
+    
 }
 
 .card-body {
     background-color: #ffffff;
     border-radius: 0 0 0.5rem 0.5rem;
+    height:100%;
+    max-height:50vh;
+    overflow:scroll;
+}
+ .date-display {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.5;
 }
 
 .card-title {
@@ -147,6 +167,9 @@
 .list-group-item .text-muted {
     font-size: 0.8rem;
 }
+ .rm-avatar{
+        border-radius: inherit;
+    }
 
 /* Responsive Design */
 @media (max-width: 767px) {
@@ -165,44 +188,84 @@
     .table th, .table td {
         padding: 0.75rem;
     }
+   
+}
+.online-user img,
+.regional-manager-avatar img {
+    width: 65px;
+    height: 65px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: inline-block;
 }
 
+.online-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #28a745; /* Green color */
+    
+    vertical-align: middle;
+}
+
+.block-regional2{
+    display:grid;
+    grid-template-columns:9fr 3fr;
+    gap:25px;
+}
+
+.block-regional3{
+    display:grid;
+    grid-template-columns:8fr 4fr;
+    gap:25px;
+}
+@media(max-width:767px){
+    .block-regional2{
+    display:block;
+}
+.block-regional3{
+    display:block;
+}
+}
 </style>
+
 <div class="regional-manager-dashboard container-fluid py-4">
     <!-- Dashboard Header -->
-    <div class="dashboard-header bg-primary text-white p-4 rounded mb-4">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="mb-1 text-light">{{regionname}} Dashboard</h1>
-                <p class="mb-0 ">Regional Manager: {{username}}</p>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <p class="mb-0"><i class="fas fa-calendar me-1"></i> {{date}}</p>
-                <p class="mb-0"><i class="fas fa-users me-1"></i> {{activeUserCount}} Active Users</p>
-            </div>
-        </div>
+  <div class="dashboard-header bg-primary text-white p-4 rounded mb-4">
+  <div class="row align-items-center">
+    
+    <!-- Avatar and Regional Manager Info -->
+    <div class="col-md-8 d-flex align-items-center">
+      <div class="regional-manager-avatar me-3 border rounded-circle">
+      {{{ regionalManager.avatar }}}
+      </div>
+      <div>
+        <h1 class="mb-1 text-light">{{regionname}} Dashboard</h1>
+        <p class="mb-0">Regional Manager: {{regionalManager.name}}</p>
+        <a class="text-white-50 small" href="{{regionalManager.profile}}">View Profile</a>
+      </div>
     </div>
 
-    <!-- Online Users -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h3 class="card-title text-light mb-0"><i class="fas fa-user-clock me-2"></i> Currently Online ({{onlineUsers.length}})</h3>
-        </div>
-        <div class="card-body">
-            <div class="d-flex flex-wrap">
-                {{#onlineUsers}}
-                <div class="online-user me-4 mb-3 text-center">
-                    <div class="mb-2">{{{avatar}}}</div>
-                    <a href="{{profileurl}}" class="text-dark">{{name}}</a>
-                </div>
-                {{/onlineUsers}}
-                {{^onlineUsers}}
-                <p class="mb-0">No users currently online</p>
-                {{/onlineUsers}}
-            </div>
-        </div>
-    </div>
+    <!-- Date and active users -->
+  <!-- Date and active users -->
+<div class="col-md-4 text-md-end mt-3 mt-md-0 d-flex flex-column align-items-end gap-2">
+  <div class="date-display">
+    <i class="fas fa-calendar"></i> {{date}}
+  </div>
+  <p class="mb-0"><i class="fas fa-users me-1"></i> {{activeUserCount}} Active Users</p>
+</div>
 
+
+  </div>
+</div>
+
+<div class="mb-3">
+  <a href="{{{config.wwwroot}}}/course/management.php?categoryid=5" class="btn btn-outline-secondary me-2">Manage courses</a>
+  <a href="{{{config.wwwroot}}}/course/edit.php?category=5" class="btn btn-primary">Create course</a>
+</div>
+
+<div class="block-regional2">
     <!-- Student Progress Report -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
@@ -247,9 +310,37 @@
             </div>
         </div>
     </div>
-
-    <!-- Course Completion Summary -->
+             <!-- Online Users -->
     <div class="card mb-4">
+        <div class="card-header  text-white">
+            <h3 class="card-title text-light mb-0"><i class="fas fa-user-clock me-2"></i> Currently Online ({{onlineUsersCount}})</h3>
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-wrap">
+                {{#onlineUsers}}
+                <div class="online-user me-4 mb-3 text-center">
+                    <div class="mb-2">{{{avatar}}}</div>
+                    <a href="{{profileurl}}" class="text-dark">
+                        {{name}} 
+                        <!-- Green dot indicating online status -->
+                        <span class="online-dot"></span>
+                    </a>
+                </div>
+                {{/onlineUsers}}
+                {{^onlineUsers}}
+                <p class="mb-0">No users currently online</p>
+                {{/onlineUsers}}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="block-regional3">
+        
+            <!-- Course Completion Summary -->
+        <div class="card mb-4">
         <div class="card-header bg-primary text-white">
             <h3 class="card-title mb-0 text-light"><i class="fas fa-book me-2"></i> Course Completion Summary</h3>
         </div>
@@ -288,7 +379,8 @@
         </div>
     </div>
 
-    <!-- Recent Activity -->
+
+            <!-- Recent Activity -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
             <h3 class="card-title mb-0 text-light"><i class="fas fa-history me-2"></i> Recent Activity</h3>
@@ -314,4 +406,12 @@
             </ul>
         </div>
     </div>
+
+
+</div>
+
+
+    
+
+    
 </div>
