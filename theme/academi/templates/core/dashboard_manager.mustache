@@ -411,7 +411,74 @@
 </div>
 
 
-    
+    <div class="card mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h3 class="card-title mb-0 text-light">
+            <i class="fas fa-file-download me-2"></i> Progress Report (Downloadable)
+        </h3>
+        <a href="{{exportUrl}}" class="btn btn-light btn-sm">
+            <i class="fas fa-download me-1"></i> Export CSV
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Region</th>
+                        <th class="text-center">Score</th>
+                      
+                        <th class="text-center">Progress</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#reportData}}
+                    <tr>
+                        <td>{{username}}</td>
+                        <td>{{coursename}}</td>
+                        <td>{{region}}</td>
+                        <td class="text-center">{{score}}</td>
+                        
+                        <td>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar 
+                                    {{#progress}} {{#ge}}70{{/ge}}bg-success{{/progress}}
+                                    {{#progress}} {{#lt}}70{{/lt}}{{#ge}}40{{/ge}}bg-warning{{/progress}}
+                                    {{#progress}} {{#lt}}40{{/lt}}bg-danger{{/progress}}"
+                                    role="progressbar" 
+                                    style="width: {{progress}}%"
+                                    aria-valuenow="{{progress}}" 
+                                    aria-valuemin="0" 
+                                    aria-valuemax="100">
+                                    {{progress}}%
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge 
+                                {{#status}} {{#eq}}Completed{{/eq}}bg-success{{/status}}
+                                {{#status}} {{#eq}}In Progress{{/eq}}bg-warning{{/status}}
+                                {{#status}} {{#eq}}Not Started{{/eq}}bg-secondary{{/status}} p-2">
+                                {{status}}
+                            </span>
+                        </td>
+                    </tr>
+                    {{/reportData}}
+                    {{^reportData}}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <i class="fas fa-info-circle me-2"></i> No report data available
+                        </td>
+                    </tr>
+                    {{/reportData}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
     
 </div>

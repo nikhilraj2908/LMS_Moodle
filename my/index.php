@@ -1375,35 +1375,65 @@ $templatecontext['onlineUsers']      = $onlineUsersData;
 $templatecontext['onlineUsersCount'] = count($onlineUsersData);
     // 3. Progress Report downlodable
     $regionId = optional_param('regionid', 0, PARAM_INT); // Region ID from the filter
+  // 3. Progress Report (Downloadable) - CORRECTED QUERY
+   $sql = "
+        SELECT 
+            CONCAT(u.id, '-', c.id) AS uniqueid,
+            u.id AS userid,
+            CONCAT(u.firstname, ' ', u.lastname) AS username,
+            c.fullname AS coursename,
+            cat.name AS region,
+            ROUND(gg.finalgrade, 0) AS score,
+            ROUND((gg.finalgrade / NULLIF(gi.grademax, 0)) * 5) AS rating,
+            ROUND(
+                (SELECT COUNT(*)
+                 FROM {course_modules_completion} cmc
+                 JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
+                 WHERE cm.course = c.id AND cmc.userid = u.id AND cmc.completionstate = 1) 
+                / 
+                NULLIF(
+                    (SELECT COUNT(*) 
+                     FROM {course_modules} cm 
+                     WHERE cm.course = c.id AND cm.completion > 0),
+                    0
+                ) * 100
+            ) AS progress,
+            CASE
+                WHEN cc.timecompleted IS NOT NULL THEN 'Completed'
+                WHEN cc.timecompleted IS NULL AND gg.finalgrade IS NOT NULL THEN 'In Progress'
+                ELSE 'Not Started'
+            END AS status
+        FROM {user} u
+        JOIN {user_enrolments} ue ON ue.userid = u.id
+        JOIN {enrol} e ON e.id = ue.enrolid
+        JOIN {course} c ON c.id = e.courseid
+        JOIN {course_categories} cat ON c.category = cat.id
+        LEFT JOIN {grade_items} gi ON gi.courseid = c.id AND gi.itemtype = 'course'
+        LEFT JOIN {grade_grades} gg ON gg.itemid = gi.id AND gg.userid = u.id
+        LEFT JOIN {course_completions} cc ON cc.course = c.id AND cc.userid = u.id
+        WHERE c.visible = 1
+        AND cat.id = :regionid
+        ORDER BY username, coursename
+    ";
+    $reportData = $DB->get_records_sql($sql, ['regionid' => $regioncategory]);
+    
+    // Process report data
+    $processedData = [];
+    foreach ($reportData as $record) {
+        $processedData[] = [
+            'username' => $record->username,
+            'coursename' => $record->coursename,
+            'region' => $record->region,
+            'score' => $record->score ?: 0,
+            'rating' => min(5, max(0, $record->rating ?: 0)),
+            'progress' => $record->progress ?: 0,
+            'status' => $record->status
+        ];
+    }
 
-$sql = "
-    SELECT u.id AS userid,
-           CONCAT(u.firstname, ' ', u.lastname) AS username,
-           c.fullname AS course_name,
-           cat.name AS region,
-           gg.finalgrade AS score,
-           gi.gradepass AS rating,
-           ROUND((gg.finalgrade / gi.gradepass) * 100) AS progress,
-           CASE 
-               WHEN gg.finalgrade < gi.gradepass THEN 'In Progress'
-               WHEN gg.finalgrade = gi.gradepass THEN 'Needs Review'
-               ELSE 'Completed'
-           END AS status
-    FROM mdl_user u
-    JOIN mdl_user_enrolments ue ON ue.userid = u.id
-    JOIN mdl_enrol e ON e.id = ue.enrolid
-    JOIN mdl_course c ON c.id = e.courseid
-    JOIN mdl_course_categories cat ON c.category = cat.id
-    LEFT JOIN mdl_grade_items gi ON gi.courseid = c.id
-    LEFT JOIN mdl_grade_grades gg ON gg.itemid = gi.id AND gg.userid = u.id
-    WHERE cat.id = :regionid
-    ORDER BY u.lastname, u.firstname
-";
-
-$params = ['regionid' => $regionId];
-
-$reportData = $DB->get_records_sql($sql, $params);
-$templatecontext['reportData'] = $reportData;
+    // Set template context for report
+    $templatecontext['reportData'] = $processedData;
+    $templatecontext['exportUrl'] = (new moodle_url('/my/export.php', ['regionid' => $regioncategory]))->out();
 
   // 3. Student Progress Report
 $userfieldssql = \core_user\fields::for_name()->get_sql('u', false, '', 'userid', false);
