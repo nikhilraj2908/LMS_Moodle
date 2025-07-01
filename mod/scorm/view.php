@@ -174,6 +174,90 @@ if ($available && empty($launch)) {
 }
 
 echo $OUTPUT->box($attemptstatus);
+$attempt = scorm_get_last_attempt($scorm->id, $USER->id);
+$trackdata = scorm_get_tracks($scorm->id, $USER->id, $attempt);
+
+// fallback
+$completion = 'incomplete';
+$success = 'unknown';
+$score = '0';
+$time = '0s';
+
+// check SCORM tracking
+if (!empty($trackdata)) {
+    if (!empty($trackdata->completion_status)) {
+    $completion = $trackdata->completion_status;
+} elseif (!empty($trackdata->lesson_status)) {
+    $completion = $trackdata->lesson_status;
+}
+
+if (!empty($trackdata->success_status)) {
+    $success = $trackdata->success_status;
+} elseif (!empty($trackdata->lesson_status)) {
+    if ($trackdata->lesson_status === 'passed') {
+        $success = 'passed';
+    } elseif ($trackdata->lesson_status === 'failed') {
+        $success = 'failed';
+    }
+}
+
+
+    if (!empty($trackdata->score_raw)) {
+        $score = $trackdata->score_raw;
+    }
+    if (!empty($trackdata->total_time)) {
+        $time = $trackdata->total_time;
+    }
+}
+
+// fallback from module completion
+$completioninfo = new completion_info($course);
+$completionstate = $completioninfo->get_data($cm, false);
+if ($completionstate->completionstate == COMPLETION_COMPLETE) {
+    $completion = 'completed';
+}
+
+// fallback to Moodle gradebook for score if needed
+$gradeitem = grade_get_grades($course->id, 'mod', 'scorm', $scorm->id, $USER->id);
+if ($gradeitem && !empty($gradeitem->items[0]->grades)) {
+    $usergrade = reset($gradeitem->items[0]->grades);
+    if (isset($usergrade->grade)) {
+        $score = round($usergrade->grade, 2);
+    }
+}
+
+
+// show status in Bootstrap cards
+echo '<div class="row mt-4">';
+echo '  <div class="col-md-3">';
+echo '    <div class="card p-3 text-center">';
+echo '      <h5>Completion</h5>';
+echo '      <span class="fw-bold text-' . ($completion === 'completed' ? 'success' : 'danger') . '">' . htmlspecialchars($completion) . '</span>';
+echo '    </div>';
+echo '  </div>';
+
+echo '  <div class="col-md-3">';
+echo '    <div class="card p-3 text-center">';
+echo '      <h5>Success</h5>';
+echo '      <span class="fw-bold text-' . ($success === 'passed' ? 'success' : 'danger') . '">' . htmlspecialchars($success) . '</span>';
+echo '    </div>';
+echo '  </div>';
+
+echo '  <div class="col-md-3">';
+echo '    <div class="card p-3 text-center">';
+echo '      <h5>Score</h5>';
+echo '      <span class="fw-bold text-primary">' . htmlspecialchars($score) . ' %</span>';
+echo '    </div>';
+echo '  </div>';
+
+echo '  <div class="col-md-3">';
+echo '    <div class="card p-3 text-center">';
+echo '      <h5>Total Time</h5>';
+echo '      <span class="fw-bold text-primary">' . htmlspecialchars($time) . '</span>';
+echo '    </div>';
+echo '  </div>';
+echo '</div>';
+
 
 if (!empty($forcejs)) {
     $message = $OUTPUT->box(get_string("forcejavascriptmessage", "scorm"), "forcejavascriptmessage");

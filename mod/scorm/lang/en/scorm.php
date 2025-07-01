@@ -458,3 +458,16 @@ $string['youmustselectastatus'] = 'You must select a status to require';
 
 // Deprecated since Moodle 4.3.
 $string['completionscorerequired_help'] = 'Enabling this setting will require a user to have at least the minimum score entered to be marked complete in this SCORM activity, as well as any other Activity Completion requirements.';
+
+
+
+
+$string['completion'] = 'Completion';
+$string['success'] = 'Success';
+$string['score'] = 'Score';
+$string['totaltime'] = 'Total Time';
+$string['completed'] = 'Completed';
+$string['incomplete'] = 'Incomplete';
+$string['passed'] = 'Passed';
+$string['failed'] = 'Failed';
+$string['unknown'] = 'Unknown';
