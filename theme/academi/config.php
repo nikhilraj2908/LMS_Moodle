@@ -66,6 +66,7 @@ $THEME->blockrtlmanipulations = [
     'side-post' => 'side-pre',
 ];
 
+$THEME->javascripts_footer[] = 'autodescription';
 $THEME->javascripts_footer[] = 'search';
 
 

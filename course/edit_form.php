@@ -213,9 +213,11 @@ class course_edit_form extends moodleform {
         $mform->setType('summary_editor', PARAM_RAW);
         
         // Ensure summary is empty for a new course
-        if (empty($course->id)) { 
-            $mform->setDefault('summary_editor', ['text' => '']); // Clears summary field
-        }
+       if (empty($course->id)) {
+    // For new course, force the summary editor to be empty
+    $mform->setDefault('summary_editor', ['text' => '', 'format' => FORMAT_HTML]);
+}
+
         
 
         $mform->addHelpButton('summary_editor', 'coursesummary');
@@ -596,55 +598,55 @@ class course_edit_form extends moodleform {
         return $this->context;
     }
 }
-$PAGE->requires->js_init_code("document.addEventListener('DOMContentLoaded', function () {
-    const titleField = document.getElementById('id_fullname'); 
-    const summaryField = document.getElementById('id_summary_editor'); 
+// $PAGE->requires->js_init_code("document.addEventListener('DOMContentLoaded', function () {
+//     const titleField = document.getElementById('id_fullname'); 
+//     const summaryField = document.getElementById('id_summary_editor'); 
 
-    if (!titleField || !summaryField) return;
+//     if (!titleField || !summaryField) return;
 
-    // Check if it's a new course by checking the title field
-    titleField.addEventListener('focus', function () {
-        if (!titleField.value.trim()) { 
-            if (typeof tinymce !== 'undefined') {
-                tinymce.get('id_summary_editor').setContent('');
-            } else {
-                summaryField.value = '';
-            }
-        }
-    });
+//     // Check if it's a new course by checking the title field
+//     titleField.addEventListener('focus', function () {
+//         if (!titleField.value.trim()) { 
+//             if (typeof tinymce !== 'undefined') {
+//                 tinymce.get('id_summary_editor').setContent('');
+//             } else {
+//                 summaryField.value = '';
+//             }
+//         }
+//     });
 
-    titleField.addEventListener('blur', function () {
-        let title = titleField.value.trim();
-        if (title.length > 3) {
-            fetchSummary(title);
-        }
-    });
+//     titleField.addEventListener('blur', function () {
+//         let title = titleField.value.trim();
+//         if (title.length > 3) {
+//             fetchSummary(title);
+//         }
+//     });
 
-    function fetchSummary(title) {
-        fetch(M.cfg.wwwroot + '/local/ai_blog/gemini_summary.php?title=' + encodeURIComponent(title))
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Server error: ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.error) {
-                    console.error('API Error:', data.error);
-                    alert('Error: ' + data.error);
-                } else {
-                    if (typeof tinymce !== 'undefined') {
-                        tinymce.get('id_summary_editor').setContent(data.summary);
-                    } else {
-                        summaryField.value = data.summary;
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching summary:', error);
-                alert('Failed to generate summary. Check console for details.');
-            });
-    }
-});
+//     function fetchSummary(title) {
+//         fetch(M.cfg.wwwroot + '/local/ai_blog/gemini_summary.php?title=' + encodeURIComponent(title))
+//             .then(response => {
+//                 if (!response.ok) {
+//                     throw new Error('Server error: ' + response.status);
+//                 }
+//                 return response.json();
+//             })
+//             .then(data => {
+//                 if (data.error) {
+//                     console.error('API Error:', data.error);
+//                     alert('Error: ' + data.error);
+//                 } else {
+//                     if (typeof tinymce !== 'undefined') {
+//                         tinymce.get('id_summary_editor').setContent(data.summary);
+//                     } else {
+//                         summaryField.value = data.summary;
+//                     }
+//                 }
+//             })
+//             .catch(error => {
+//                 console.error('Error fetching summary:', error);
+//                 alert('Failed to generate summary. Check console for details.');
+//             });
+//     }
+// });
 
-");
+// ");
