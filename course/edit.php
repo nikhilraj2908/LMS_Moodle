@@ -243,37 +243,7 @@ echo $OUTPUT->heading($pagedesc);
 
 $editform->display();
 
-echo '<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const titleInput = document.getElementById("id_fullname");
-    if (!titleInput) return;
 
-    titleInput.addEventListener("blur", async function () {
-        const title = titleInput.value.trim();
-        if (title.length < 3) return;
-
-        const editor = tinyMCE.get("id_summary_editor");
-        if (!editor) return;
-
-        editor.setContent("Generating AI summary...");
-
-        try {
-            const response = await fetch("/moodle/local/geminiapi/gemini_summary.php?title=" + encodeURIComponent(title));
-            const data = await response.json();
-
-            if (data.description) {
-                editor.setContent(data.description);
-            } else {
-                editor.setContent("Could not generate summary.");
-                console.error(data.error || "Unknown error");
-            }
-        } catch (e) {
-            editor.setContent("Error generating summary.");
-            console.error("Fetch error:", e);
-        }
-    });
-});
-</script>';
 
 
 
