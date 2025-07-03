@@ -1,4 +1,10 @@
 <?php
+
+
+// If guest user, redirect to guestcourses page
+if (isguestuser()) {
+    redirect(new moodle_url('/local/guestlogin/guestcourses.php'));
+}
 defined('MOODLE_INTERNAL') || die();
 
 // Load necessary files and Moodle's global context

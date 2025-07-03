@@ -1,4 +1,6 @@
 {{> theme_boost/head }}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <style>
    .container-main {
@@ -230,6 +232,7 @@
   </div>
 
   <button type="submit" class="signup-btn">Sign up</button>
+
 </form>
 
 
@@ -243,9 +246,47 @@
                     </div>
                     <div class="line"></div>
                 </div>
+               <button onclick='loginguestclick()' class="btn btn-outline-primary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#guestLoginModal">
+                    {{#str}} loginguest, theme_academi {{/str}}
+                </button>
             </div>
         </div>
     </div>
+
+    <!--  modal for guest registration -->
+ <div class="modal fade" id="guestLoginModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+           <div class="modal-header">
+                <h5 class="modal-title">{{#str}} guestlogin, theme_academi {{/str}}</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <span>&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="guest-email-section">
+                    <div class="form-group">
+                        <label for="guestemail">{{#str}} enteremail, local_guestlogin {{/str}}</label>
+                        <input type="email" class="form-control" id="guestemail" required>
+                    </div>
+                    <button type="button" id="getGuestOtp" class="btn btn-primary w-100">
+                        {{#str}} getotp, local_guestlogin {{/str}}
+                    </button>
+                    <div id="guestEmailMessage" class="mt-2 text-danger"></div>
+                </div>
+                <div id="guest-otp-section" style="display:none;">
+                    <div class="form-group">
+                        <label for="guestotp">{{#str}} enterotp, local_guestlogin {{/str}}</label>
+                        <input type="text" class="form-control" id="guestotp" maxlength="6" required>
+                    </div>
+                    <button type="button" id="verifyGuestOtp" class="btn btn-success w-100">
+                        {{#str}} verifyotp, local_guestlogin {{/str}}
+                    </button>
+                    <div id="guestOtpMessage" class="mt-2 text-danger"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -254,5 +295,76 @@
                 document.querySelector(".signup-btn").disabled = true;
             });
         });
+        function loginguestclick(){
+            console.log("login as guest clicked")
+        }
+
+    document.addEventListener("DOMContentLoaded", function() {
+    const guestModal = $('#guestLoginModal');
+    
+    // Open modal when "Login as Guest" is clicked
+    $('[data-bs-target="#guestLoginModal"]').click(function() {
+        guestModal.modal('show');
+    });
+    
+    // Get OTP button handler
+    $('#getGuestOtp').click(function() {
+           console.log("Get OTP clicked")
+        const email = $('#guestemail').val().trim();
+        if (!validateEmail(email)) {
+            $('#guestEmailMessage').text('Please enter a valid email address');
+            return;
+        }
+        const url="{{config.wwwroot}}/local/guestlogin/send_otp.php";
+        console.log("OTP URL is", url);
+      fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email })
+})
+.then(res => res.json())
+.then(data => {
+    console.log("Fetch response:", data);
+    if (data.success) {
+        $('#guest-email-section').hide();
+        $('#guest-otp-section').show();
+        $('#guestEmailMessage').text('');
+        
+    } else {
+        $('#guestEmailMessage').text(data.message);
+    }
+})
+.catch(error => {
+    console.error("Fetch failed:", error);
+});
+});
+    
+    // Verify OTP button handler
+    $('#verifyGuestOtp').click(function() {
+        const email = $('#guestemail').val().trim();
+        const otp = $('#guestotp').val().trim();
+        
+        fetch("{{config.wwwroot}}/local/guestlogin/verify_otp.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, otp })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = data.redirect;
+            } else {
+                $('#guestOtpMessage').text(data.message);
+            }
+        });
+    });
+    
+    // Email validation helper
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+});
+
     </script>
 </body>

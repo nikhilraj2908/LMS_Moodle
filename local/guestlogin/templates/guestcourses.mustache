@@ -1,0 +1,25 @@
+<div class="container mt-4">
+
+
+  <div class="row">
+    {{#courses}}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow rounded-3 border-0">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title text-primary">{{fullname}}</h5>
+            <p class="card-text small text-muted">{{{summary}}}</p>
+            <a href="{{wwwroot}}/course/view.php?id={{id}}" class="btn btn-outline-primary mt-auto">
+              View Course
+            </a>
+          </div>
+        </div>
+      </div>
+    {{/courses}}
+  </div>
+</div>
+  
+  <div class="my-4 w-100 text-center">
+    <a href="{{config.wwwroot}}/login/index.php" class="btn btn-secondary">
+      Back to Login
+    </a>
+  </div>

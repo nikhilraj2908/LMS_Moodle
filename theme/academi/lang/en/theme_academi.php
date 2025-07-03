@@ -263,3 +263,7 @@ $string['topRight'] = 'TopRight';
 $string['url'] = 'URL';
 $string['urldesc'] = 'Enter the URL to set the link for the title of this site feature {$a->block}';
 $string['viewallcourses'] = 'View all courses';
+
+
+$string['loginguest'] = 'Login as Guest';
+$string['guestlogin'] = 'Guest Login';

@@ -22,6 +22,10 @@
  */
 
 require_once(__DIR__ . '/../config.php');
+if (isguestuser()) {
+    // Redirect guests to a safe landing page, like the guestcourses page
+    redirect(new moodle_url('/local/guestlogin/guestcourses.php'));
+}
 require_once($CFG->dirroot . '/my/lib.php');
 
 redirect_if_major_upgrade_required();
