@@ -191,6 +191,22 @@
 .header-main .navbar.navbar-light .primary-navigation .navigation .nav-link:hover {
 
 }
+/* show next to More only on small screens */
+.mobile-inline {
+  display: block;
+}
+@media (min-width: 768px) {
+  .mobile-inline {
+    display: none;
+  }
+  
+}
+@media (max-width:767px){
+     .header-main .search-input-wrapper {
+  display:none;
+  }
+}
+
 </style>
 
 
@@ -221,14 +237,21 @@
                     <div id="search-results-container" class="search-results"></div>
                 </div>
 
+{{#primarymoremenu}}
+  <div class="primary-navigation d-flex align-items-center">
 
-                {{#primarymoremenu}}
-              
-                    <div class="primary-navigation">
-                        {{> core/moremenu}}
-                    </div>
-                    
-                {{/primarymoremenu}}
+    {{> core/moremenu}}
+
+    {{^isloginpage}}
+      {{#usermenu}}
+        <div class="usermenu-container mobile-inline ms-2" data-region="usermenu">
+          {{> core/user_menu}}
+        </div>
+      {{/usermenu}}
+    {{/isloginpage}}
+
+  </div>
+{{/primarymoremenu}}
 
                 <ul class="navbar-nav d-none d-md-flex my-1 px-1">
                     <!-- page_heading_menu -->
