@@ -1229,7 +1229,51 @@
 .badge-show {
   animation: badgePop 0.8s ease-out forwards;
 }
+/* ===== ANIMATION CLASSES ===== */
+    /* Initial hidden state */
+    .animated-element {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
 
+    /* Slide in from left */
+    .slide-in-left {
+        transform: translateX(-100px);
+    }
+
+    /* Slide in from right */
+    .slide-in-right {
+        transform: translateX(100px);
+    }
+
+    /* Slide in from bottom */
+    .slide-in-bottom {
+        transform: translateY(100px);
+    }
+
+    /* Final visible state */
+    .animate-visible {
+        opacity: 1;
+        transform: translate(0, 0) !important;
+    }
+
+    /* ===== ANIMATION DELAYS ===== */
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+    .delay-5 { transition-delay: 0.5s; }
+    .delay-6 { transition-delay: 0.6s; }
+
+/* Add this to your CSS */
+html {
+    scroll-behavior: smooth;
+}
+
+.animated-element {
+    will-change: transform, opacity; /* Optimize for animation */
+}
          
     </style>
 </head>
@@ -1252,7 +1296,7 @@
 
 
       <!-- 1) Streak Card -->
-      <div class="learning-card" style="width:25%;">
+      <div class="learning-card animated-element slide-in-left delay-1" style="width:25%;">
         <div class="decoration decoration-1"></div>
         <div class="decoration decoration-2"></div>
         <div class="card-header">
@@ -1363,7 +1407,7 @@
         </div>
       </div>
       <!-- 2) Continue Learning Card -->
-      <div class="card-equal learning-card" style="width:25%;">
+      <div class="card-equal learning-card animated-element slide-in-left delay-1" style="width:25%;">
         <div class="decoration decoration-1"></div>
         <div class="decoration decoration-2"></div>
         <div class="card-header">
@@ -1420,7 +1464,7 @@
       <!-- /.Continue Learning Card -->
 
       <!-- 3) Recent Enrollments Card -->
-      <div class="card-equal learning-card " style="width:25%;">
+      <div class="card-equal learning-card animated-element slide-in-right delay-1" style="width:25%;">
         <div class="decoration decoration-1"></div>
         <div class="decoration decoration-2"></div>
         <div class="card-header">
@@ -1501,7 +1545,7 @@
       <!-- /.Recent Enrollments Card -->
 
       <!-- 4) Learning Path Card -->
-      <div class="card-equal learning-card" style="width:23%;">
+      <div class="card-equal learning-card animated-element slide-in-right delay-1" style="width:23%;">
         <div class="decoration decoration-1"></div>
         <div class="decoration decoration-2"></div>
         <div class="card-header">
@@ -1549,10 +1593,10 @@
 
 
     <!-- Second Row: Hours Activity, Earned Points, Course Enrolled -->
-    <div class="d-flex justify-content-between top-row mb-4">
+    <div class="d-flex justify-content-between top-row mb-4  ">
       <!-- Hours Activity -->
       <div class="dashboard-card flex-grow-1 margin-left: 15px;" style=" margin-left: 30px;>
-                    <h2>Hours <span class=" img-heading">Activity</span></h2>
+                    <h2>Hours <span class="img-heading">Activity</span></h2>
         <div class="hours-activity-section d-flex justify-content-around align-items-center">
           <div class="hours-activity-chart">
             <div class="hours-activity-header">
@@ -1620,6 +1664,29 @@
     <script>
 
         document.addEventListener('DOMContentLoaded', function () {
+
+
+
+             const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-visible');
+                        // Unobserve after animation to prevent re-triggering
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1, // Trigger when 10% visible
+                rootMargin: '0px 0px -100px 0px' // Trigger a bit early
+            });
+
+            // Observe all animated elements
+            document.querySelectorAll('.animated-element').forEach(el => {
+                observer.observe(el);
+            });
+
+
+
             // Read dynamic values from placeholders (replace these with actual data injection if needed)
             const learningPathPercentage = parseFloat('{{learningPathPercentage}}') || 0;
             const remainingCourses = parseInt('{{totalOverdue}}') || 0;
