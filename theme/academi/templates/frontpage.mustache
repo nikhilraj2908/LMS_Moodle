@@ -40,7 +40,7 @@
     border: 2px solid #204070;
     border-radius: 15px;
     position: absolute;
-    top: 45%;
+    top: 20%;
     left: 3%;
     transform: translateY(-50%);
     max-width: 50%; 
@@ -1262,8 +1262,51 @@ body, #page-wrapper {
   }
 }
 
+/* ===== ANIMATION CLASSES ===== */
+    /* Initial hidden state */
+    .animated-element {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
 
+    /* Slide in from left */
+    .slide-in-left {
+        transform: translateX(-100px);
+    }
 
+    /* Slide in from right */
+    .slide-in-right {
+        transform: translateX(100px);
+    }
+
+    /* Slide in from bottom */
+    .slide-in-bottom {
+        transform: translateY(100px);
+    }
+
+    /* Final visible state */
+    .animate-visible {
+        opacity: 1;
+        transform: translate(0, 0) !important;
+    }
+
+    /* ===== ANIMATION DELAYS ===== */
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+    .delay-5 { transition-delay: 0.5s; }
+    .delay-6 { transition-delay: 0.6s; }
+
+/* Add this to your CSS */
+html {
+    scroll-behavior: smooth;
+}
+
+.animated-element {
+    will-change: transform, opacity; /* Optimize for animation */
+}
     </style>
 </head>
 
@@ -1321,7 +1364,7 @@ body, #page-wrapper {
                 {{/banners}}
             </div>
 
-            <div class="carousel-overlay-box">
+            <div class="carousel-overlay-box animated-element slide-in-left delay-1">
     <h2>Transform your <br>  <span style="color: #003366; font-weight: 750; font-size: 50px;">Learning Journey</span> <br> With <span style="color: #003366; font-weight: 700;">ALOGICDATA</span></h2>
     <p>Bringing Education to Your Fingertips</p>
     <div>
@@ -1351,7 +1394,7 @@ body, #page-wrapper {
 
         <!-- Course Cards Overlay -->
    <!-- Course Cards Section -->
-<div class="course-cards-overlay">
+<div class="course-cards-overlay animated-element slide-in-bottom delay-2">
     <div class="carousel-course-btn">
         <button class="active" data-type="new">New</button>
         <button data-type="continue">Continue Learning</button>
@@ -1364,7 +1407,7 @@ body, #page-wrapper {
     </div>
 </div>
 
-                <div class="section-top-performers">
+                <div class="section-top-performers animated-element slide-in-right delay-3">
     <div class="top-performer d-flex justify-content-center">
                             <h2  class="top-performer-heading">
                                 Our Top <span style="color:#204070;">Performers</span> <span style="color: gold;">⭐</span>
@@ -1403,7 +1446,7 @@ body, #page-wrapper {
     <div class="container my-5">
  <div class=" align-items-start newsletter-wrapper">
   <!-- Left Side: Subscribe Box -->
-  <div class="col-md-5 col-12">
+  <div class="col-md-5 col-12 animated-element slide-in-left delay-1">
     <div class="newsletter-box text-center p-4 rounded-4 shadow">
       <div class="bg-texture rounded-4"></div>
       <div class="position-relative z-2">
@@ -1432,7 +1475,7 @@ body, #page-wrapper {
   </div>
 
   <!-- Right Side: Forum Newsletter Items -->
-  <div class="col-md-7 col-12">
+  <div class="col-md-7 col-12  animated-element slide-in-right delay-1">
     <div class="newsletter-posts px-2">
       {{{newsitems_html}}}
     </div>
@@ -1565,6 +1608,23 @@ body, #page-wrapper {
 
 const MOODLE_WWWROOT = '{{config.wwwroot}}';
     document.addEventListener('DOMContentLoaded', function() {
+   const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-visible');
+                        // Unobserve after animation to prevent re-triggering
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1, // Trigger when 10% visible
+                rootMargin: '0px 0px -100px 0px' // Trigger a bit early
+            });
+
+            // Observe all animated elements
+            document.querySelectorAll('.animated-element').forEach(el => {
+                observer.observe(el);
+            });
 
     // Function to render courses
     function renderCourses(courses) {
