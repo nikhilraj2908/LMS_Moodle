@@ -176,6 +176,7 @@ body#page-course-view-remuiformat {
                 display: flex;
                 align-items: center;
                 gap: $gap-24 $gap-40;
+                z-index: 9999;
 
                 @media (max-width:1200px) {
                     flex-direction: column;

@@ -1,71 +1,75 @@
-<div class="rmuiformate-header-wrapper d-none ">
-    <header id="page-header" class=" d-print-none hasbackground design-1 position-relative "
-        style="background:  url('{{headercourseimage}}');background-position: {{remuiheaderimagebgposition}}; background-size:{{remuiheaderimagebgsize}};background-repeat: no-repeat;">
-           <div class = "position-absolute w-100 h-100" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0.0)  -24.52%, #000000 97.67%);left:0%;bottom:0%; opacity:{{{overlayopacity}}};border-radius:inherit;"> </div>
+<div class="rmuiformate-header-wrapper d-none">
+    <header id="page-header" class="d-print-none hasbackground design-1 position-relative"
+        style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url('{{headercourseimage}}');background-position: {{remuiheaderimagebgposition}}; background-size:{{remuiheaderimagebgsize}};background-repeat: no-repeat;">
+   
        <div class="align-self-end" style="z-index:1;">
         {{{turneditingonswitch}}}
        </div>
-        <div class="w-100 header-wrapper " style="z-index:1;">
+        <div class="w-100 header-wrapper" style="z-index:1;">
             <div class="d-flex flex-wrap w-100">
                 <div class="d-flex align-items-center w-100">
                     <div class="dashboard-bar-wrapper w-100">
                         <div class="header-main-section">
                             <div class="category">
-                                <span class="badge ">
+                                <span class="badge modern-badge" style="border-radius: 0px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px">
                                     {{{coursecategoryname}}}
                                 </span>
                             </div>
-                            <div class="page-context-header p-0 m-0">
-                                <div class="page-header-headings p-0">
-                                    <h1 class="h2 header-heading coursepage design-1 m-0">{{{coursefullname}}}</h1>
-                                </div>
-                            </div>
                         </div>
 
-
-
-
-                        
-                           <div class="rating-instructor-wrapper">
-                                {{#rnrdesign}}
-                                <div class="edw-ratings-wrapper">
-                                    {{{rnrdesign}}}
-                                </div>
-                                {{/rnrdesign}}
+                        <div class="d-flex align-items-start justify-content-between mt-3" style="gap: 2rem;">
+                            <!-- Left Card (35%) - Profile + Course + Ratings -->
+                            <div class="glassmorphism-box combined-box" style="width:35%;">
                                 {{#teachers}}
                                 <div class="instructor-info stat-container position-relative">
                                     {{#instructors}}
-                                    <div class="position-relative">
-                                        <a class="view-user-profile-link" href="{{teacherprofileurl}}" class="" title="{{name}}"></a>
-                                        {{{avatars}}}
-                                        <span class="titles ">{{name}}</span>
+                                    <div class="position-relative modern-instructor">
+                                        <a class="view-user-profile-link" href="{{teacherprofileurl}}" title="{{name}}">
+                                            {{{avatars}}}
+                                        </a>
+                                        <span class="titles modern-title">{{name}}</span>
                                     </div>
                                     {{/instructors}}
+                                    
+                                    <div class="page-context-header p-0 m-0">
+                                        <div class="page-header-headings p-0">
+                                            <h1 class="h2 header-heading coursepage design-1 modern-course-title">{{{coursefullname}}}</h1>
+                                        </div>
+                                    </div>
+                                    
                                     {{#teachercount}}
-                                        <a class="view-all-instructorslink" href="{{participantspageurl}}" class="">view all</a>
+                                        <a class="view-all-instructorslink modern-view-all" href="{{participantspageurl}}">view all</a>
                                     {{/teachercount}}
                                 </div>
                                 {{/teachers}}
+                                
+                                <!-- Rating Component - Now properly included 
+                                <div class="rating-component-wrapper mt-9">
+                                    {{#rnrdesign}}
+                                    <div class="edw-ratings-wrapper">
+                                        {{{rnrdesign}}}
+                                    </div>
+                                    {{/rnrdesign}}
+                                </div>
+                                -->
                             </div>
 
-
-                            
-                        <div class="header-sub-section">
-                         
+                            <!-- Right Card - Progress + Resume -->
                             {{#coursecompletionstatus}}
-                            <div class="progress-resume-wrapper">
+                            <div class="glassmorphism-box modern-progress" style="flex:1; max-width: 300px; height:10%;">
                                 <div class="progressbar-text-wrapper">
-                                    <div class="progress progress-rounded">
+                                    <div class="progress progress-rounded modern-progress-bar">
                                         <div class="progress-bar bg-green-600"
-                                            style="width: {{{percentage}}}%; height: 100%;" role="progressbar">
+                                            style="width: {{{percentage}}}%; height: 100%; z-index: 100;" role="progressbar">
                                             <span class="sr-only">{{{percentage}}}% {{#str}} Complete, format_remuiformat {{/str}}</span>
                                         </div>
                                     </div>
-                                    <span>{{{percentage}}}% {{#str}} Complete, format_remuiformat {{/str}}</span>
+                                    <span class="progress-text">{{{percentage}}}% {{#str}} Complete, format_remuiformat {{/str}}</span>
                                 </div>
                                 {{#resumeactivityurl}}
-                                <a class="btn btn-primary btn-block bold" href="{{{ resumeactivityurl }}}"
-                                    role="button">{{#str}} resumetoactivity, format_remuiformat{{/str}}</a>
+                                <a class="btn btn-primary btn-block bold modern-resume-btn" href="{{resumeactivityurl}}">
+                                    {{#str}} resumetoactivity, format_remuiformat{{/str}}
+                                </a>
                                 {{/resumeactivityurl}}
                             </div>
                             {{/coursecompletionstatus}}
@@ -73,24 +77,186 @@
                     </div>
                 </div>
             </div>
+        </div>
     </header>
 </div>
 
 <style>
-
- .tool_courserating-widget{
-    z-index: -0 ! important;
-
+/* Modern Base Styles */
+#page-header {
+    min-height: 380px;
+    padding-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: relative;
 }
-.titles {
-        font-size: 30px;
+
+/* Combined Glass Box */
+.combined-box {
+    padding: 1.5rem;
+}
+
+
+
+/* Category Badge */
+.modern-badge {
+    background: rgba(255,255,255,0.9);
+    color: #2d2d2d;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 1rem 5rem;
+ 
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.text_to_html{
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+
+
+
+/* Course Title */
+.modern-course-title {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: rem 0 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     color: white;
-    box-shadow: 1px 2px 2px 2px bla
 }
 
+/* Instructor Section */
+.modern-instructor {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+}
 
+.modern-instructor img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    transition: all 0.3s ease;
+}
 
- </style>
+.modern-instructor img:hover {
+    transform: scale(1.05);
+    border-color: rgba(255,255,255,0.6);
+}
+
+.modern-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: white;
+}
+
+.modern-view-all {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(255,255,255,0.15);
+    border-radius: 16px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin-top: 0.5rem;
+}
+
+.modern-view-all:hover {
+    background: rgba(255,255,255,0.25);
+}
+
+/* Rating Component */
+.rating-component-wrapper {
+    margin-top: 1rem;
+}
+.edw-ratings-wrapper {
+    padding: 10rem 0;
+}
+
+.tool_courserating-widget {
+  position: absolute;
+  top: 270px;
+  left:100px;  
+
+}
+
+.tool_courserating-addrating{
+    color:white;
+}
+
+/* Progress Card */
+.modern-progress {
+    padding: 1.5rem;
+   
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.modern-progress-bar {
+    height: 12px;
+    background: rgba(255,255,255,0.2);
+
+}
+
+.progress-text {
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: white;
+}
+
+.modern-resume-btn {
+    border-radius: 8px;
+    padding: 0.6rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+}
+
+.modern-resume-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Enhanced Glassmorphism */
+.glassmorphism-box {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    height: 28vh;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .d-flex.align-items-start {
+        flex-direction: column;
+        gap: 1rem !important;
+    }
+    
+    .combined-box, .modern-progress {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    .modern-course-title {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
 {{#courseheaderdesign}}
 {{#js}}
 require(['format_remuiformat/headerreplaces'], function(HEADERREPLACE) {
