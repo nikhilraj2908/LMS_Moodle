@@ -391,7 +391,7 @@
     .scrollable-card {
         display: flex;
         flex-direction: column;
-        height: 100%;
+       
     }
     
     .scrollable-card .card-body {
@@ -512,9 +512,9 @@
     </div>
 
     <!-- Main Dashboard Grid -->
-    <div class="block-regional2">
+    <div class="block-regional2 ">
         <!-- Student Progress Report -->
-        <div class="card">
+        <div class="card scrollable-card  ">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-user-graduate me-2"></i> Student Progress Report</h3>
             </div>
@@ -601,7 +601,7 @@
         <div class="card-header bg-primary text-white">
             <h3 class="card-title mb-0 text-light"><i class="fas fa-book me-2  text-white"></i> Course Completion Summary</h3>
         </div>
-        <div class="card-body">
+        <div class="card-body p-3">
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead class="table-light">
@@ -664,7 +664,7 @@
 </div>
 
     <!-- Progress Report -->
-    <div class="card export-card">
+    <div class="card export-card scrollable-card">
         <div class="card-header d-flex justify-content-between align-items-center mt-50px">
             <h3 class="card-title"><i class="fas fa-file-download me-2"></i> Progress Report</h3>
             <a href="{{exportUrl}}" class="export-btn">
