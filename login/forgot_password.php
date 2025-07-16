@@ -362,16 +362,7 @@ echo $OUTPUT->header();
             <span><i class="fa fa-phone"></i><span>Call us</span> : +91 8839833183</span>
             <span><i class="fa fa-envelope-o"></i><span>E-mail</span> : <a href="mailto:hbarsaiyan17@gmail.com">hbarsaiyan17@gmail.com</a></span>
         </nav>
-    
-    
-                    
             <div id="usernavigation" class="navbar-nav ml-auto">
-                
-                    
-    
-                
-    
-    
         <div class="d-flex align-items-stretch usermenu-container" data-region="usermenu">
     
                   
