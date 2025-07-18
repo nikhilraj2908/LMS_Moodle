@@ -39,6 +39,14 @@
         }
     }
 }}
+<script>
+    document.addEventListener('DOMContentLoaded',()=>{
+        let date= new Date()
+let year = date.getFullYear();
+document.getElementById("current-year").innerHTML=year;
+    })
+
+</script>
 {{#footersmall}}
     <footer id="page-footer" class=" footer-popover footer-dark text-light">
         <div id="footer">
@@ -51,9 +59,11 @@
     </footer>
 {{/footersmall}}
 <footer id="page-footer" class="footer-custom text-white" role="contentinfo"
-    style="background: linear-gradient(to bottom, #6FB1FC,  #ffffff); padding: 1rem; text-align: center;">
+    style="background: linear-gradient(to bottom, #d4f4ff,  #ffffff); padding: 1rem; text-align: center;">
     <div class="container">
-        <p class="mb-0">&copy; {{#config.sitename}}{{config.sitename}}{{/config.sitename}} {{currentyear}}</p>
+<p class="mb-0 text-dark">
+  &copy; All rights reserved. {{sitename}} <span id="current-year"></span>
+</p>
     </div>
 
     <!-- Keep popover and debug functionality working -->
