@@ -49,34 +49,42 @@
 }
 
 /* 2XL screens and above (1536px+) - original styling */
-@media (min-width: 1556px) {
-    .carousel-overlay-box {
-        width: 32%;
-        max-width: 50%;
-        left: 3%;
-        padding: 30px;
-    }
-}
+
 
 /* XL screens (1280px to 1535px) */
 @media (min-width: 1280px) and (max-width: 1555px) {
     .carousel-overlay-box {
-        width: 38%;
-        max-width: 35%;
-        left: 4%;
-        padding: 20px;
-        top: 40%;
+
+    background-color: #fff;
+    padding: 20px;
+    border: 2px solid #204070;
+    border-radius: 15px;
+    position: absolute;
+    top: 20%;
+    left: 4%;
+    transform: translateY(-50%);
+    max-width: 35%; 
+    width: 32%;
+    z-index: 2;
+      
     }
 }
 
 /* LG screens (1024px to 1279px) */
 @media (min-width: 1024px) and (max-width: 1279px) {
     .carousel-overlay-box {
-        width: 45%;
-        max-width: 60%;
-        left: 5%;
-        padding: 20px;
-        border-radius: 12px;
+   background-color: #fff;
+    padding: 20px;
+    border: 2px solid #204070;
+    border-radius: 12px;
+    position: absolute;
+    top: 7%;
+    left: 5%;
+    transform: translateY(-50%);
+    max-width: 60%; 
+    width: 45%;
+    z-index: 2;
+        
     }
 }
 

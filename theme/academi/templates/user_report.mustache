@@ -1,0 +1,81 @@
+<div class="admin-container">
+  <div class="dashboard-header">
+    <div class="user-info my-1">
+      <div class="d-flex">
+        <div class="avatar me-3">
+          {{{userpicture}}}
+        </div>
+        <div>
+          <h3 class="text-dark">{{user.firstname}} {{user.lastname}}</h3>
+          <small>User Course Report</small>
+        </div>
+      </div>
+    </div>
+    <div class="header-controls">
+      <div class="date-display">
+        <i class="fas fa-calendar-day"></i> {{date}}
+      </div>
+      <a href="{{{config.wwwroot}}}/my" class="btn btn-light">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <div class="admin-card">
+    <div class="card-header">
+      <h2><i class="fas fa-book"></i> Course Progress Report</h2>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Course Name</th>
+            <th>Status</th>
+            <th>Progress</th>
+            <th>Points Earned</th>
+            <th>Max Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#coursedetails}}
+          <tr>
+            <td>{{coursename}}</td>
+            <td>
+              {{#completion_status}}<span class="badge 
+                {{#completion_status}}badge-{{completion_status}}{{/completion_status}}
+                {{completion_status}}">
+                {{completion_status}}
+              </span>{{/completion_status}}
+            </td>
+            <td>
+              <div class="progress" style="height: 20px;">
+                <div class="progress-bar" role="progressbar" 
+                     style="width: {{progress_percent}}%;" 
+                     aria-valuenow="{{progress_percent}}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                  {{progress_percent}}%
+                </div>
+              </div>
+            </td>
+            <td>{{points_earned}}</td>
+            <td>{{max_points}}</td>
+          </tr>
+          {{/coursedetails}}
+          {{^coursedetails}}
+          <tr>
+            <td colspan="5" class="text-center py-4">No courses found for this user</td>
+          </tr>
+          {{/coursedetails}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<style>
+  .badge-Completed { background-color: #28a745; }
+  .badge-In-Progress { background-color: #ffc107; color: #000; }
+  .badge-Not-Started { background-color: #6c757d; }
+</style>

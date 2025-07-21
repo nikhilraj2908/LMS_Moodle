@@ -513,6 +513,49 @@
     </div>
   </div>
 </div>
+
+<!-- Add this after the "System Logs" card -->
+<div class="admin-card mt-4">
+  <div class="card-header">
+    <h2><i class="fas fa-users"></i> User Summary</h2>
+  </div>
+  
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Total Courses</th>
+          <th>Completed</th>
+          <th>In Progress</th>
+          <th>Points</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#userSummaries}}
+        <tr>
+          <td>{{firstname}} {{lastname}}</td>
+          <td>{{email}}</td>
+          <td>{{total_courses}}</td>
+          <td>{{completed_courses}}</td>
+          <td>{{inprogress_courses}}</td>
+          <td>{{total_points_earned}} / {{max_total_points}}</td>
+          <td>
+            <a href="{{config.wwwroot}}/my/user_report.php?id={{id}}" class="btn btn-sm btn-primary">
+              <i class="fas fa-eye"></i> Details
+            </a>
+          </td>
+        </tr>
+        {{/userSummaries}}
+        {{^userSummaries}}
+          <tr><td colspan="7">No users found</td></tr>
+        {{/userSummaries}}
+      </tbody>
+    </table>
+  </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
@@ -732,3 +775,4 @@ if (sendMailConfirm) {
 
 
   </script>
+ 

@@ -16,6 +16,13 @@
     margin-top:20px;
 }
 
+
+.course-card .card-img-top, .theme-card .card-img-top {
+    height: 12rem !important;
+    background-position: center;
+    background-size: cover;
+}
+
 </style>
 <?php
 // Moodle My Courses Page
