@@ -139,11 +139,14 @@
 }
 
 .modern-instructor img {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.3);
-    transition: all 0.3s ease;
+    border: 3px solid white; /* Add solid border to stand out */
+    background-color: #fff; /* Optional: for fallback visibility */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    object-fit: cover; /* Prevent distortion */
+    transition: transform 0.3s ease;
 }
 
 .modern-instructor img:hover {
