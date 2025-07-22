@@ -994,45 +994,90 @@ if ($isadmin) {
     // Add this in the admin dashboard section (after online users data)
 if ($isadmin) {
     // ... existing admin dashboard code ...
+$selectedCategoryId = optional_param('categoryid', 0, PARAM_INT);
 
+// Get top-level categories and their subcategories
+$allCategories = $DB->get_records('course_categories', [], 'sortorder ASC');
+
+$categories = [];
+foreach ($allCategories as $cat) {
+    if ($cat->parent == 0) {
+        $categories[$cat->id] = [
+            'id' => $cat->id,
+            'name' => $cat->name,
+            'selected' => ($selectedCategoryId == $cat->id),
+            'subcategories' => []
+        ];
+    }
+}
+
+foreach ($allCategories as $cat) {
+    if ($cat->parent != 0 && isset($categories[$cat->parent])) {
+        $categories[$cat->parent]['subcategories'][] = [
+            'id' => $cat->id,
+            'name' => $cat->name,
+            'selected' => ($selectedCategoryId == $cat->id)
+        ];
+    }
+}
+
+$templatecontext['categories'] = array_values($categories);
+$templatecontext['selectedCategoryId'] = $selectedCategoryId;
     // NEW: Get user summaries for the admin dashboard
-    $userSummarySql = "
-        SELECT 
-            u.id,
-            u.firstname,
-            u.lastname,
-            u.email,
-            COUNT(DISTINCT c.id) AS total_courses,
-            COUNT(DISTINCT CASE 
-                WHEN cp.progress_percent = 100 THEN c.id 
-            END) AS completed_courses,
-            COUNT(DISTINCT CASE 
-                WHEN cp.progress_percent > 0 AND cp.progress_percent < 100 THEN c.id 
-            END) AS inprogress_courses,
-            ROUND(SUM(COALESCE(g.finalgrade, 0)), 0) AS total_points_earned,
-            ROUND(SUM(COALESCE(g.rawgrademax, 0)), 0) AS max_total_points
-        FROM {user} u
-        LEFT JOIN {user_enrolments} ue ON u.id = ue.userid
-        LEFT JOIN {enrol} e ON ue.enrolid = e.id
-        LEFT JOIN {course} c ON c.id = e.courseid
-        LEFT JOIN (
-            SELECT 
-                cmc.userid, 
-                cm.course,
-                (COUNT(CASE WHEN cmc.completionstate = 1 THEN 1 END) * 100.0 / COUNT(*)) AS progress_percent
-            FROM {course_modules_completion} cmc
-            JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
-            GROUP BY cmc.userid, cm.course
-        ) cp ON cp.userid = u.id AND cp.course = c.id
-        LEFT JOIN {grade_items} gi ON gi.courseid = c.id AND gi.itemtype = 'course'
-        LEFT JOIN {grade_grades} g ON g.itemid = gi.id AND g.userid = u.id
-        WHERE u.deleted = 0 AND u.suspended = 0
-        GROUP BY u.id, u.firstname, u.lastname, u.email
-        ORDER BY u.firstname
-        LIMIT 500
-    ";
+  $categoryWhere = '';
+$params = [];
 
-    $templatecontext['userSummaries'] = array_values($DB->get_records_sql($userSummarySql, []));
+if ($selectedCategoryId > 0) {
+    $categoryWhere = 'AND c.category = :categoryid';
+    $params['categoryid'] = $selectedCategoryId;
+}
+
+$sql = "
+    SELECT 
+        u.id,
+        CONCAT(u.firstname, ' ', u.lastname) AS fullname,
+        u.email,
+        COUNT(DISTINCT c.id) AS total_courses,
+        COUNT(DISTINCT CASE 
+            WHEN cp.progress_percent = 100 THEN c.id 
+        END) AS completed_courses,
+        COUNT(DISTINCT CASE 
+            WHEN cp.progress_percent > 0 AND cp.progress_percent < 100 THEN c.id 
+        END) AS inprogress_courses,
+        COUNT(DISTINCT CASE 
+            WHEN cp.progress_percent IS NULL OR cp.progress_percent = 0 THEN c.id 
+        END) AS notstarted_courses,
+        ROUND(SUM(COALESCE(g.finalgrade, 0)), 0) AS total_points_earned,
+        ROUND(SUM(COALESCE(gi.grademax, 0)), 0) AS max_total_points
+    FROM {user} u
+    LEFT JOIN {user_enrolments} ue ON u.id = ue.userid
+    LEFT JOIN {enrol} e ON ue.enrolid = e.id
+    LEFT JOIN {course} c ON c.id = e.courseid
+    LEFT JOIN (
+        SELECT 
+            cmc.userid, 
+            cm.course,
+            (COUNT(CASE WHEN cmc.completionstate = 1 THEN 1 END) * 100.0 / COUNT(*)) AS progress_percent
+        FROM {course_modules_completion} cmc
+        JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
+        GROUP BY cmc.userid, cm.course
+    ) cp ON cp.userid = u.id AND cp.course = c.id
+    LEFT JOIN {grade_items} gi ON gi.courseid = c.id AND gi.itemtype = 'course'
+    LEFT JOIN {grade_grades} g ON g.itemid = gi.id AND g.userid = u.id
+    WHERE u.deleted = 0 AND u.suspended = 0
+    $categoryWhere
+    GROUP BY u.id, u.firstname, u.lastname, u.email
+    ORDER BY u.firstname ASC
+    LIMIT 500
+";
+
+$userSummaries = $DB->get_records_sql($sql, $params);
+$templatecontext['userSummaries'] = array_values($userSummaries);
+$templatecontext['summaryExportUrl'] = (new moodle_url('/my/export.php', [
+    'categoryid' => $selectedCategoryId,
+    'type' => 'summary'
+]))->out(false);
+
 }
     // ADMIN DASHBOARD
     $templatecontext['template'] = 'theme_academi/core/dashboard_admin';

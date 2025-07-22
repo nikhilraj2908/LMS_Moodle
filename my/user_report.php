@@ -70,7 +70,8 @@ $sql = "
             SUM(max_points) AS total_possible_points
         FROM course_summary
     )
-    SELECT 
+    SELECT
+         cs.courseid, 
         cs.coursename,
         cs.completion_status,
         cs.progress_percent,
