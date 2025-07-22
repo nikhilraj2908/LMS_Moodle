@@ -133,7 +133,7 @@
 
 /* Add these new styles to your existing CSS */
   .log-table-container {
-    max-height: 400px;
+    max-height: 40vh;
     overflow-y: auto;
     margin-top: 20px;
     border: 1px solid rgba(0,0,0,0.05);
@@ -229,8 +229,15 @@
 .admin-container .admin-card:nth-of-type(2) { animation-delay: 0.2s; }
 .admin-container .admin-card:nth-of-type(3) { animation-delay: 0.3s; }
 .admin-container .admin-card:nth-of-type(4) { animation-delay: 0.4s; }
-/* add more rules if you have more cards */
 
+/* add more rules if you have more cards */
+.table-responsive{
+  height:40vh;
+}
+
+tr th{
+  align-content:center;
+}
 </style>
 
 <div class="admin-container">
@@ -291,97 +298,72 @@
   <div class="row">
     <!-- Recent Managers -->
     <div class="col-lg-8">
-      <div class="admin-card">
-        <div class="card-header">
-          <h2><i class="fas fa-user-tie"></i>Regional Managers</h2>
-        </div>
-        {{#recentRegionManagers}}
-  <div class="manager-card">
-    {{{avatarhtml}}}
-    <div class="manager-info">
-      <div class="manager-name">{{username}}</div>
-      <div class="manager-region"><i class="fas fa-map-marker-alt"></i> {{regionname}}</div>
-    </div>
-  </div>
-{{/recentRegionManagers}}
-
-        {{^recentRegionManagers}}
-          <p class="no-online"><i class="fas fa-user-slash"></i><br>No managers found.</p>
-        {{/recentRegionManagers}}
-      </div>
+      
 
       
 
-<div class="admin-card mt-4">
+<!-- Add this after the "System Logs" card -->
+<div class="admin-card ">
   <div class="card-header">
-    <h2><i class="fas fa-chart-line"></i> Region-Based User Report</h2>
+    <h2><i class="fas fa-users"></i> User Report Summary</h2>
   </div>
-
-  <!-- Region Selection -->
   <div class="d-flex gap-2 flex-wrap mb-3 align-items-center">
-    <div class="d-flex gap-2 align-items-center">
-      <label for="regionSelect" class="form-label mb-0">Select Region:</label>
-      <select id="regionSelect" class="form-select  form-select-lg p-1 ms-2" style="width: 200px;">
-    <option value="0" {{^selectedRegionId}}selected{{/selectedRegionId}}>All Regions</option>
-    {{#regions}}
+  <div class="d-flex gap-2 align-items-center">
+    <label for="categorySelect" class="form-label mb-0">Select Category:</label>
+    <select id="categorySelect" class="form-select form-select-lg p-1 ms-2" style="width: 200px;">
+      <option value="0" {{^selectedCategoryId}}selected{{/selectedCategoryId}}>All Categories</option>
+      {{#categories}}
         <option value="{{id}}" {{#selected}}selected{{/selected}}>{{name}}</option>
-        {{#subregions}}
-            <option value="{{id}}" {{#selected}}selected{{/selected}}>&nbsp;&nbsp;&nbsp;{{name}}</option>
-        {{/subregions}}
-    {{/regions}}
-</select>
-    </div>
-   <a href="{{summaryExportUrl}}" class="btn btn-sm btn-danger ms-auto">
-      <i class="fas fa-download"></i> Export Summary
-   </a>
-    <a class="btn btn-sm btn-primary " id="mailReportBtn">
-  <i class="fas fa-envelope"></i> Mail Report
-</a>
+        {{#subcategories}}
+          <option value="{{id}}" {{#selected}}selected{{/selected}}>&nbsp;&nbsp;&nbsp;{{name}}</option>
+        {{/subcategories}}
+      {{/categories}}
+    </select>
   </div>
+  <a href="{{summaryExportUrl}}" class="btn btn-sm btn-danger ms-auto">
+    <i class="fas fa-download"></i> Export Report
+  </a>
+  <a class="btn btn-sm btn-primary" id="mailReportBtn">
+    <i class="fas fa-envelope"></i> Mail Report
+  </a>
 
-  <!-- Report Table -->
-  <div class="log-table-container">
-    <table class="log-table">
+   
+</div>
+
+  <div class="table-responsive">
+    <table class="table table-striped">
       <thead>
         <tr>
-          <th>User</th>
-          <th>Course</th>
-          <th>Region</th>
-          <th>Score</th>
-       
-          <th>Progress</th>
-          <th>Status</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Total_Courses</th>
+          <th>Completed</th>
+          <th>In_Progress</th>
+          <th>Not_Started</th>
+          <th>Points</th>
+          <th>Actions</th>
         </tr>
       </thead>
-      <tbody id="reportTableBody">
-        {{#reportData}}
+      <tbody>
+        {{#userSummaries}}
         <tr>
-          <td>{{username}}</td>
-          <td>{{coursename}}</td>
-          <td>{{region}}</td>
-          <td>{{score}}%</td>
-         
+          <td>{{fullname}}</td>
+          <td>{{email}}</td>
+          <td>{{total_courses}}</td>
+          <td>{{completed_courses}}</td>
+          <td>{{inprogress_courses}}</td>
+          <td>{{notstarted_courses}}</td>
+          <td>{{total_points_earned}} / {{max_total_points}}</td>
           <td>
-            <div style="width:100px; background:#eee; border-radius:10px;">
-              <div style="width:{{progress}}%; background:#204070; height:8px; border-radius:10px;"></div>
-            </div>
-            <small>{{progress}}%</small>
-          </td>
-          <td>
-            {{#is_completed}}<span style="color:green;">Completed</span>{{/is_completed}}
-            {{#is_progress}}<span style="color:orange;">In Progress</span>{{/is_progress}}
-            {{#is_review}}<span style="color:red;">Needs Review</span>{{/is_review}}
+            <a href="{{config.wwwroot}}/my/user_report.php?id={{id}}" class="btn btn-sm btn-primary">
+              <i class="fas fa-eye"></i> Details
+            </a>
           </td>
         </tr>
-        {{/reportData}}
-
-        {{^reportData}}
-          <tr>
-            <td colspan="7" style="text-align:center; padding:20px;">
-              No users found in selected region
-            </td>
-          </tr>
-        {{/reportData}}
+        {{/userSummaries}}
+        {{^userSummaries}}
+          <tr><td colspan="7">No users found</td></tr>
+        {{/userSummaries}}
       </tbody>
     </table>
   </div>
@@ -426,7 +408,9 @@
 
     <!-- Online Users + Quick Links -->
     <div class="col-lg-4 " >
-      <div class="admin-card online-users-card">
+     
+
+      <div class="admin-card online-users-card mb-4">
         <div class="card-header">
           <h2><i class="fas fa-user-clock"></i> Online Users</h2>
           <div class="online-count">{{onlineUserCount}} Active</div>
@@ -463,6 +447,26 @@
           {{/onlineUsersData}}
         </div>
       </div>
+
+       <div class="admin-card">
+        <div class="card-header">
+          <h2><i class="fas fa-user-tie"></i>Regional Managers</h2>
+        </div>
+        {{#recentRegionManagers}}
+  <div class="manager-card">
+    {{{avatarhtml}}}
+    <div class="manager-info">
+      <div class="manager-name">{{username}}</div>
+      <div class="manager-region"><i class="fas fa-map-marker-alt"></i> {{regionname}}</div>
+    </div>
+  </div>
+{{/recentRegionManagers}}
+
+        {{^recentRegionManagers}}
+          <p class="no-online"><i class="fas fa-user-slash"></i><br>No managers found.</p>
+        {{/recentRegionManagers}}
+      </div>
+
 
       <div class="admin-card mt-4">
         <div class="card-header">
@@ -514,81 +518,18 @@
   </div>
 </div>
 
-<!-- Add this after the "System Logs" card -->
-<div class="admin-card mt-4">
-  <div class="card-header">
-    <h2><i class="fas fa-users"></i> User Summary</h2>
-  </div>
-  <div class="d-flex gap-2 flex-wrap mb-3 align-items-center">
-  <div class="d-flex gap-2 align-items-center">
-    <label for="categorySelect" class="form-label mb-0">Select Category:</label>
-    <select id="categorySelect" class="form-select form-select-lg p-1 ms-2" style="width: 200px;">
-      <option value="0" {{^selectedCategoryId}}selected{{/selectedCategoryId}}>All Categories</option>
-      {{#categories}}
-        <option value="{{id}}" {{#selected}}selected{{/selected}}>{{name}}</option>
-        {{#subcategories}}
-          <option value="{{id}}" {{#selected}}selected{{/selected}}>&nbsp;&nbsp;&nbsp;{{name}}</option>
-        {{/subcategories}}
-      {{/categories}}
-    </select>
-  </div>
-  <a href="{{summaryExportUrl}}" class="btn btn-sm btn-danger ms-auto">
-    <i class="fas fa-download"></i> Export Summary
-  </a>
-  <a class="btn btn-sm btn-primary" id="mailSummaryBtn">
-    <i class="fas fa-envelope"></i> Mail Summary
-  </a>
-
-   
-</div>
-
-  <div class="table-responsive">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Total Courses</th>
-          <th>Completed</th>
-          <th>In Progress</th>
-          <th>Not Started</th>
-          <th>Points</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{#userSummaries}}
-        <tr>
-          <td>{{fullname}}</td>
-          <td>{{email}}</td>
-          <td>{{total_courses}}</td>
-          <td>{{completed_courses}}</td>
-          <td>{{inprogress_courses}}</td>
-          <td>{{notstarted_courses}}</td>
-          <td>{{total_points_earned}} / {{max_total_points}}</td>
-          <td>
-            <a href="{{config.wwwroot}}/my/user_report.php?id={{id}}" class="btn btn-sm btn-primary">
-              <i class="fas fa-eye"></i> Details
-            </a>
-          </td>
-        </tr>
-        {{/userSummaries}}
-        {{^userSummaries}}
-          <tr><td colspan="7">No users found</td></tr>
-        {{/userSummaries}}
-      </tbody>
-    </table>
-  </div>
-</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+////////// added for dropdown inside the new summary report
+    document.getElementById('categorySelect')?.addEventListener('change', function () {
+      const url = new URL(window.location.href);
+      url.searchParams.set('categoryid', this.value);
+      window.location.href = url.toString();
+    });
 
-document.getElementById('categorySelect')?.addEventListener('change', function () {
-  const url = new URL(window.location.href);
-  url.searchParams.set('categoryid', this.value);
-  window.location.href = url.toString();
-});
+
+    
     document.addEventListener('DOMContentLoaded', function() {
       const exportBtn = document.querySelector('.btn.btn-sm.btn-danger.ms-auto');
       if (exportBtn) {
@@ -737,9 +678,10 @@ if (mailReportBtn) {
 }
 
 if (sendMailConfirm) {
-  sendMailConfirm.addEventListener('click', async function() {
-    const regionSelect = document.getElementById('regionSelect');
-    const selectedRegionId = regionSelect.value;
+    sendMailConfirm.addEventListener('click', async function() {
+    const categorySelect = document.getElementById('categorySelect');
+    const selectedCategoryId = categorySelect ? categorySelect.value : 0;
+
     const recipientEmail = recipientEmailInput.value.trim();
     mailError.style.display = 'none';
 
@@ -758,10 +700,12 @@ if (sendMailConfirm) {
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          regionid: selectedRegionId,
+          categoryid: selectedCategoryId,
           email: recipientEmail
         })
+
       });
+      
 
       const contentType = response.headers.get("content-type") || "";
       if (!contentType.includes("application/json")) {

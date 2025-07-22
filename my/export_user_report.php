@@ -3,23 +3,21 @@ require_once(__DIR__.'/../config.php');
 require_login();
 
 $userid = required_param('id', PARAM_INT);
-$context = context_system::instance();
 
+$context = context_system::instance();
 if (!has_capability('moodle/site:config', $context)) {
     throw new moodle_exception('nopermission');
 }
 
-$PAGE->set_context($context);
-$PAGE->set_url('/my/user_report.php', array('id' => $userid));
-$PAGE->set_pagelayout('admin');
-$PAGE->set_title('User Report');
-$PAGE->set_heading('User Report');
+header('Content-Type: text/csv');
+header('Content-Disposition: attachment; filename="user_course_report_'.$userid.'.csv"');
 
-$user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
+$filename = 'php://output';
 
-// Get user course details
-$sql = "
-    WITH course_progress AS (
+$handle = fopen($filename, 'w');
+fputcsv($handle, ['Course Name', 'Category','Status', 'Progress %', 'Points Earned', 'Max Points']);
+
+$sql = "    WITH course_progress AS (
         SELECT 
             cmc.userid, 
             cm.course,
@@ -85,31 +83,19 @@ $sql = "
     t.completed_courses,
     t.total_earned_points,
     t.total_possible_points
-FROM course_summary cs, totals t
-";
-
-
-
-$userpicture = new user_picture($user);
-$userpicture->size = 100; // Optional: 100 = large, 35 = small
-$userpicturehtml = $OUTPUT->render($userpicture);
-
-
-$params = array('userid' => $userid);
+FROM course_summary cs, totals t";
+$params = ['userid' => $userid];
 $coursedetails = $DB->get_records_sql($sql, $params);
 
-// Prepare data for template
-$data = array(
-    'date' => date('d M Y, H:i A'),
-    'user' => $user,
-    'userpicture' => $userpicturehtml, // 👈 Add this line
-    'coursedetails' => array_values($coursedetails),
-);
-
-
-echo $OUTPUT->header();
-// echo $OUTPUT->render_from_template('core/user_report', $data);
-echo $OUTPUT->render_from_template('theme_academi/user_report', $data);
-
-
-echo $OUTPUT->footer();
+foreach ($coursedetails as $row) {
+    fputcsv($handle, [
+        $row->coursename,
+        $row->categoryname,
+        $row->completion_status,
+        $row->progress_percent,
+        $row->points_earned,
+        $row->max_points
+    ]);
+}
+fclose($handle);
+exit;

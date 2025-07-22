@@ -1,156 +1,145 @@
 <?php
-// my/send_report.php
+// File: my/send_report.php
+
+define('AJAX_SCRIPT', true);
 
 require_once(__DIR__ . '/../config.php');
-require_login(null, false, null, false, true);
+require_once($CFG->libdir . '/moodlelib.php');
+require_once($CFG->libdir . '/messagelib.php');
+require_once($CFG->dirroot . '/user/lib.php');
 
-// Only site admins
-if (!is_siteadmin()) {
-    throw new moodle_exception('Access denied');
-}
+require_login();
+$PAGE->set_context(context_system::instance());
+header('Content-Type: application/json');
 
 try {
-    // Read JSON POST body
-    $raw = json_decode(file_get_contents("php://input"), true);
-    $regionid = isset($raw['regionid']) ? intval($raw['regionid']) : 0;
-    $email = isset($raw['email']) ? clean_param($raw['email'], PARAM_EMAIL) : '';
+    // Step 1: Read and validate input
+    $input = json_decode(file_get_contents('php://input'), true);
+    $categoryid = isset($input['categoryid']) ? (int)$input['categoryid'] : 0;
+    $email = isset($input['email']) ? clean_param($input['email'], PARAM_EMAIL) : '';
 
-    if (!$email) {
-        throw new moodle_exception('Invalid email address.');
+    if (!validate_email($email)) {
+        throw new Exception('Invalid email address.');
     }
 
-    global $DB, $CFG;
-
-    // Build the query similar to dashboard
+    // Step 2: Build SQL
+    $categoryWhere = '';
     $params = [];
-    if ($regionid > 0) {
-        $sql = "
-            SELECT 
-                CONCAT(u.id, '-', c.id) AS uniqueid,
-                CONCAT(u.firstname, ' ', u.lastname) AS username,
-                c.fullname AS coursename,
-                cat.name AS region,
-                ROUND(gg.finalgrade, 0) AS score,
-                ROUND((gg.finalgrade / NULLIF(gi.grademax, 0)) * 5) AS rating,
-                ROUND(
-                    (SELECT COUNT(*)
-                     FROM {course_modules_completion} cmc
-                     JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
-                     WHERE cm.course = c.id AND cmc.userid = u.id AND cmc.completionstate = 1) 
-                    / 
-                    NULLIF(
-                        (SELECT COUNT(*) FROM {course_modules} cm WHERE cm.course = c.id AND cm.completion > 0),
-                        0
-                    ) * 100
-                ) AS progress,
-                CASE
-                    WHEN cc.timecompleted IS NOT NULL THEN 'Completed'
-                    WHEN cc.timecompleted IS NULL AND gg.finalgrade IS NOT NULL THEN 'In Progress'
-                    ELSE 'Not Started'
-                END AS status
-            FROM {user} u
-            JOIN {user_enrolments} ue ON ue.userid = u.id
-            JOIN {enrol} e ON e.id = ue.enrolid
-            JOIN {course} c ON c.id = e.courseid
-            JOIN {course_categories} cat ON cat.id = c.category
-            LEFT JOIN {grade_items} gi ON gi.courseid = c.id AND gi.itemtype = 'course'
-            LEFT JOIN {grade_grades} gg ON gg.itemid = gi.id AND gg.userid = u.id
-            LEFT JOIN {course_completions} cc ON cc.course = c.id AND cc.userid = u.id
-            WHERE c.visible = 1
-              AND cat.id = :regionid
-            ORDER BY username ASC
-            LIMIT 500
-        ";
-        $params['regionid'] = $regionid;
-    } else {
-        $sql = "
-            SELECT 
-                CONCAT(u.id, '-', c.id) AS uniqueid,
-                CONCAT(u.firstname, ' ', u.lastname) AS username,
-                c.fullname AS coursename,
-                cat.name AS region,
-                ROUND(gg.finalgrade, 0) AS score,
-                ROUND((gg.finalgrade / NULLIF(gi.grademax, 0)) * 5) AS rating,
-                ROUND(
-                    (SELECT COUNT(*)
-                     FROM {course_modules_completion} cmc
-                     JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
-                     WHERE cm.course = c.id AND cmc.userid = u.id AND cmc.completionstate = 1) 
-                    / 
-                    NULLIF(
-                        (SELECT COUNT(*) FROM {course_modules} cm WHERE cm.course = c.id AND cm.completion > 0),
-                        0
-                    ) * 100
-                ) AS progress,
-                CASE
-                    WHEN cc.timecompleted IS NOT NULL THEN 'Completed'
-                    WHEN cc.timecompleted IS NULL AND gg.finalgrade IS NOT NULL THEN 'In Progress'
-                    ELSE 'Not Started'
-                END AS status
-            FROM {user} u
-            JOIN {user_enrolments} ue ON ue.userid = u.id
-            JOIN {enrol} e ON e.id = ue.enrolid
-            JOIN {course} c ON c.id = e.courseid
-            JOIN {course_categories} cat ON cat.id = c.category
-            LEFT JOIN {grade_items} gi ON gi.courseid = c.id AND gi.itemtype = 'course'
-            LEFT JOIN {grade_grades} gg ON gg.itemid = gi.id AND gg.userid = u.id
-            LEFT JOIN {course_completions} cc ON cc.course = c.id AND cc.userid = u.id
-            WHERE c.visible = 1
-              AND cat.parent = 0
-            ORDER BY region, username ASC
-            LIMIT 500
-        ";
+
+    if ($categoryid > 0) {
+        $categoryWhere = 'AND c.category = :categoryid';
+        $params['categoryid'] = $categoryid;
     }
+
+  // Step 2: Build SQL with category join
+$sql = "
+    SELECT 
+        u.id,
+        CONCAT(u.firstname, ' ', u.lastname) AS fullname,
+        u.email,
+        cc.name AS categoryname,  -- ✅ Category Name
+        COUNT(DISTINCT c.id) AS total_courses,
+        COUNT(DISTINCT CASE 
+            WHEN cp.progress_percent = 100 THEN c.id 
+        END) AS completed_courses,
+        COUNT(DISTINCT CASE 
+            WHEN cp.progress_percent > 0 AND cp.progress_percent < 100 THEN c.id 
+        END) AS inprogress_courses,
+        COUNT(DISTINCT CASE 
+            WHEN cp.progress_percent IS NULL OR cp.progress_percent = 0 THEN c.id 
+        END) AS notstarted_courses,
+        ROUND(SUM(COALESCE(g.finalgrade, 0)), 0) AS total_points_earned,
+        ROUND(SUM(COALESCE(gi.grademax, 0)), 0) AS max_total_points
+    FROM {user} u
+    LEFT JOIN {user_enrolments} ue ON u.id = ue.userid
+    LEFT JOIN {enrol} e ON ue.enrolid = e.id
+    LEFT JOIN {course} c ON c.id = e.courseid
+    LEFT JOIN {course_categories} cc ON cc.id = c.category  -- ✅ JOIN added
+    LEFT JOIN (
+        SELECT 
+            cmc.userid, 
+            cm.course,
+            (COUNT(CASE WHEN cmc.completionstate = 1 THEN 1 END) * 100.0 / COUNT(*)) AS progress_percent
+        FROM {course_modules_completion} cmc
+        JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
+        GROUP BY cmc.userid, cm.course
+    ) cp ON cp.userid = u.id AND cp.course = c.id
+    LEFT JOIN {grade_items} gi ON gi.courseid = c.id AND gi.itemtype = 'course'
+    LEFT JOIN {grade_grades} g ON g.itemid = gi.id AND g.userid = u.id
+    WHERE u.deleted = 0 AND u.suspended = 0
+    $categoryWhere
+    GROUP BY u.id, u.firstname, u.lastname, u.email, cc.name
+    ORDER BY u.firstname ASC
+    LIMIT 500
+";
+
 
     $reportRows = $DB->get_records_sql($sql, $params);
 
-    // Build CSV
-    $csv = "User,Course,Region,Score,Rating,Progress,Status\n";
-    foreach ($reportRows as $row) {
-        $csv .= sprintf(
-            "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
-            $row->username,
-            $row->coursename,
-            $row->region,
-            $row->score ?? '0',
-            $row->rating ?? '0',
-            $row->progress ?? '0',
-            $row->status
-        );
+    // Step 3: Build CSV
+   $csv = "Name,Category,Email,Total Courses,Completed,In Progress,Not Started,Points Earned / Max\n";
+foreach ($reportRows as $row) {
+    $csv .= sprintf(
+        "\"%s\",\"%s\",\"%s\",\"%d\",\"%d\",\"%d\",\"%d\",\"%s / %s\"\n",
+        $row->fullname,
+        $row->categoryname ?? 'N/A',  // ✅ Safeguard if null
+        $row->email,
+        $row->total_courses,
+        $row->completed_courses,
+        $row->inprogress_courses,
+        $row->notstarted_courses,
+        $row->total_points_earned,
+        $row->max_total_points
+    );
+}
+
+    // Step 4: Create temp file
+    $tempdir = make_temp_directory('reports');
+    $filename = 'user_summary_report_' . time() . '.csv';
+    $filepath = $tempdir . '/' . $filename;
+    if (file_put_contents($filepath, $csv) === false) {
+        throw new Exception("Failed to write CSV to temporary file.");
     }
 
-    // Use PHPMailer
-    $mail = get_mailer();
-    $mail->setFrom($CFG->noreplyaddress, 'Moodle Report');
-    $mail->addAddress($email);
-    $mail->Subject = "Region Progress Report";
-    $mail->isHTML(true);
-    $mail->Body = "<p>Please find the attached report from Moodle.</p>";
-    $mail->AltBody = "Please find the attached report from Moodle.";
-
-    // attach
-    $mail->addStringAttachment($csv, 'report.csv', 'base64', 'text/csv');
-
-    $result = $mail->send();
-
-    while (ob_get_level()) {
-        ob_end_clean();
+    // Step 5: Get recipient user
+    $user = \core_user::get_user_by_email($email);
+    if (!$user) {
+        $user = (object)[
+            'email' => $email,
+            'firstname' => 'User',
+            'lastname' => 'Report'
+        ];
     }
-    header('Content-Type: application/json');
-    echo json_encode([
-        'success' => $result,
-        'message' => $result ? 'Report sent successfully.' : 'Mail sending failed: ' . $mail->ErrorInfo
-    ]);
-    exit;
+
+    // Step 6: Email the report (FIXED ATTACHMENT HANDLING)
+    $from = \core_user::get_noreply_user();
+    $subject = "User Summary Report";
+    $messagetext = "Hi,\n\nAttached is the User Summary Report based on your selected category filter.\n\nRegards,\nAdmin";
+    $messagehtml = "<p>Hi,<br><br>Attached is the <strong>User Summary Report</strong> based on your selected category filter.<br><br>Regards,<br>Admin</p>";
+
+    $success = email_to_user(
+        $user,
+        $from,
+        $subject,
+        $messagetext,
+        $messagehtml,
+        $filepath,   // Pass file path directly
+        $filename    // Attachment name
+    );
+
+    // Step 7: Cleanup and return JSON
+    unlink($filepath);
+
+    if ($success) {
+        echo json_encode(['success' => true]);
+    } else {
+        throw new Exception("Email sending failed. Please check SMTP settings.");
+    }
 
 } catch (Throwable $e) {
-    while (ob_get_level()) {
-        ob_end_clean();
-    }
-    header('Content-Type: application/json');
+    http_response_code(500);
     echo json_encode([
         'success' => false,
         'message' => 'Server error: ' . $e->getMessage()
     ]);
-    exit;
 }

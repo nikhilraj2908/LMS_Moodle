@@ -1,25 +1,24 @@
 <?php
+define('AJAX_SCRIPT', true);
 require_once(__DIR__.'/../config.php');
+require_once($CFG->libdir.'/moodlelib.php');
+require_once($CFG->libdir.'/messagelib.php');
 require_login();
+$PAGE->set_context(context_system::instance());
+header('Content-Type: application/json');
 
-$userid = required_param('id', PARAM_INT);
-$context = context_system::instance();
+try {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $userid = clean_param($input['userid'], PARAM_INT);
+    $email = clean_param($input['email'], PARAM_EMAIL);
 
-if (!has_capability('moodle/site:config', $context)) {
-    throw new moodle_exception('nopermission');
-}
+    if (!validate_email($email)) {
+        throw new Exception('Invalid email address.');
+    }
 
-$PAGE->set_context($context);
-$PAGE->set_url('/my/user_report.php', array('id' => $userid));
-$PAGE->set_pagelayout('admin');
-$PAGE->set_title('User Report');
-$PAGE->set_heading('User Report');
+    $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
 
-$user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
-
-// Get user course details
-$sql = "
-    WITH course_progress AS (
+    $sql = "      WITH course_progress AS (
         SELECT 
             cmc.userid, 
             cm.course,
@@ -85,31 +84,49 @@ $sql = "
     t.completed_courses,
     t.total_earned_points,
     t.total_possible_points
-FROM course_summary cs, totals t
-";
+FROM course_summary cs, totals t";
+    $params = ['userid' => $userid];
+    $coursedetails = $DB->get_records_sql($sql, $params);
+
+   $csv = "Course Name,Category,Status,Progress %,Points Earned,Max Points,\n";
+foreach ($coursedetails as $row) {
+    $csv .= sprintf(
+        "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+        $row->coursename,
+        $row->categoryname,
+        $row->completion_status,
+        $row->progress_percent,
+        $row->points_earned,
+        $row->max_points,
+    );
+}
 
 
+    $tempdir = make_temp_directory('reports');
+    $filename = 'user_report_' . $userid . '_' . time() . '.csv';
+    $filepath = $tempdir . '/' . $filename;
+    file_put_contents($filepath, $csv);
 
-$userpicture = new user_picture($user);
-$userpicture->size = 100; // Optional: 100 = large, 35 = small
-$userpicturehtml = $OUTPUT->render($userpicture);
+    $recipient = \core_user::get_user_by_email($email);
+    if (!$recipient) {
+        $recipient = (object)[ 'email' => $email, 'firstname' => 'User', 'lastname' => 'Report' ];
+    }
 
+    $from = \core_user::get_noreply_user();
+    $subject = "User Course Report";
+    $msgtext = "Hi,\n\nAttached is your detailed course report.\n\nThanks.";
+    $msghtml = "<p>Hi,<br><br>Attached is your <strong>course report</strong>.<br><br>Thanks.</p>";
 
-$params = array('userid' => $userid);
-$coursedetails = $DB->get_records_sql($sql, $params);
+    $sent = email_to_user($recipient, $from, $subject, $msgtext, $msghtml, $filepath, $filename);
+    unlink($filepath);
 
-// Prepare data for template
-$data = array(
-    'date' => date('d M Y, H:i A'),
-    'user' => $user,
-    'userpicture' => $userpicturehtml, // 👈 Add this line
-    'coursedetails' => array_values($coursedetails),
-);
+    if ($sent) {
+        echo json_encode(['success' => true]);
+    } else {
+        throw new Exception('Mail sending failed.');
+    }
 
-
-echo $OUTPUT->header();
-// echo $OUTPUT->render_from_template('core/user_report', $data);
-echo $OUTPUT->render_from_template('theme_academi/user_report', $data);
-
-
-echo $OUTPUT->footer();
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+}
