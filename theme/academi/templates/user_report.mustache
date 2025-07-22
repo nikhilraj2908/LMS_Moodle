@@ -1,36 +1,50 @@
 <div class="admin-container">
-  <div class="dashboard-header">
-    <div class="user-info my-1">
-      <div class="d-flex">
-        <div class="avatar me-3">
-          {{{userpicture}}}
-        </div>
-        <div>
-          <h3 class="text-dark">{{user.firstname}} {{user.lastname}}</h3>
-          <small>User Course Report</small>
-        </div>
-      </div>
-    </div>
-    <div class="header-controls">
-      <div class="date-display">
-        <i class="fas fa-calendar-day"></i> {{date}}
-      </div>
-      <a href="{{{config.wwwroot}}}/my" class="btn btn-light">
+<div class="text-start my-3">
+      <a href="{{{config.wwwroot}}}/my" class="btn btn-primary btn-sm">
         <i class="fas fa-arrow-left"></i> Back to Dashboard
       </a>
     </div>
+  <div class="dashboard-header d-flex justify-content-between align-items-center">
+    <div class="user-info d-flex align-items-center gap-3">
+      <div class="avata me-2">
+        {{{userpicture}}}
+      </div>
+      <div>
+      
+        <h3 class="mb-1 fw-bold text-dark">{{user.firstname}} {{user.lastname}}</h3>
+        <div class="text-muted small">User Course Report</div>
+        <div class="text-muted mt-2">
+        <i class="fas fa-calendar-day me-1"></i> {{date}}
+      </div>
+      </div>
+    </div>
+
+    
   </div>
 
-  <div class="admin-card">
-    <div class="card-header">
-      <h2><i class="fas fa-book"></i> Course Progress Report</h2>
+  <div class="admin-card mt-4 p-4 shadow rounded bg-white">
+   <div class="d-flex align-items-center mb-3 justify-content-between">
+      <div class="d-flex">
+        <span class="fas fa-chart-line fw-1 text-primary pt-1 me-2"></span>
+        <h4 class="fw-semibold">Course Progress Report</h4>
+      </div>
+      <div>
+        <button class="btn btn-sm btn-outline-primary me-2 " id="exportBtn">
+          <i class="fas fa-file-csv me-1"></i> Export CSV
+        </button>
+        <button class="btn btn-sm btn-outline-success" id="emailBtn">
+          <i class="fas fa-envelope me-1"></i> Send Mail
+        </button>
+      </div>
     </div>
-    
+
+
     <div class="table-responsive">
-      <table class="table table-striped">
-        <thead>
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
           <tr>
             <th>Course Name</th>
+            <th>Category</th>
             <th>Status</th>
             <th>Progress</th>
             <th>Points Earned</th>
@@ -40,17 +54,20 @@
         <tbody>
           {{#coursedetails}}
           <tr>
-            <td>{{coursename}}</td>
             <td>
-              {{#completion_status}}<span class="badge 
-                {{#completion_status}}badge-{{completion_status}}{{/completion_status}}
-                {{completion_status}}">
-                {{completion_status}}
-              </span>{{/completion_status}}
+              <a href="{{{config.wwwroot}}}/course/view.php?id={{courseid}}" target="_blank">
+                {{coursename}}
+              </a>
             </td>
+            <td>{{categoryname}}</td>
             <td>
+              <span class="badge {{#completion_status}}badge-{{completion_status}}{{/completion_status}}">
+                {{completion_status}}
+              </span>
+            </td>
+            <td style="min-width: 160px;">
               <div class="progress" style="height: 20px;">
-                <div class="progress-bar" role="progressbar" 
+                <div class="progress-bar bg-primary" role="progressbar"
                      style="width: {{progress_percent}}%;" 
                      aria-valuenow="{{progress_percent}}" 
                      aria-valuemin="0" 
@@ -65,7 +82,7 @@
           {{/coursedetails}}
           {{^coursedetails}}
           <tr>
-            <td colspan="5" class="text-center py-4">No courses found for this user</td>
+            <td colspan="5" class="text-center py-4 text-muted">No courses found for this user</td>
           </tr>
           {{/coursedetails}}
         </tbody>
@@ -75,7 +92,77 @@
 </div>
 
 <style>
-  .badge-Completed { background-color: #28a745; }
-  .badge-In-Progress { background-color: #ffc107; color: #000; }
-  .badge-Not-Started { background-color: #6c757d; }
+  .admin-container {
+    max-width: 1400px;
+  
+  }
+  .user-info{
+    margin-top: 5px;
+  }
+
+  .dashboard-header {
+  background:#80808024;
+    
+    color: white;
+    padding: 20px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  .admin-card {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .badge-Completed {
+    background-color: #28a745;
+    color: #fff;
+  }
+
+  .badge-In-Progress {
+    background-color: #ffc107;
+    color: #000;
+  }
+
+  .badge-Not-Started {
+    background-color: #6c757d;
+    color: #fff;
+  }
+
+  .table th, .table td {
+    vertical-align: middle;
+  }
+
+  .progress-bar {
+    font-size: 0.75rem;
+    line-height: 20px;
+  }
 </style>
+<script>
+document.getElementById('exportBtn').addEventListener('click', () => {
+    const userId = {{user.id}};
+    window.location.href = `{{{config.wwwroot}}}/my/export_user_report.php?id=${userId}`;
+});
+
+document.getElementById('emailBtn').addEventListener('click', async () => {
+    const userId = {{user.id}};
+    const email = '{{user.email}}';
+
+    const btn = document.getElementById('emailBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Sending...';
+
+    const res = await fetch(`{{{config.wwwroot}}}/my/send_user_report.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userid: userId, email })
+    });
+
+    const data = await res.json();
+    alert(data.success ? 'Mail sent successfully!' : 'Failed: ' + data.message);
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-envelope me-1"></i> Send Mail';
+});
+</script>
