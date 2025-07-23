@@ -116,10 +116,29 @@ if ($user !== false or $frm !== false or $errormsg !== '') {
         $frm->username = $user->username;
     } else {
         $frm = data_submitted();
+        if (!empty($frm->username)) {
+    // Check if input is email
+    if (validate_email($frm->username)) {
+        $possibleuser = $DB->get_record('user', ['email' => $frm->username, 'deleted' => 0]);
+        if ($possibleuser) {
+            $frm->username = $possibleuser->username; // replace email with username
+        }
+    }
+}
+
     }
 
 } else {
     $frm = data_submitted();
+      // ✅ Add this email-to-username conversion here
+    if (!empty($frm->username)) {
+        if (filter_var($frm->username, FILTER_VALIDATE_EMAIL)) {
+            $possibleuser = $DB->get_record('user', ['email' => $frm->username, 'deleted' => 0]);
+            if ($possibleuser) {
+                $frm->username = $possibleuser->username;
+            }
+        }
+    }
 }
 
 // Restore the #anchor to the original wantsurl. Note that this
