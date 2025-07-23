@@ -1,34 +1,45 @@
 <?php
+// File: theme/academi/streak.php
+// Tracks a “streak” that increments once per calendar day (or resets if you skip a day)
+// Uses mdl_user_preferences so no schema changes are required.
+
 require_once(__DIR__ . '/../../config.php');
 require_login();
 
-global $DB, $USER;
+global $USER;
 
-$userid = $USER->id;
-$today = date('Y-m-d');
+// current timestamp
+$now = time();
 
-error_log("streak.php called for user $userid on $today");
+// 1) Load previous values (defaults to 0)
+$lastTs = get_user_preferences('streak_last_ts', 0);
+$count  = get_user_preferences('streak_count',   0);
 
-$existing = $DB->get_record('user_streaks', ['userid' => $userid, 'streak_date' => $today]);
+// 2) Derive “day” buckets
+$today    = date('Y-m-d', $now);
+$lastDay  = $lastTs ? date('Y-m-d', $lastTs) : null;
 
-if (!$existing) {
-    error_log("No record for today, inserting with visited=1");
-    $record = new stdClass();
-    $record->userid = $userid;
-    $record->streak_date = $today;
-    $record->visited = 1;
-    $DB->insert_record('user_streaks', $record);
-} else if (isset($existing->visited) && !$existing->visited) {
-    error_log("Record found but visited=0, updating to 1");
-    $existing->visited = 1;
-    $DB->update_record('user_streaks', $existing);
-} else {
-    error_log("Record found and visited=1");
+if ($lastDay === $today) {
+    // still the same calendar day → do nothing
+}
+else {
+    // first hit on a new day
+    if ($lastTs && ($now - $lastTs <= 86400)) {
+        // previous visit was yesterday → continue streak
+        $count++;
+    } else {
+        // gap > 1 day → reset streak
+        $count = 1;
+    }
+    // save updated prefs
+    set_user_preference('streak_last_ts', $now);
+    set_user_preference('streak_count',   $count);
 }
 
-$streakCount = $DB->count_records('user_streaks', ['userid' => $userid]);
-$visitDone = $DB->record_exists('user_streaks', ['userid' => $userid, 'streak_date' => $today, 'visited' => 1]);
-
+// 3) Return JSON (your front-end remains unchanged)
 header('Content-Type: application/json');
-echo json_encode(['streakCount' => $streakCount, 'visitDone' => $visitDone]);
-exit();
+echo json_encode([
+    'streakCount' => $count,
+    'visitDone'   => true
+]);
+exit;

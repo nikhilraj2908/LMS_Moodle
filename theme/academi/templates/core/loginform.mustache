@@ -307,7 +307,33 @@
 .row{
     margin-right:0px;
 }
+/* make wrapper relative so the eye can be positioned */
+.input-wrapper { position: relative; }
 
+/* override left-icon positioning for lock/user icons */
+
+
+/* style & position the eye icon on the right */
+.show-password-icon {
+  position: absolute;
+  left: 12px;
+  right: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--primary);
+}
+
+
+
+
+.fa.fa-eye {
+    margin-left: 330;
+}
+
+.fa.fa-eye-slash {
+    margin-left: 330;
+}
 
 </style>
 
@@ -346,19 +372,20 @@
 
   <div class="input-wrapper">
     <span class="input-icon"><i class="fa fa-user"></i></span>
-    <input type="text" name="username" placeholder="Enter your username" required />
+    <input type="text" name="username" placeholder="Email Address or Username" required />
   </div>
 
   <div class="input-wrapper">
     <span class="input-icon"><i class="fa fa-lock"></i></span>
-    <input type="password" name="password" placeholder="Enter your password" required />
+    <input type="password" name="password" placeholder="Your Password" required />
+     <span class="input-icon show-password-icon"><i class="fa fa-eye"></i></span>
   </div>
 
   <div class="forgot-pass">
     <a href="{{forgotpasswordurl}}">Forgot Password</a>
   </div>
 
-  <button type="submit" class="signup-btn">Sign up</button>
+  <button type="submit" class="signup-btn">Sign Up</button>
 
 </form>
 
@@ -545,5 +572,26 @@
             
             // Start typing animation
             setTimeout(type, 1000);
+
+
+
+
+            // on DOM ready
+$(function() {
+  $('.show-password-icon').on('click', function() {
+    const $wrapper = $(this).closest('.input-wrapper');
+    const $input   = $wrapper.find('input[name="password"]');
+    const $icon    = $(this).find('i');
+
+    if ($input.attr('type') === 'password') {
+      $input.attr('type', 'text');
+      $icon.removeClass('fa-eye').addClass('fa-eye-slash');
+    } else {
+      $input.attr('type', 'password');
+      $icon.removeClass('fa-eye-slash').addClass('fa-eye');
+    }
+  });
+});
+
     </script>
 </body>
