@@ -228,32 +228,32 @@ if ($gradeitem && !empty($gradeitem->items[0]->grades)) {
 
 
 // show status in Bootstrap cards
-echo '<div class="row mt-4">';
+echo '<div class="mt-4 row">';
 echo '  <div class="col-md-3">';
-echo '    <div class="card p-3 text-center">';
+echo '    <div class="p-3 text-center card">';
 echo '      <h5>Completion</h5>';
 echo '      <span class="fw-bold text-' . ($completion === 'completed' ? 'success' : 'danger') . '">' . htmlspecialchars($completion) . '</span>';
 echo '    </div>';
 echo '  </div>';
 
 echo '  <div class="col-md-3">';
-echo '    <div class="card p-3 text-center">';
+echo '    <div class="p-3 text-center card">';
 echo '      <h5>Success</h5>';
 echo '      <span class="fw-bold text-' . ($success === 'passed' ? 'success' : 'danger') . '">' . htmlspecialchars($success) . '</span>';
 echo '    </div>';
 echo '  </div>';
 
 echo '  <div class="col-md-3">';
-echo '    <div class="card p-3 text-center">';
+echo '    <div class="p-3 text-center card">';
 echo '      <h5>Score</h5>';
-echo '      <span class="fw-bold text-primary">' . htmlspecialchars($score) . ' %</span>';
+echo '      <span class="text-primary fw-bold">' . htmlspecialchars($score) . ' %</span>';
 echo '    </div>';
 echo '  </div>';
 
 echo '  <div class="col-md-3">';
-echo '    <div class="card p-3 text-center">';
+echo '    <div class="p-3 text-center card">';
 echo '      <h5>Total Time</h5>';
-echo '      <span class="fw-bold text-primary">' . htmlspecialchars($time) . '</span>';
+echo '      <span class="text-primary fw-bold">' . htmlspecialchars($time) . '</span>';
 echo '    </div>';
 echo '  </div>';
 echo '</div>';
