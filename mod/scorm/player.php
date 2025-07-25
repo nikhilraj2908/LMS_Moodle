@@ -99,6 +99,42 @@
 
     require_login($course, false, $cm);
 
+
+
+    
+// ------------------- Track session start & increase counter -------------------
+$existingsession = $DB->get_record('scorm_session_time', [
+    'userid' => $USER->id,
+    'scormid' => $scorm->id,
+    'endtime' => null
+]);
+
+if ($existingsession) {
+    // Resume session in progress
+    $SESSION->scorm_start_time = $existingsession->starttime;
+} else {
+    // Count how many past sessions the user had
+    $previouscount = $DB->count_records('scorm_session_time', [
+        'userid' => $USER->id,
+        'scormid' => $scorm->id
+    ]);
+
+    // Start a new session
+    $record = new stdClass();
+    $record->userid = $USER->id;
+    $record->scormid = $scorm->id;
+    $record->starttime = time();
+    $record->duration = 0;
+    $record->endtime = null;
+    $record->counter = $previouscount + 1;
+
+    $DB->insert_record('scorm_session_time', $record);
+    $SESSION->scorm_start_time = $record->starttime;
+}
+// -------------------------------------------------------------------------------
+
+
+
     $strscorms = get_string('modulenameplural', 'scorm');
     $strscorm  = get_string('modulename', 'scorm');
     $strpopup = get_string('popup', 'scorm');
@@ -161,17 +197,15 @@
     $completion->set_module_viewed($cm);
 
     // Generate the exit button.
-    $exiturl = "";
-    if (empty($scorm->popup) || $displaymode == 'popup') {
-        if ($course->format == 'singleactivity' && $scorm->skipview == SCORM_SKIPVIEW_ALWAYS
-            && !has_capability('mod/scorm:viewreport', context_module::instance($cm->id))) {
-            // Redirect students back to site home to avoid redirect loop.
-            $exiturl = $CFG->wwwroot;
-        } else {
-            // Redirect back to the correct section if one section per page is being used.
-            $exiturl = course_get_url($course, $cm->sectionnum)->out();
-        }
-    }
+  $exiturl = new moodle_url('/mod/scorm/exit.php', [
+    'id' => $cm->id,
+    'sesskey' => sesskey(),
+    'scormid' => $scorm->id,
+    'attempt' => $attempt
+]);
+
+$PAGE->requires->js_init_code("window.exitUrl = " . json_encode($exiturl->out(false)) . ";");
+$PAGE->requires->js(new moodle_url('/mod/scorm/exitlog.js'));
 
     // Print the page header.
     $PAGE->requires->data_for_js('scormplayerdata', Array('launch' => false,
@@ -318,9 +352,17 @@ $PAGE->requires->js_init_code("
 
 
 
-
     // Add the keepalive system to keep checking for a connection.
     \core\session\manager::keepalive('networkdropped', 'mod_scorm', 30, 10);
+
+$exiturl = new moodle_url('/mod/scorm/exit.php', [
+    'id' => $cm->id, // course module id
+    'scormid' => $scorm->id,
+    'attempt' => $attempt,
+    'sesskey' => sesskey(),
+]);
+
+
 
     echo $OUTPUT->footer();
 

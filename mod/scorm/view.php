@@ -18,6 +18,21 @@ require_once("../../config.php");
 require_once($CFG->dirroot.'/mod/scorm/lib.php');
 require_once($CFG->dirroot.'/mod/scorm/locallib.php');
 require_once($CFG->dirroot.'/course/lib.php');
+require_once($CFG->libdir.'/ddllib.php'); // Needed for XMLDB
+$dbman = $DB->get_manager();
+
+$table = new xmldb_table('scorm_session_time');
+if (!$dbman->table_exists($table)) {
+    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+    $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('scormid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('starttime', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('endtime', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+    $table->add_field('duration', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+    $table->add_field('counter', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 1); // new field
+    $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+    $dbman->create_table($table);
+}
 
 $id = optional_param('id', '', PARAM_INT);       // Course Module ID, or
 $a = optional_param('a', '', PARAM_INT);         // scorm ID
@@ -128,6 +143,7 @@ $pagetitle = strip_tags($shortname.': '.format_string($scorm->name));
 // Trigger module viewed event.
 scorm_view($scorm, $course, $cm, $contextmodule);
 
+
 if (empty($preventskip) && empty($launch) && (has_capability('mod/scorm:skipview', $contextmodule))) {
     scorm_simple_play($scorm, $USER, $contextmodule, $cm->id);
 }
@@ -226,9 +242,22 @@ if ($gradeitem && !empty($gradeitem->items[0]->grades)) {
     }
 }
 
+$timesql = "SELECT SUM(duration) as totaltime, MAX(counter) as attemptcount
+            FROM {scorm_session_time}
+            WHERE userid = :userid AND scormid = :scormid";
 
+$params = ['userid' => $USER->id, 'scormid' => $scorm->id];
+$scormdata = $DB->get_record_sql($timesql, $params);
+
+$totalduration = $scormdata->totaltime ?? 0;
+$attemptcount = $scormdata->attemptcount ?? 0;
+
+// Convert total seconds to H:i:s format
+$time = gmdate("H:i:s", $totalduration);
 // show status in Bootstrap cards
+
 echo '<div class="row mt-4">';
+
 echo '  <div class="col-md-3">';
 echo '    <div class="card p-3 text-center">';
 echo '      <h5>Completion</h5>';
@@ -238,8 +267,8 @@ echo '  </div>';
 
 echo '  <div class="col-md-3">';
 echo '    <div class="card p-3 text-center">';
-echo '      <h5>Success</h5>';
-echo '      <span class="fw-bold text-' . ($success === 'passed' ? 'success' : 'danger') . '">' . htmlspecialchars($success) . '</span>';
+echo '      <h5>All Attempts</h5>';
+echo '      <span class="fw-bold text-primary">' . htmlspecialchars($attemptcount) . '</span>';
 echo '    </div>';
 echo '  </div>';
 
@@ -256,7 +285,9 @@ echo '      <h5>Total Time</h5>';
 echo '      <span class="fw-bold text-primary">' . htmlspecialchars($time) . '</span>';
 echo '    </div>';
 echo '  </div>';
+
 echo '</div>';
+
 
 
 if (!empty($forcejs)) {
