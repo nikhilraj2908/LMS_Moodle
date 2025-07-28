@@ -1038,7 +1038,7 @@ body, #page-wrapper {
     align-items: center;
     font-size: 1rem;
     padding: 20px;
-    height: 100px;
+    height: 130px;
      border-left: 5px solid #204070;
         padding: 15px 20px;
     margin-bottom: 20px; /* More space between announcements */
@@ -1084,7 +1084,9 @@ body, #page-wrapper {
     margin-left: 10px;
 }
 
-
+.announcement-title:hover {
+    text-decoration: underline;
+}
 
 .announcement-meta {
     font-size: 0.85em;
@@ -1179,7 +1181,6 @@ body, #page-wrapper {
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-  height: 420px;
 }
 
 /* For Laptop and Desktop (larger screens) */
@@ -1315,6 +1316,68 @@ html {
     will-change: transform, opacity; /* Optimize for animation */
 }
 
+
+
+.progress-container {
+  background-color: #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 8px;
+  margin: 8px 0;
+  width:65%
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #4caf50; /* green */
+  transition: width 0.4s ease-in-out;
+}
+
+.progress-label {
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 6px;
+}
+.progress-bar[data-progress^="0"] { background-color: #e74c3c; }     /* red */
+.progress-bar[data-progress^="5"] { background-color: #f1c40f; }     /* yellow */
+.progress-bar[data-progress^="9"] { background-color: #2ecc71; }     /* green */
+
+
+
+.course-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background-color: #ff4d4f; /* bright red */
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 2;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.custom-course-card-image {
+  position: relative;
+}
+
+
+.expiring-timer {
+  font-size: 0.8rem;
+  color: #d9534f;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.countdown-text{
+  position:absolute;
+  top: 10px;
+  left:10px;
+  padding:5px;
+}
+
+
 .announcement-box {
   background: linear-gradient(to right, #f4faff, #eaf4fb);
   border-radius: 20px;
@@ -1380,12 +1443,6 @@ html {
     gap: 10px;
 }
 
-.countdown-text{
-  position:absolute;
-  top: 10px;
-  left:10px;
-  padding:5px;
-}
     </style>
 </head>
 
@@ -1525,7 +1582,7 @@ html {
     <div class="container my-5">
  <div class=" align-items-start newsletter-wrapper">
   <!-- Left Side: Subscribe Box -->
-<div class="col-md-5 col-12 animated-element slide-in-left delay-1">
+  <div class="col-md-5 col-12 animated-element slide-in-left delay-1">
   <div class="announcement-box d-flex align-items-center p-4 shadow rounded-4">
     <div class="announcement-icon-wrapper me-4">
       <img src="{{config.wwwroot}}/theme/academi/pix/Newsletter.png" alt="Newsletter Icon" class="announcement-icon-img">
@@ -1538,12 +1595,11 @@ html {
 <a href="{{config.wwwroot}}/mod/forum/view.php?f={{forumid}}" class="btn btn-outline-dark rounded-pill px-4 py-2">
   All Announcements
 </a>
-
+ 
       </div>
     </div>
   </div>
 </div>
-
 
   <!-- Right Side: Forum Newsletter Items -->
   <div class="col-md-7 col-12  animated-element slide-in-right delay-1">
