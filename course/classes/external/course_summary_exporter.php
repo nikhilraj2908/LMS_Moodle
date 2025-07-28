@@ -66,17 +66,18 @@ class course_summary_exporter extends \core\external\exporter {
         }
         $progress = floor($progress ?? 0);
         $coursecategory = \core_course_category::get($this->data->category, MUST_EXIST, true);
-        return array(
-            'fullnamedisplay' => get_course_display_name_for_list($this->data),
-            'viewurl' => (new moodle_url('/course/view.php', array('id' => $this->data->id)))->out(false),
-            'courseimage' => $courseimage,
-            'progress' => $progress,
-            'hasprogress' => $hasprogress,
-            'isfavourite' => $this->related['isfavourite'],
-            'hidden' => boolval(get_user_preferences('block_myoverview_hidden_course_' . $this->data->id, 0)),
-            'showshortname' => $CFG->courselistshortnames ? true : false,
-            'coursecategory' => $coursecategory->name
-        );
+       return array(
+        'fullnamedisplay' => get_course_display_name_for_list($this->data),
+        'viewurl' => (new moodle_url('/course/view.php', array('id' => $this->data->id)))->out(false),
+        'courseimage' => $courseimage,
+        'progress' => $progress,
+        'hasprogress' => $hasprogress,
+        'iscomplete' => $progress == 100, // ✅ ADD THIS LINE
+        'isfavourite' => $this->related['isfavourite'],
+        'hidden' => boolval(get_user_preferences('block_myoverview_hidden_course_' . $this->data->id, 0)),
+        'showshortname' => $CFG->courselistshortnames ? true : false,
+        'coursecategory' => $coursecategory->name
+    );
     }
 
     public static function define_properties() {
@@ -141,6 +142,9 @@ class course_summary_exporter extends \core\external\exporter {
 
     public static function define_other_properties() {
         return array(
+            'iscomplete' => array(
+                'type' => PARAM_BOOL
+            ),
             'fullnamedisplay' => array(
                 'type' => PARAM_TEXT,
             ),
