@@ -1038,7 +1038,7 @@ body, #page-wrapper {
     align-items: center;
     font-size: 1rem;
     padding: 20px;
-    height: 100px;
+    height: 130px;
      border-left: 5px solid #204070;
         padding: 15px 20px;
     margin-bottom: 20px; /* More space between announcements */
@@ -1084,7 +1084,9 @@ body, #page-wrapper {
     margin-left: 10px;
 }
 
-
+.announcement-title:hover {
+    text-decoration: underline;
+}
 
 .announcement-meta {
     font-size: 0.85em;
@@ -1179,7 +1181,6 @@ body, #page-wrapper {
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-  height: 420px;
 }
 
 /* For Laptop and Desktop (larger screens) */
@@ -1315,69 +1316,58 @@ html {
     will-change: transform, opacity; /* Optimize for animation */
 }
 
-.announcement-box {
-  background: linear-gradient(to right, #f4faff, #eaf4fb);
-  border-radius: 20px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 30px;
-  height: 420px;
+
+
+.progress-container {
+  background-color: #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 8px;
+  margin: 8px 0;
+  width:65%
 }
 
-.announcement-icon-wrapper {
-  flex-shrink: 0;
+.progress-bar {
+  height: 100%;
+  background-color: #4caf50; /* green */
+  transition: width 0.4s ease-in-out;
 }
 
-.announcement-icon-img {
-  width: 300px;
-  height: auto;
+.progress-label {
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 6px;
 }
-
-.announcement-text-content h3 {
-  font-size: 2rem;
-  color: #003366;
-
-}
-
-.announcement-subtext {
-  color: #666;
-  font-size: 1rem;
-  padding: 10px;
-}
-
-.btn:not(:disabled):not(.disabled)
-
- {
-    border-color: #204070;
-}
+.progress-bar[data-progress^="0"] { background-color: #e74c3c; }     /* red */
+.progress-bar[data-progress^="5"] { background-color: #f1c40f; }     /* yellow */
+.progress-bar[data-progress^="9"] { background-color: #2ecc71; }     /* green */
 
 
 
-.btn-dark {
-  background-color: #003366;
-  border: none;
-}
-
-.btn-dark:hover {
-  background-color: #002244;
-}
-
-.btn-outline-dark {
-  color: #003366;
-  border: 2px solid #003366;
-}
-
-.btn-outline-dark:hover {
-  background-color: #003366;
+.course-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background-color: #ff4d4f; /* bright red */
   color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 2;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
-.d-flex
- {
-    display: flex !important;
-    gap: 10px;
+.custom-course-card-image {
+  position: relative;
+}
+
+
+.expiring-timer {
+  font-size: 0.8rem;
+  color: #d9534f;
+  font-weight: 500;
+  margin-bottom: 6px;
 }
 
 .countdown-text{
@@ -1452,6 +1442,7 @@ html {
     display: flex !important;
     gap: 10px;
 }
+
     </style>
 </head>
 
@@ -1591,7 +1582,7 @@ html {
     <div class="container my-5">
  <div class=" align-items-start newsletter-wrapper">
   <!-- Left Side: Subscribe Box -->
- <div class="col-md-5 col-12 animated-element slide-in-left delay-1">
+  <div class="col-md-5 col-12 animated-element slide-in-left delay-1">
   <div class="announcement-box d-flex align-items-center p-4 shadow rounded-4">
     <div class="announcement-icon-wrapper me-4">
       <img src="{{config.wwwroot}}/theme/academi/pix/Newsletter.png" alt="Newsletter Icon" class="announcement-icon-img">
@@ -1822,6 +1813,7 @@ function renderCourses(courses, type) {
           </div>
           <div class="progress-label">${course.progress || 0}% complete</div>
         </div>
+
       <div class="d-flex justify-content-between align-items-center">
           <a href="${course.course_url}" class="course-card-link"><span>Explore Course</span></a>
           ${type === 'closing' && course.enddate ? `
