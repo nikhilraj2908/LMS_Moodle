@@ -1672,6 +1672,35 @@ html {
     <script>
 
 const MOODLE_WWWROOT = '{{config.wwwroot}}';
+function startCountdownTimers() {
+  const timers = document.querySelectorAll('.expiring-timer');
+
+  timers.forEach(timer => {
+    const enddate = parseInt(timer.dataset.enddate);
+    const countdownEl = timer.querySelector('.countdown-value');
+
+    function updateTimer() {
+      const now = Date.now();
+      const distance = enddate - now;
+
+      if (distance <= 0) {
+        countdownEl.innerText = 'Expired';
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      countdownEl.innerText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    updateTimer();
+    setInterval(updateTimer, 1000); // update every second
+  });
+}
+
     document.addEventListener('DOMContentLoaded', function() {
    const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -1692,36 +1721,55 @@ const MOODLE_WWWROOT = '{{config.wwwroot}}';
             });
 
     // Function to render courses
-    function renderCourses(courses) {
-    const courseGrid = document.getElementById('courseGrid');
-    courseGrid.innerHTML = '';
+function renderCourses(courses, type) {
+  const courseGrid = document.getElementById('courseGrid');
+  courseGrid.innerHTML = '';
 
-    // Limit to first 4 courses
-    const limitedCourses = courses.slice(0, 4);
-limitedCourses.forEach(course => {
+  const limitedCourses = courses.slice(0, 4);
+  limitedCourses.forEach(course => {
     const courseCard = document.createElement('div');
     courseCard.className = 'custom-course-card';
-    courseCard.style.cursor = 'pointer';  // show it’s clickable
+    courseCard.style.cursor = 'pointer';
 
     courseCard.innerHTML = `
-        <div class="custom-course-card-image">
-            <img src="${course.course_image_url}" alt="${course.course_name}">
+      <div class="custom-course-card-image">
+        ${type === 'new' ? '<div class="course-badge">NEW</div>' : ''}
+        <img src="${course.course_image_url}" alt="${course.course_name}">
+      </div>
+      <div class="custom-course-content">
+        <h3 class="custom-course-title">${course.course_name}</h3>
+
+        ${type === 'closing' && course.enddate ? `
+        <div class="expiring-timer" data-enddate="${course.enddate * 1000}">
+          <span class="countdown-text">Ends in: <span class="countdown-value">Loading...</span></span>
+          <br>
+          <small>Ends on: ${new Date(course.enddate * 1000).toLocaleDateString()}</small>
         </div>
-        <div class="custom-course-content">
-            <h3 class="custom-course-title">${course.course_name}</h3>
-            <a href="${course.course_url}" class="course-card-link"><span>Explore Course</span></a>
+      ` : ''}
+
+        <div class="d-flex justify-content-between">
+          <div class="progress-container">
+            <div class="progress-bar" style="width: ${course.progress || 0}%;"></div>
+          </div>
+          <div class="progress-label">${course.progress || 0}% complete</div>
         </div>
+
+        <a href="${course.course_url}" class="course-card-link"><span>Explore Course</span></a>
+      </div>
     `;
 
-    // Redirect when anywhere on the card is clicked
     courseCard.addEventListener('click', () => {
-        window.location.href = course.course_url;
+      window.location.href = course.course_url;
     });
 
     courseGrid.appendChild(courseCard);
-});
+  });
 
+  if (type === 'closing') {
+    startCountdownTimers(); // ✅ This is needed only once
+  }
 }
+
 
 
     // Set active button    
@@ -1745,7 +1793,7 @@ limitedCourses.forEach(course => {
             if (!response.ok) throw new Error('Network response was not ok');
             
             const data = await response.json();
-            renderCourses(data);
+            renderCourses(data,type);
         } catch (error) {
             console.error('Error fetching courses:', error);
             courseGrid.innerHTML = `
@@ -1932,50 +1980,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   document.querySelector('.prev-slide').addEventListener('click', function() {
     carousel.scrollBy({ left: -carousel.offsetWidth, behavior: 'smooth' });
-  });
-});
-
-
-document.addEventListener('DOMContentLoaded', function() {
-  const buttons = document.querySelectorAll('.carousel-course-btn button');
-  const courseGrid = document.getElementById('courseGrid');
-
-  function renderCourses(courses) {
-    courseGrid.innerHTML = '';  // clear existing courses
-    courses.forEach(course => {
-      const courseCard = document.createElement('div');
-      courseCard.className = 'custom-course-card';
-
-      courseCard.innerHTML = `
-        <div class="custom-course-card-image">
-          <img src="${course.course_image_url}" alt="${course.course_name}">
-        </div>
-        <div class="custom-course-content">
-          <h3 class="custom-course-title">${course.course_name}</h3>
-          <a href="${course.course_url}" class="course-card-link"><span>Explore Course</span></a>
-        </div>
-      `;
-      courseGrid.appendChild(courseCard);
-    });
-  }
-
-  buttons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      buttons.forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-
-      const type = this.getAttribute('data-type');
-
-      // IMPORTANT: This URL must point to your PHP AJAX file
-      fetch(`/theme/academi/layout/getcourses.php?type=${type}`)
-        .then(response => response.json())
-        .then(data => {
-          renderCourses(data);
-        })
-        .catch(err => {
-          console.error('Failed to fetch courses:', err);
-        });
-    });
   });
 });
 

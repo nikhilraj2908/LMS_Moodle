@@ -2,6 +2,7 @@
 // theme/academi/layout/getcourses.php
 require_once(__DIR__ . '/../../../config.php');
 require_login();
+use core_completion\progress;
 
 global $DB, $USER, $CFG;
 
@@ -74,58 +75,54 @@ switch ($type) {
         ];
         $courses = $DB->get_records_sql($sql, $params);
         break;
+case 'closing':
+    $sql = "
+        SELECT DISTINCT
+            c.id AS course_id,
+            c.fullname AS course_name,
+            c.shortname AS course_shortname,
+            c.summary AS course_summary,
+            c.enddate,
+            f.filename AS course_image_filename,
+            CONCAT('/pluginfile.php/', ctx.id, '/course/overviewfiles/', f.filename) AS course_image_url
+        FROM {course} c
+        JOIN {enrol} e ON e.courseid = c.id
+        JOIN {user_enrolments} ue ON ue.enrolid = e.id AND ue.userid = :userid
+        LEFT JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50
+        LEFT JOIN {files} f ON f.contextid = ctx.id AND f.component = 'course'
+            AND f.filearea = 'overviewfiles' AND f.filename <> '.'
+        WHERE c.visible = 1
+            AND c.enddate > :now
+            AND c.enddate <= :closing_date
+        ORDER BY c.enddate ASC
+        LIMIT 10
+    ";
 
-    case 'closing':
-        $base_sql = "
-            SELECT DISTINCT
-                c.id AS course_id,
-                c.fullname AS course_name,
-                c.shortname AS course_shortname,
-                c.summary AS course_summary,
-                c.enddate,
-                f.filename AS course_image_filename,
-                CONCAT('/pluginfile.php/', ctx.id, '/course/overviewfiles/', f.filename) AS course_image_url
-            FROM {course} c
-            $enrollment_join
-            LEFT JOIN {context} ctx ON c.id = ctx.instanceid AND ctx.contextlevel = 50
-            LEFT JOIN {files} f ON ctx.id = f.contextid AND f.component = 'course'
-                AND f.filearea = 'overviewfiles' AND f.filename <> '.'
-            WHERE c.visible = 1
-                AND c.enddate > UNIX_TIMESTAMP()
-                AND c.enddate <= :closing_date
-                AND c.startdate <= UNIX_TIMESTAMP()
-            ORDER BY c.enddate ASC
-        ";
+    $params = [
+        'userid' => $userid,
+        'now' => time(),
+        'closing_date' => time() + (15 * 24 * 60 * 60)
+    ];
 
-        // First try: Courses ending in next 15 days
-        $params = [
-            'userid' => $userid,
-            'closing_date' => time() + (15 * 24 * 60 * 60)
-        ];
-        $courses = $DB->get_records_sql($base_sql . " LIMIT 4", $params);
-        
-        // Second try: Extend to 30 days if needed
-        if (count($courses) < 4) {
-            $params['closing_date'] = time() + (30 * 24 * 60 * 60);
-            $more_courses = $DB->get_records_sql($base_sql . " LIMIT 10", $params);
-            
-            foreach ($more_courses as $course) {
-                if (count($courses) >= 4) break;
-                if (!isset($courses[$course->course_id])) {
-                    $courses[$course->course_id] = $course;
-                }
+    $courses = $DB->get_records_sql($sql, $params);
+
+    if (count($courses) < 4) {
+        $params['closing_date'] = time() + (30 * 24 * 60 * 60);
+        $more_courses = $DB->get_records_sql($sql, $params);
+        foreach ($more_courses as $course) {
+            if (count($courses) >= 4) break;
+            if (!isset($courses[$course->course_id])) {
+                $courses[$course->course_id] = $course;
             }
         }
-        
-        // Final sorting by enddate
-        usort($courses, function($a, $b) {
-            return $a->enddate <=> $b->enddate;
-        });
-        break;
+    }
 
-    default:
-        $courses = [];
-        break;
+    usort($courses, function($a, $b) {
+        return $a->enddate <=> $b->enddate;
+    });
+    break;
+
+
 }
 
 
@@ -147,15 +144,23 @@ foreach ($courses as $course) {
             : $rawsummary;
     }
     
+$course_object = get_course($course->course_id); // Needed for core_completion
+$progress = progress::get_course_progress_percentage($course_object);
+$progress = is_numeric($progress) ? round($progress) : 0;
+$enddate = property_exists($course, 'enddate') ? (int)$course->enddate : null;
 
-    $courses_data[] = [
-        'course_id' => (int)$course->course_id,
-        'course_name' => $course->course_name,
-        'course_shortname' => $course->course_shortname,
-        'course_summary' => $summary,
-        'course_image_url' => $course_image_url,
-        'course_url' => (new moodle_url('/course/view.php', ['id' => $course->course_id]))->out(false),
-    ];
+$courses_data[] = [
+    'course_id' => (int)$course->course_id,
+    'course_name' => $course->course_name,
+    'course_shortname' => $course->course_shortname,
+    'course_summary' => $summary,
+    'course_image_url' => $course_image_url,
+    'course_url' => (new moodle_url('/course/view.php', ['id' => $course->course_id]))->out(false),
+    'progress' => $progress,
+    'enddate' => $enddate
+];
+
+
 }
 
 // Ensure at least 4 courses
@@ -174,6 +179,8 @@ if (count($courses_data) < $min_courses) {
             $placeholder['course_name'] = 'No courses closing soon';
             $placeholder['course_summary'] = 'Check back later for upcoming deadlines';
             $placeholder['course_shortname'] = 'no-closing';
+            $placeholder['progress'] = 0;
+            $placeholder['enddate'] = null;
         } else {
             $placeholder['course_name'] = 'Coming Soon';
             $placeholder['course_summary'] = 'New courses coming soon';
