@@ -1370,6 +1370,12 @@ html {
   margin-bottom: 6px;
 }
 
+.countdown-text{
+  position:absolute;
+  top: 10px;
+  left:10px;
+  padding:5px;
+}
     </style>
 </head>
 
@@ -1739,9 +1745,7 @@ function renderCourses(courses, type) {
 
         ${type === 'closing' && course.enddate ? `
         <div class="expiring-timer" data-enddate="${course.enddate * 1000}">
-          <span class="countdown-text">Ends in: <span class="countdown-value">Loading...</span></span>
-          <br>
-          <small>Ends on: ${new Date(course.enddate * 1000).toLocaleDateString()}</small>
+          <span class="countdown-text text-light bg-danger"> <span class="countdown-value">Loading...</span></span>
         </div>
       ` : ''}
 
@@ -1752,7 +1756,13 @@ function renderCourses(courses, type) {
           <div class="progress-label">${course.progress || 0}% complete</div>
         </div>
 
-        <a href="${course.course_url}" class="course-card-link"><span>Explore Course</span></a>
+      <div class="d-flex justify-content-between align-items-center">
+          <a href="${course.course_url}" class="course-card-link"><span>Explore Course</span></a>
+          ${type === 'closing' && course.enddate ? `
+          <small>Ends On: ${new Date(course.enddate * 1000).toLocaleDateString()}</small>
+        </div>
+      </div>
+      ` : ''}
       </div>
     `;
 
@@ -1786,7 +1796,7 @@ function renderCourses(courses, type) {
         try {
             const response = await fetch(`${MOODLE_WWWROOT}/theme/academi/layout/getcourses.php?type=${type}`, {
                 credentials: 'include'
-            });
+            });    
             
             if (!response.ok) throw new Error('Network response was not ok');
             

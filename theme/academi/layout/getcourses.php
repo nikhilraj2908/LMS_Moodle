@@ -101,7 +101,7 @@ case 'closing':
     $params = [
         'userid' => $userid,
         'now' => time(),
-        'closing_date' => time() + (15 * 24 * 60 * 60)
+        'closing_date' => time() + (365 * 24 * 60 * 60)
     ];
 
     $courses = $DB->get_records_sql($sql, $params);
