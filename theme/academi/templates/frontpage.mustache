@@ -1386,6 +1386,72 @@ html {
   left:10px;
   padding:5px;
 }
+
+
+.announcement-box {
+  background: linear-gradient(to right, #f4faff, #eaf4fb);
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 30px;
+  height: 420px;
+}
+
+.announcement-icon-wrapper {
+  flex-shrink: 0;
+}
+
+.announcement-icon-img {
+  width: 300px;
+  height: auto;
+}
+
+.announcement-text-content h3 {
+  font-size: 2rem;
+  color: #003366;
+
+}
+
+.announcement-subtext {
+  color: #666;
+  font-size: 1rem;
+  padding: 10px;
+}
+
+.btn:not(:disabled):not(.disabled)
+
+ {
+    border-color: #204070;
+}
+
+
+
+.btn-dark {
+  background-color: #003366;
+  border: none;
+}
+
+.btn-dark:hover {
+  background-color: #002244;
+}
+
+.btn-outline-dark {
+  color: #003366;
+  border: 2px solid #003366;
+}
+
+.btn-outline-dark:hover {
+  background-color: #003366;
+  color: white;
+}
+
+.d-flex
+ {
+    display: flex !important;
+    gap: 10px;
+}
     </style>
 </head>
 
@@ -1525,7 +1591,7 @@ html {
     <div class="container my-5">
  <div class=" align-items-start newsletter-wrapper">
   <!-- Left Side: Subscribe Box -->
-<div class="col-md-5 col-12 animated-element slide-in-left delay-1">
+ <div class="col-md-5 col-12 animated-element slide-in-left delay-1">
   <div class="announcement-box d-flex align-items-center p-4 shadow rounded-4">
     <div class="announcement-icon-wrapper me-4">
       <img src="{{config.wwwroot}}/theme/academi/pix/Newsletter.png" alt="Newsletter Icon" class="announcement-icon-img">
@@ -1538,12 +1604,11 @@ html {
 <a href="{{config.wwwroot}}/mod/forum/view.php?f={{forumid}}" class="btn btn-outline-dark rounded-pill px-4 py-2">
   All Announcements
 </a>
-
+ 
       </div>
     </div>
   </div>
 </div>
-
 
   <!-- Right Side: Forum Newsletter Items -->
   <div class="col-md-7 col-12  animated-element slide-in-right delay-1">
