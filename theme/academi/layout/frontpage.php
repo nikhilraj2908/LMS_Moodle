@@ -82,10 +82,21 @@ foreach ($top5 as $tp) {
                             'returnurl' => $CFG->wwwroot // Ensure proper return URL
                         ];
                         break;
+                        $templatecontext['forumid'] = $forum->id;
+
                     }
                 }
             }
         }
+        // Fallback: If no forumid was set, use Site News forum
+if (empty($templatecontext['forumid'])) {
+    require_once($CFG->dirroot . '/mod/forum/lib.php');
+    $newsforum = forum_get_course_forum(SITEID, 'news');
+    if ($newsforum && !empty($newsforum->id)) {
+        $templatecontext['forumid'] = $newsforum->id;
+    }
+}
+
     }
 }
 if (isloggedin() && !isguestuser()) {

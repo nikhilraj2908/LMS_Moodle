@@ -1038,7 +1038,7 @@ body, #page-wrapper {
     align-items: center;
     font-size: 1rem;
     padding: 20px;
-    height: 130px;
+    height: 100px;
      border-left: 5px solid #204070;
         padding: 15px 20px;
     margin-bottom: 20px; /* More space between announcements */
@@ -1084,9 +1084,7 @@ body, #page-wrapper {
     margin-left: 10px;
 }
 
-.announcement-title:hover {
-    text-decoration: underline;
-}
+
 
 .announcement-meta {
     font-size: 0.85em;
@@ -1181,6 +1179,7 @@ body, #page-wrapper {
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  height: 420px;
 }
 
 /* For Laptop and Desktop (larger screens) */
@@ -1316,58 +1315,69 @@ html {
     will-change: transform, opacity; /* Optimize for animation */
 }
 
-
-
-.progress-container {
-  background-color: #e0e0e0;
-  border-radius: 6px;
-  overflow: hidden;
-  height: 8px;
-  margin: 8px 0;
-  width:65%
+.announcement-box {
+  background: linear-gradient(to right, #f4faff, #eaf4fb);
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 30px;
+  height: 420px;
 }
 
-.progress-bar {
-  height: 100%;
-  background-color: #4caf50; /* green */
-  transition: width 0.4s ease-in-out;
+.announcement-icon-wrapper {
+  flex-shrink: 0;
 }
 
-.progress-label {
-  font-size: 0.8rem;
-  color: #555;
-  margin-bottom: 6px;
+.announcement-icon-img {
+  width: 300px;
+  height: auto;
 }
-.progress-bar[data-progress^="0"] { background-color: #e74c3c; }     /* red */
-.progress-bar[data-progress^="5"] { background-color: #f1c40f; }     /* yellow */
-.progress-bar[data-progress^="9"] { background-color: #2ecc71; }     /* green */
+
+.announcement-text-content h3 {
+  font-size: 2rem;
+  color: #003366;
+
+}
+
+.announcement-subtext {
+  color: #666;
+  font-size: 1rem;
+  padding: 10px;
+}
+
+.btn:not(:disabled):not(.disabled)
+
+ {
+    border-color: #204070;
+}
 
 
 
-.course-badge {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  background-color: #ff4d4f; /* bright red */
+.btn-dark {
+  background-color: #003366;
+  border: none;
+}
+
+.btn-dark:hover {
+  background-color: #002244;
+}
+
+.btn-outline-dark {
+  color: #003366;
+  border: 2px solid #003366;
+}
+
+.btn-outline-dark:hover {
+  background-color: #003366;
   color: white;
-  font-size: 0.7rem;
-  font-weight: bold;
-  padding: 4px 8px;
-  border-radius: 4px;
-  z-index: 2;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
-.custom-course-card-image {
-  position: relative;
-}
-
-
-.expiring-timer {
-  font-size: 0.8rem;
-  color: #d9534f;
-  font-weight: 500;
-  margin-bottom: 6px;
+.d-flex
+ {
+    display: flex !important;
+    gap: 10px;
 }
 
 .countdown-text{
@@ -1515,33 +1525,25 @@ html {
     <div class="container my-5">
  <div class=" align-items-start newsletter-wrapper">
   <!-- Left Side: Subscribe Box -->
-  <div class="col-md-5 col-12 animated-element slide-in-left delay-1">
-    <div class="newsletter-box text-center p-4 rounded-4 shadow">
-      <div class="bg-texture rounded-4"></div>
-      <div class="position-relative z-2">
-        <img src="{{config.wwwroot}}/theme/academi/pix/Newsletter.png" alt="Newsletter Icon" 
-          class="newsletter-img mb-3" 
-          style="z-index: 2; height:30vh; max-width: 100%;">
+<div class="col-md-5 col-12 animated-element slide-in-left delay-1">
+  <div class="announcement-box d-flex align-items-center p-4 shadow rounded-4">
+    <div class="announcement-icon-wrapper me-4">
+      <img src="{{config.wwwroot}}/theme/academi/pix/Newsletter.png" alt="Newsletter Icon" class="announcement-icon-img">
+    </div>
+    <div class="announcement-text-content">
+      <h3 class="announcement-title mb-1">Important Announcements</h3>
+      <p class="announcement-subtext mb-3">Stay Updated! with the latest newsletters and announcements</p>
+      <div class="d-flex gap-2">
+<a href="{{config.wwwroot}}/mod/forum/post.php?forum={{forumid}}" class="btn btn-dark rounded-pill px-4 py-2"><i class="fa fa-plus me-2"></i>Add New</a>
+<a href="{{config.wwwroot}}/mod/forum/view.php?f={{forumid}}" class="btn btn-outline-dark rounded-pill px-4 py-2">
+  All Announcements
+</a>
 
-        <h5 class="mb-2 fw-semibold">Subscribe To</h5>
-        <h2 class="fw-bold mb-4 text-primary">Our Newsletter!</h2>
-        <div class="forum-subscription-btn mb-3">
-          {{#forumsubscription}}
-          <form class="forum-subscription-form" data-cmid="{{cmid}}">
-            <input type="hidden" name="id" value="{{cmid}}">
-            <input type="hidden" name="sesskey" value="{{sesskey}}">
-            <input type="hidden" name="returnurl" value="{{config.wwwroot}}/">
-            <button type="button" class="btn btn-primary px-4 py-2 rounded-pill subscription-toggle-btn"
-              data-action="{{#subscribed}}unsubscribe{{/subscribed}}{{^subscribed}}subscribe{{/subscribed}}">
-              {{#subscribed}}{{#str}}unsubscribe, mod_forum{{/str}}{{/subscribed}}
-              {{^subscribed}}{{#str}}subscribe, mod_forum{{/str}}{{/subscribed}}
-            </button>
-          </form>
-          {{/forumsubscription}}
-        </div>
       </div>
     </div>
   </div>
+</div>
+
 
   <!-- Right Side: Forum Newsletter Items -->
   <div class="col-md-7 col-12  animated-element slide-in-right delay-1">
