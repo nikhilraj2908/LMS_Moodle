@@ -1023,33 +1023,36 @@ body, #page-wrapper {
     background: #ccc;
     border-radius: 4px;
 }
-.block_news_items .bg-announcements {
-    background: url("https://cdn.pixabay.com/photo/2020/04/10/19/17/notification-5024558_960_720.png") no-repeat center;
-    background-size: cover;
-    padding: 20px;
-    border-radius: 10px;
-}
-.newlink{
-    margin-bottom:10px;
-}
 
+.newlink{
+display:none;    
+}
+.news-footer{
+  display:none;
+}
 .announcement-card {
      display: flex;
+    align-content: center;
     align-items: center;
     font-size: 1rem;
     padding: 20px;
     height: 130px;
      border-left: 5px solid #204070;
-        padding: 15px 20px;
-    margin-bottom: 20px; /* More space between announcements */
+    padding: 15px 20px;
+    margin: 10px !important;  /* More space between announcements */
     border-radius: 15px;
     box-shadow: 0 6px 16px rgba(0,0,0,0.12); /* More visible shadow */
      background: linear-gradient(to right, #ffffff 0%, rgb(204 242 255) 100%);
     padding:30px;
     border-bottom-right-radius: 45px 45px;
     border-bottom-left-radius: 45px 45px;
+    width:45%
 }
 
+.announcement-card:hover{
+  cursor:pointer;
+  padding-bottom:5px;
+}
 .announcement-icon {
     width: 40px;
     height: 40px;
@@ -1099,7 +1102,8 @@ body, #page-wrapper {
 .bg-announcements ul{
     overflow: scroll;
     scrollbar-width: none;
-    height: 46vh;
+    height:300px;
+  
 }
 .unlist, .unlist li, .inline-list, .inline-list li, .block .list, .block .list li, .section li.movehere, .tabtree li {
     margin-bottom:20px;
@@ -1177,12 +1181,20 @@ body, #page-wrapper {
 }
 
 .newsletter-posts {
+  width:45%;
   background-color: rgba(255, 255, 255, 0.75);
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+<<<<<<< HEAD
+=======
+  height:420px;
 }
-
+.bg-announcements .unlist{
+  display:flex;
+  flex-wrap:wrap;
+>>>>>>> dafc134d084f800ba10a0bde74acd7601bdf1870
+}
 /* For Laptop and Desktop (larger screens) */
 @media (min-width: 768px) {
   .newsletter-img {
@@ -1591,7 +1603,13 @@ html {
       <h3 class="announcement-title mb-1">Important Announcements</h3>
       <p class="announcement-subtext mb-3">Stay Updated! with the latest newsletters and announcements</p>
       <div class="d-flex gap-2">
-<a href="{{config.wwwroot}}/mod/forum/post.php?forum={{forumid}}" class="btn btn-dark rounded-pill px-4 py-2"><i class="fa fa-plus me-2"></i>Add New</a>
+            {{#isadmin}}
+  <!-- Show Add Button Only to Admins -->
+              <a href="{{config.wwwroot}}/mod/forum/post.php?forum={{forumid}}" class="btn btn-dark rounded-pill px-4 py-2">
+                <i class="fa fa-plus me-2"></i>Add New
+              </a>
+            {{/isadmin}}
+
 <a href="{{config.wwwroot}}/mod/forum/view.php?f={{forumid}}" class="btn btn-outline-dark rounded-pill px-4 py-2">
   All Announcements
 </a>
@@ -1602,10 +1620,11 @@ html {
 </div>
 
   <!-- Right Side: Forum Newsletter Items -->
-  <div class="col-md-7 col-12  animated-element slide-in-right delay-1">
-    <div class="newsletter-posts px-2">
+  <div class="col-md-7 d-flex  animated-element slide-in-right delay-1">
+    <span class="newsletter-posts w-100 px-2">
+    <h3 class="p-2 text-primary"> Announcement Board</h3>
       {{{newsitems_html}}}
-    </div>
+    </span>
   </div>
 </div>
 
