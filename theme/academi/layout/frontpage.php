@@ -227,6 +227,7 @@ if (isloggedin() && !isguestuser()) {
     $templatecontext['alert_gif'] = $OUTPUT->image_url('alert', 'theme_academi')->out(false);
 
     $is_admin = is_siteadmin($USER->id);
+    $templatecontext['isadmin'] = $is_admin;
     $showpopup = false;
     $popupmessage = "";
     
