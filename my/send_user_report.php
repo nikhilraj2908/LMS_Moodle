@@ -10,11 +10,11 @@ header('Content-Type: application/json');
 try {
     $input = json_decode(file_get_contents('php://input'), true);
     $userid = clean_param($input['userid'], PARAM_INT);
-    $email = clean_param($input['email'], PARAM_EMAIL);
+    // $email = clean_param($input['email'], PARAM_EMAIL);    /////used for mail to user profile whose opened 
 
-    if (!validate_email($email)) {
-        throw new Exception('Invalid email address.');
-    }
+    // if (!validate_email($email)) {
+    //     throw new Exception('Invalid email address.');
+    // }//////// ///used for mail to user profile whose opened
 
     $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
 
@@ -107,10 +107,19 @@ foreach ($coursedetails as $row) {
     $filepath = $tempdir . '/' . $filename;
     file_put_contents($filepath, $csv);
 
-    $recipient = \core_user::get_user_by_email($email);
-    if (!$recipient) {
-        $recipient = (object)[ 'email' => $email, 'firstname' => 'User', 'lastname' => 'Report' ];
-    }
+    // $recipient = \core_user::get_user_by_email($email);
+    // if (!$recipient) {
+    //     $recipient = (object)[ 'email' => $email, 'firstname' => 'User', 'lastname' => 'Report' ];
+    // } ////used for mail to user profile whose opened 
+
+
+    $recipient = get_admin(); // Get the site admin
+
+//     $recipient = (object)[
+//     'email' => 'admin@example.com',
+//     'firstname' => 'Admin',
+//     'lastname' => 'User',
+// ];   ////////////alternativly you can use this to send to any email address
 
     $from = \core_user::get_noreply_user();
     $subject = "User Course Report";

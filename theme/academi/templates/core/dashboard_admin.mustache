@@ -668,12 +668,60 @@ const mailModal = new bootstrap.Modal(document.getElementById('mailReportModal')
 const sendMailConfirm = document.getElementById('sendMailConfirm');
 const recipientEmailInput = document.getElementById('recipientEmail');
 const mailError = document.getElementById('mailError');
-
+/*
 if (mailReportBtn) {
   mailReportBtn.addEventListener('click', function() {
     recipientEmailInput.value = '';
     mailError.style.display = 'none';
     mailModal.show();
+  });
+}//////old 
+*/
+
+if (mailReportBtn) {
+  mailReportBtn.addEventListener('click', async function () {
+    const categorySelect = document.getElementById('categorySelect');
+    const selectedCategoryId = categorySelect ? categorySelect.value : 0;
+
+    mailReportBtn.disabled = true;
+    mailReportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+    try {
+      const response = await fetch(moodleRoot + '/my/send_report.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoryid: selectedCategoryId })
+      });
+
+      const contentType = response.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        throw new Error("Server did not return JSON. Check PHP for errors.");
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        mailReportBtn.innerHTML = '<i class="fas fa-check"></i> Sent!';
+        mailReportBtn.classList.remove('btn-primary');
+        mailReportBtn.classList.add('btn-success');
+      } else {
+        throw new Error(data.message || 'Unknown error');
+      }
+
+    } catch (err) {
+      console.error(err);
+      mailReportBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Failed';
+      mailReportBtn.classList.remove('btn-primary');
+      mailReportBtn.classList.add('btn-danger');
+    } finally {
+      setTimeout(() => {
+        mailReportBtn.innerHTML = '<i class="fas fa-envelope"></i> Mail Report';
+        mailReportBtn.classList.remove('btn-success', 'btn-danger');
+        mailReportBtn.classList.add('btn-primary');
+        mailReportBtn.disabled = false;
+      }, 4000);
+    }
   });
 }
 

@@ -11,16 +11,16 @@ require_once($CFG->dirroot . '/user/lib.php');
 require_login();
 $PAGE->set_context(context_system::instance());
 header('Content-Type: application/json');
-
+$admin = get_admin();
 try {
     // Step 1: Read and validate input
     $input = json_decode(file_get_contents('php://input'), true);
     $categoryid = isset($input['categoryid']) ? (int)$input['categoryid'] : 0;
-    $email = isset($input['email']) ? clean_param($input['email'], PARAM_EMAIL) : '';
+    // $email = isset($input['email']) ? clean_param($input['email'], PARAM_EMAIL) : ''; /////// //old send report using modal to anyone
 
-    if (!validate_email($email)) {
-        throw new Exception('Invalid email address.');
-    }
+    // if (!validate_email($email)) {
+    //     throw new Exception('Invalid email address.');
+    // }   //// ////////old send report using modal to anyone
 
     // Step 2: Build SQL
     $categoryWhere = '';
@@ -102,15 +102,22 @@ foreach ($reportRows as $row) {
     }
 
     // Step 5: Get recipient user
-    $user = \core_user::get_user_by_email($email);
-    if (!$user) {
-        $user = (object)[
-            'email' => $email,
-            'firstname' => 'User',
-            'lastname' => 'Report'
-        ];
-    }
+    // $user = \core_user::get_user_by_email($email);
+    // if (!$user) {
+    //     $user = (object)[
+    //         'email' => $email,
+    //         'firstname' => 'User',
+    //         'lastname' => 'Report'
+    //     ];
+    // }   //////////old send report using modal to anyone
 
+
+
+    $recipient = get_admin();  // Always send to site admin
+
+
+
+    
     // Step 6: Email the report (FIXED ATTACHMENT HANDLING)
     $from = \core_user::get_noreply_user();
     $subject = "User Summary Report";
@@ -118,7 +125,8 @@ foreach ($reportRows as $row) {
     $messagehtml = "<p>Hi,<br><br>Attached is the <strong>User Summary Report</strong> based on your selected category filter.<br><br>Regards,<br>Admin</p>";
 
     $success = email_to_user(
-        $user,
+        ////$user,///////////////////old send report to user
+        $recipient,
         $from,
         $subject,
         $messagetext,
