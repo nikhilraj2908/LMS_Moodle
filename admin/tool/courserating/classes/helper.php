@@ -442,8 +442,11 @@ class helper {
             'context' => $context,
         ];
         if (self::get_setting(constants::SETTING_USEHTML)) {
-            list($text, $format) = external_format_text($row->review, FORMAT_HTML, $formatparams['context'],
-                $formatparams['component'], $formatparams['filearea'], $formatparams['itemid'], $formatparams['options']);
+            // list($text, $format) = external_format_text($row->review, FORMAT_HTML, $formatparams['context'],
+            //     $formatparams['component'], $formatparams['filearea'], $formatparams['itemid'], $formatparams['options']);
+            list($text, $format) = \external_format_text($row->review, FORMAT_HTML, $formatparams['context'],
+            $formatparams['component'], $formatparams['filearea'], $formatparams['itemid'], $formatparams['options']);
+
             return $text;
         } else {
             return format_text(clean_param($row->review, PARAM_TEXT), FORMAT_MOODLE, ['context' => $context]);

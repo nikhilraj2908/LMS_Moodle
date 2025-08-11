@@ -12,6 +12,9 @@
     margin-bottom: 0rem !important;
     flex: 1 0 auto;
 }
+body#page-course-view-remuiformat .align-items-center{
+    margin-bottom: 0px;
+}
 </style>
 <?php
 // This file is part of Moodle - http://moodle.org/

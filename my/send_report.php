@@ -32,6 +32,7 @@ try {
     }
 
   // Step 2: Build SQL with category join
+//   C:\xampp\htdocs\moodle\my\send_report.php
 $sql = "
     SELECT 
         u.id,
