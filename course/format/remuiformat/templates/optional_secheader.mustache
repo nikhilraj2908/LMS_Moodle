@@ -21,8 +21,8 @@
                             <!-- Left Card (35%) - Profile + Course + Ratings -->
                             <div class="glassmorphism-box combined-box" style="width:35%;">
                                 {{#teachers}}
-                                <div class="instructor-info stat-container position-relative">
-                                    {{#instructors}}
+                                    <div class="instructor-info stat-container position-relative">
+                                     {{#instructors}}
                                     <div class="position-relative modern-instructor">
                                         <a class="view-user-profile-link" href="{{teacherprofileurl}}" title="{{name}}">
                                             {{{avatars}}}
@@ -30,18 +30,17 @@
                                         <span class="titles modern-title">{{name}}</span>
                                     </div>
                                     {{/instructors}}
-                                    
-                                    <div class="page-context-header p-0 m-0">
-                                        <div class="page-header-headings p-0">
-                                            <h1 class="h2 header-heading coursepage design-1 modern-course-title">{{{coursefullname}}}</h1>
-                                        </div>
+                                    {{#teachercount}}<a class="view-all-instructorslink modern-view-all" href="{{participantspageurl}}">view all</a>{{/teachercount}}
                                     </div>
-                                    
-                                    {{#teachercount}}
-                                        <a class="view-all-instructorslink modern-view-all" href="{{participantspageurl}}">view all</a>
-                                    {{/teachercount}}
-                                </div>
                                 {{/teachers}}
+
+                                    <!-- Title should ALWAYS render --> 
+                                    <div class="page-context-header p-0 m-0">
+                                    <div class="page-header-headings p-0">
+                                        <h1 class="h2 header-heading coursepage design-1 modern-course-title">{{{coursefullname}}}</h1>
+                                    </div>
+                                    </div>
+
                                 
                                 <!-- Rating Component - Now properly included 
                                 <div class="rating-component-wrapper mt-9">
