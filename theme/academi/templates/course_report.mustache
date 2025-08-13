@@ -1,0 +1,304 @@
+<div class="admin-container">
+  <div class="text-start my-3 d-flex gap-2">
+    <a href="{{{config.wwwroot}}}/my" class="btn btn-primary">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+    <a href="{{{config.wwwroot}}}/course/view.php?id={{course.id}}" class="btn btn-outline-primary  mx-2">
+      <i class="fas fa-book"></i> Open Course
+    </a>
+  </div>
+
+  <div class="dashboard-header d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-3">
+ 
+      <div>
+        <h3 class="mb-1 fw-bold text-dark">{{course.fullname}}</h3>
+        <div class="text-muted small">
+          <i class="fas fa-layer-group me-1"></i> {{course.categoryname}}
+          {{#course.startdate}} &nbsp; • &nbsp; <i class="fas fa-calendar me-1"></i> Starts {{course.startdate}}{{/course.startdate}}
+        </div>
+        <div class="text-muted mt-2">
+          <i class="fas fa-calendar-day me-1"></i> {{date}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top stats (clickable filters) -->
+  <div class="row mt-3">
+    <div class="col-md-2">
+      <div class="admin-card stat-card js-filter-card" data-status="all" tabindex="0" role="button" aria-label="Show all">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-value">{{stats.enrolled}}</div>
+        <div class="stat-label">Enrolled</div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="admin-card stat-card js-filter-card" data-status="completed" tabindex="0" role="button" aria-label="Show completed">
+        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-value">{{stats.completed}}</div>
+        <div class="stat-label">Completed</div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="admin-card stat-card js-filter-card" data-status="inprogress" tabindex="0" role="button" aria-label="Show in progress">
+        <div class="stat-icon"><i class="fas fa-tasks"></i></div>
+        <div class="stat-value">{{stats.inprogress}}</div>
+        <div class="stat-label">In Progress</div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="admin-card stat-card js-filter-card" data-status="notstarted" tabindex="0" role="button" aria-label="Show not started">
+        <div class="stat-icon"><i class="fas fa-pause-circle"></i></div>
+        <div class="stat-value">{{stats.notstarted}}</div>
+        <div class="stat-label">Not Started</div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="admin-card stat-card">
+        <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="stat-value">{{stats.avgprogress}}%</div>
+        <div class="stat-label">Avg Progress</div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="admin-card stat-card">
+        <div class="stat-icon"><i class="fas fa-puzzle-piece"></i></div>
+        <div class="stat-value">{{stats.totalmodules}}</div>
+        <div class="stat-label">Trackable Modules</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-card mt-3 p-4 shadow rounded bg-white">
+
+    <!-- FILTERS PANEL -->
+    <div class="filters-panel mb-3">
+      <form id="cr-filter-form" method="get" class="filters-form">
+        <input type="hidden" name="id" value="{{course.id}}">
+
+        <!-- Search -->
+        <div class="form-group mb-3">
+          <label class="form-label mb-1">Search user:</label>
+          <div class="input-group input-group-lg">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fas fa-search"></i></span>
+            </div>
+            <input type="text"
+                   class="form-control"
+                   name="userq"
+                   value="{{filters.userq}}"
+                   placeholder="Type name or email…">
+          </div>
+        </div>
+
+        <!-- Row with Status + Sort -->
+        <div class="form-row">
+        <!-- Status -->
+<div class="form-group col-12 col-md-5 col-lg-4">
+  <label class="form-label mb-1 d-block">Status</label>
+  <select id="status-select" name="status" class="custom-select custom-select-lg">
+    <option value="all"        {{#filters.status_is_all}}selected{{/filters.status_is_all}}>All statuses</option>
+    <option value="completed"  {{#filters.status_is_completed}}selected{{/filters.status_is_completed}}>Completed</option>
+    <option value="inprogress" {{#filters.status_is_inprogress}}selected{{/filters.status_is_inprogress}}>In Progress</option>
+    <option value="notstarted" {{#filters.status_is_notstarted}}selected{{/filters.status_is_notstarted}}>Not Started</option>
+  </select>
+</div>
+
+<!-- Sort + direction toggle -->
+<div class="form-group col-12 col-md-7 col-lg-8">
+  <label class="form-label mb-1 d-block">Sort by</label>
+  <div class="d-flex">
+    <select id="sortby-select" name="sortby" class="custom-select custom-select-lg flex-grow-1 mr-2">
+      <option value="name"     {{#filters.sortby.isname}}selected{{/filters.sortby.isname}}>Name (A–Z)</option>
+      <option value="progress" {{#filters.sortby.isprogress}}selected{{/filters.sortby.isprogress}}>Progress %</option>
+      <option value="points"   {{#filters.sortby.ispoints}}selected{{/filters.sortby.ispoints}}>Points</option>
+    </select>
+
+    <input type="hidden" name="dir" id="cr-dir" value="{{filters.dir.value}}">
+    <button type="button"
+            class="btn btn-outline-secondary btn-lg filters-icon"
+            id="cr-toggle-dir"
+            title="Toggle direction">
+      <i class="fas {{#filters.dir.isdesc}}fa-sort-amount-down{{/filters.dir.isdesc}}{{^filters.dir.isdesc}}fa-sort-amount-up{{/filters.dir.isdesc}}"></i>
+    </button>
+  </div>
+</div>
+
+        </div>
+
+        <!-- Actions (Apply kept as an option; auto-submit handles changes) -->
+        <div class="form-row mt-1">
+          <div class="col-12 col-md-6 mb-2 mb-md-0">
+            <button type="submit" class="btn btn-primary btn-lg w-100">
+              <i class="fas fa-filter mr-2"></i> Apply
+            </button>
+          </div>
+          <div class="col-12 col-md-6">
+           <a href="{{{exportUrl}}}" download
+                class="btn btn-danger btn-lg w-100 {{^hasusers}}disabled{{/hasusers}}"
+                {{^hasusers}}aria-disabled="true" tabindex="-1"{{/hasusers}}>
+                <i class="fas fa-file-csv mr-2"></i> Export CSV
+            </a>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th style="min-width: 160px;">Progress</th>
+            <th>Status</th>
+            <th>Points</th>
+            <th>Last Access</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#users}}
+          <tr>
+            <td><a href="{{profileurl}}" target="_blank">{{fullname}}</a></td>
+            <td>{{email}}</td>
+            <td>
+              <div class="progress" style="height:20px;">
+                <div class="progress-bar"
+                     role="progressbar"
+                     style="width: {{progress_percent}}%;"
+                     data-pct="{{progress_percent}}"
+                     aria-valuenow="{{progress_percent}}" aria-valuemin="0" aria-valuemax="100">
+                  {{progress_percent}}%
+                </div>
+              </div>
+            </td>
+            <td>
+              {{#badgeCompleted}}  <span class="badge bg-success text-light">Completed</span> {{/badgeCompleted}}
+              {{#badgeInProgress}} <span class="badge bg-warning text-dark">In Progress</span> {{/badgeInProgress}}
+              {{#badgeNotStarted}} <span class="badge bg-secondary text-light">Not Started</span> {{/badgeNotStarted}}
+            </td>
+            <td>{{points_earned}} / {{max_points}}</td>
+            <td>{{lastaccess_human}}</td>
+            <td class="text-end">
+              <a class="btn btn-sm btn-outline-primary" href="{{{config.wwwroot}}}/my/user_report.php?id={{id}}">
+                <i class="fas fa-eye me-1"></i> User Report
+              </a>
+            </td>
+          </tr>
+          {{/users}}
+
+          {{^users}}
+          <tr><td colspan="7" class="text-center py-4 text-muted">No enrolled users found.</td></tr>
+          {{/users}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<style>
+  .admin-container { max-width: 1400px; }
+  .dashboard-header { background:#80808024; color:#1b1f23; padding:20px 30px; border-radius:12px; }
+  .admin-card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+  .stat-card { text-align:center; }
+  .stat-icon { font-size:1.8rem; color:#3C6894; background:rgba(60,104,148,.1); width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 10px; }
+  .stat-value { font-size:1.8rem; font-weight:800; color:#204070; line-height:1; }
+  .stat-label { opacity:.7; margin-top:4px; }
+  .js-filter-card { cursor:pointer; }
+  .js-filter-card:focus { outline:0; box-shadow:0 0 0 .2rem rgba(32,64,112,.2); }
+
+  .progress-bar { background-color:#204070; }
+  .progress .progress-bar[data-pct="0"]      { background-color:#adb5bd; }
+  .progress .progress-bar[data-pct="1-49"]   { background-color:#f59e0b; }
+  .progress .progress-bar[data-pct="50-79"]  { background-color:#3C6894; }
+  .progress .progress-bar[data-pct="80-100"] { background-color:#204070; }
+
+  .badge { font-weight:600; letter-spacing:.2px; }
+  .table td, .table th { vertical-align: middle; }
+
+  :root{
+    --panel-border:#e7edf5;
+    --panel-shadow:0 10px 18px rgba(20,45,90,.06);
+    --radius-lg:12px;
+  }
+  .filters-panel{
+    background:#fff;
+    border:1px solid var(--panel-border);
+    border-radius:var(--radius-lg);
+    padding:18px;
+    box-shadow:var(--panel-shadow);
+    position:sticky; top:72px; z-index:10;
+  }
+  @media (max-width:768px){ .filters-panel{ top:60px; } }
+
+  /* Make controls the same height (Bootstrap 4) */
+  .input-group-lg .form-control,
+  .input-group-lg .input-group-text,
+  .custom-select.custom-select-lg,
+  .btn.btn-lg{ height:48px; }
+  .input-group-text{ background:#f4f7fb; }
+  .input-group-lg .input-group-text{ border-top-left-radius:10px; border-bottom-left-radius:10px; }
+  .input-group-lg .form-control{ border-top-right-radius:10px; border-bottom-right-radius:10px; }
+  .custom-select.custom-select-lg{ border-radius:10px; }
+  .filters-icon{
+    width:48px; min-width:48px; padding:0;
+    display:inline-flex; align-items:center; justify-content:center;
+    border-radius:10px;
+  }
+  .btn.btn-lg{ border-radius:10px; }
+</style>
+
+<script>
+  // Auto-submit + quick filters + sort-direction + progress colors
+  (function () {
+    var form   = document.getElementById('cr-filter-form');
+    var status = document.getElementById('status-select');
+    var sortby = document.getElementById('sortby-select');
+
+    if (!form) return;
+
+    // Auto-submit when Status or Sort changes
+    if (status) status.addEventListener('change', function(){ form.submit(); });
+    if (sortby) sortby.addEventListener('change', function(){ form.submit(); });
+
+    // Sort direction toggle (kept from your code)
+    var dirBtn = document.getElementById('cr-toggle-dir');
+    if (dirBtn){
+      dirBtn.addEventListener('click', function(){
+        var hidden = document.getElementById('cr-dir');
+        hidden.value = (hidden.value.toLowerCase() === 'desc') ? 'asc' : 'desc';
+        form.submit();
+      });
+    }
+
+    // Clickable stat cards -> set status and submit
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.js-filter-card[data-status]'),
+      function(card){
+        var apply = function(){
+          var v = card.getAttribute('data-status');
+          if (status) status.value = v;
+          form.submit();
+        };
+        card.addEventListener('click', apply);
+        card.addEventListener('keydown', function(e){
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); apply(); }
+        });
+      }
+    );
+
+    // Color thresholds for progress bars
+    document.querySelectorAll('.progress-bar[data-pct]').forEach(function(el){
+      var v = parseInt(el.getAttribute('data-pct'), 10) || 0;
+      el.setAttribute('data-pct',
+        v === 0 ? '0' :
+        v < 50  ? '1-49' :
+        v < 80  ? '50-79' :
+                  '80-100'
+      );
+    });
+  })();
+</script>

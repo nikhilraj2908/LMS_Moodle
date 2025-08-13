@@ -238,6 +238,74 @@
 tr th{
   align-content:center;
 }
+
+
+
+/* Filters row look */
+.course-report .cr-filters .form-label { color: #6b7280; font-weight: 600; }
+.course-report .form-select-sm,
+.course-report .form-control-sm { border-radius: .5rem; }
+
+/* Table header */
+.course-report .cr-thead th {
+  font-weight: 700;
+  color: #415a77; /* deep slate */
+  border-bottom: 1px solid #e9eef5;
+  background: #f8fafc;
+}
+
+/* Rows */
+.course-report .cr-row { border-bottom: 1px solid #f0f4f9; }
+.course-report .cr-course .cr-subtext { font-size: .85rem; color: #6b7280; }
+
+/* Metric badges */
+.metric-badge {
+  display: inline-block;
+  min-width: 28px;
+  padding: .25rem .5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .85rem;
+}
+.badge-enrolled   { background: #eaf2ff; color: #3b82f6; }
+.badge-completed  { background: #eafaf1; color: #22c55e; }
+.badge-inprogress { background: #fff5e6; color: #f59e0b; }
+.badge-notstarted { background: #f2f4f7; color: #9aa4b2; }
+.badge-neutral    { background: #eef2f7; color: #667085; }
+
+/* Progress pill */
+.cr-progress { display: flex; align-items: center; gap: .5rem; min-width: 160px; }
+.cr-bar {
+  position: relative;
+  flex: 1 1 auto;
+  height: 8px;
+  background: #eef2f7;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.cr-bar-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  background: linear-gradient(90deg, #4567b7, #3b82f6);
+  border-radius: 999px;
+}
+.cr-pct { font-weight: 700; color: #334155; min-width: 3ch; }
+
+/* Labels and control heights */
+.course-report .cr-filters .form-label{color:#50627a;font-weight:600;font-size:.9rem}
+
+/* Normalize “sm” heights so select/input/button match */
+.course-report .form-control-sm,
+.course-report .form-select-sm {height:38px; padding:.375rem .5rem; font-size:.9rem}
+.course-report .btn-sm {height:38px; padding:0 .75rem}
+
+/* Make input-group-sm members equal height */
+.course-report .input-group-sm>.form-select,
+.course-report .input-group-sm>.btn {height:38px}
+
+/* Optional spacing tweaks */
+.course-report .cr-filters{padding-bottom:.25rem}
+
 </style>
 
 <div class="admin-container">
@@ -309,16 +377,17 @@ tr th{
   </div>
   <div class="d-flex gap-2 flex-wrap mb-3 align-items-center">
   <div class="d-flex gap-2 align-items-center">
-    <label for="categorySelect" class="form-label mb-0">Select Category:</label>
-    <select id="categorySelect" class="form-select form-select-lg p-1 ms-2" style="width: 200px;">
-      <option value="0" {{^selectedCategoryId}}selected{{/selectedCategoryId}}>All Categories</option>
-      {{#categories}}
-        <option value="{{id}}" {{#selected}}selected{{/selected}}>{{name}}</option>
-        {{#subcategories}}
-          <option value="{{id}}" {{#selected}}selected{{/selected}}>&nbsp;&nbsp;&nbsp;{{name}}</option>
-        {{/subcategories}}
-      {{/categories}}
-    </select>
+    <label for="userCategorySelect" class="form-label mb-0">Select Category:</label>
+<select id="userCategorySelect" class="form-select form-select-lg p-1 ms-2" style="width:200px;">
+  <option value="0" {{#userSelectedAll}}selected{{/userSelectedAll}}>All Categories</option>
+  {{#categoriesUser}}
+    <option value="{{id}}" {{#selected}}selected{{/selected}}>{{name}}</option>
+    {{#subcategories}}
+      <option value="{{id}}" {{#selected}}selected{{/selected}}>&nbsp;&nbsp;&nbsp;{{name}}</option>
+    {{/subcategories}}
+  {{/categoriesUser}}
+</select>
+
   </div>
   <a href="{{summaryExportUrl}}" class="btn btn-sm btn-danger ms-auto">
     <i class="fas fa-download"></i> Export Report
@@ -364,6 +433,74 @@ tr th{
         {{^userSummaries}}
           <tr><td colspan="7">No users found</td></tr>
         {{/userSummaries}}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+<!-- Course Report Summary (matching User Report Summary look) -->
+<div class="admin-card mt-4">
+  <div class="card-header">
+    <h2><i class="fas fa-book-open"></i> Course Report Summary</h2>
+  </div>
+
+  <div class="d-flex gap-2 flex-wrap mb-3 align-items-center">
+    <div class="d-flex gap-2 align-items-center">
+      <label for="courseCategorySelect" class="form-label mb-0">Select Category:</label>
+<select id="courseCategorySelect" class="form-select form-select-lg p-1 ms-2" style="width:200px;">
+  <option value="0" {{#courseSelectedAll}}selected{{/courseSelectedAll}}>All Categories</option>
+  {{#categoriesCourse}}
+    <option value="{{id}}" {{#selected}}selected{{/selected}}>{{name}}</option>
+    {{#subcategories}}
+      <option value="{{id}}" {{#selected}}selected{{/selected}}>&nbsp;&nbsp;&nbsp;{{name}}</option>
+    {{/subcategories}}
+  {{/categoriesCourse}}
+</select>
+
+    </div>
+
+    <a href="{{courseSummaryExportUrl}}" class="btn btn-sm btn-danger ms-auto">
+      <i class="fas fa-download"></i> Export Report
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Course</th>
+          <th>Enrolled</th>
+          <th>Completed</th>
+          <th>In_Progress</th>
+          <th>Not_Started</th>
+          <th>Avg Progress %</th>
+          <th>Trackable Modules</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#courseSummaries}}
+        <tr>
+          <td>{{fullname}}</td>
+          <td>{{enrolled}}</td>
+          <td>{{completed}}</td>
+          <td>{{inprogress}}</td>
+          <td>{{notstarted}}</td>
+          <td>{{avgprogress}}</td>
+          <td>{{totalmodules}}</td>
+          <td>
+            <a href="{{detailsurl}}" class="btn btn-sm btn-primary">
+              <i class="fas fa-eye"></i> Details
+            </a>
+          </td>
+        </tr>
+        {{/courseSummaries}}
+
+        {{^courseSummaries}}
+          <tr><td colspan="8" class="text-center">No courses found</td></tr>
+        {{/courseSummaries}}
       </tbody>
     </table>
   </div>
@@ -522,11 +659,18 @@ tr th{
 
 <script>
 ////////// added for dropdown inside the new summary report
-    document.getElementById('categorySelect')?.addEventListener('change', function () {
-      const url = new URL(window.location.href);
-      url.searchParams.set('categoryid', this.value);
-      window.location.href = url.toString();
-    });
+   function bindCategorySelect(id, paramName) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('change', function () {
+    const url = new URL(window.location.href);
+    url.searchParams.set(paramName, this.value);
+    window.location.href = url.toString();
+  });
+}
+
+bindCategorySelect('userCategorySelect', 'usercat');     // affects only user table
+bindCategorySelect('courseCategorySelect', 'coursecat'); // affects only course table
 
 
     

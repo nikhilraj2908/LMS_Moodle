@@ -994,65 +994,70 @@ if ($isadmin) {
     // Add this in the admin dashboard section (after online users data)
 if ($isadmin) {
     // ... existing admin dashboard code ...
-$selectedCategoryId = optional_param('categoryid', 0, PARAM_INT);
+/**** ===== USER-WISE REPORT (ADMIN) ===== ****/
 
-// Get top-level categories and their subcategories
-$allCategories = $DB->get_records('course_categories', [], 'sortorder ASC');
+/* read the user table’s category filter from the URL */
+$userCategoryId = optional_param('usercat', -1, PARAM_INT);         // from #userCategorySelect
+if ($userCategoryId < 0) {                                          // backward compat with old param
+    $userCategoryId = optional_param('categoryid', 0, PARAM_INT);
+}
 
-$categories = [];
-foreach ($allCategories as $cat) {
-    if ($cat->parent == 0) {
-        $categories[$cat->id] = [
-            'id' => $cat->id,
-            'name' => $cat->name,
-            'selected' => ($selectedCategoryId == $cat->id),
-            'subcategories' => []
-        ];
+/* helper to build dropdown tree (safe to define once) */
+if (!function_exists('build_category_tree_with_selected')) {
+    function build_category_tree_with_selected(array $all, int $selectedid): array {
+        $tops = [];
+        foreach ($all as $c) {
+            if ((int)$c->parent === 0) {
+                $tops[$c->id] = [
+                    'id'            => (int)$c->id,
+                    'name'          => $c->name,
+                    'selected'      => ((int)$selectedid === (int)$c->id),
+                    'subcategories' => [],
+                ];
+            }
+        }
+        foreach ($all as $c) {
+            if ((int)$c->parent !== 0 && isset($tops[$c->parent])) {
+                $tops[$c->parent]['subcategories'][] = [
+                    'id'       => (int)$c->id,
+                    'name'     => $c->name,
+                    'selected' => ((int)$selectedid === (int)$c->id),
+                ];
+            }
+        }
+        return array_values($tops);
     }
 }
 
-foreach ($allCategories as $cat) {
-    if ($cat->parent != 0 && isset($categories[$cat->parent])) {
-        $categories[$cat->parent]['subcategories'][] = [
-            'id' => $cat->id,
-            'name' => $cat->name,
-            'selected' => ($selectedCategoryId == $cat->id)
-        ];
-    }
+/* build category list for the USER dropdown */
+$allCats = $DB->get_records('course_categories', [], 'sortorder ASC');
+$templatecontext['categoriesUser']  = build_category_tree_with_selected($allCats, (int)$userCategoryId);
+$templatecontext['userSelectedAll'] = empty($userCategoryId);
+
+/* filter clause for the user summaries query */
+$categoryWhere = '';
+$userparams    = [];
+if ($userCategoryId > 0) {
+    $categoryWhere        = 'AND c.category = :usercat';
+    $userparams['usercat'] = $userCategoryId;
 }
 
-$templatecontext['categories'] = array_values($categories);
-$templatecontext['selectedCategoryId'] = $selectedCategoryId;
-    // NEW: Get user summaries for the admin dashboard
-  $categoryWhere = '';
-$params = [];
-
-if ($selectedCategoryId > 0) {
-    $categoryWhere = 'AND c.category = :categoryid';
-    $params['categoryid'] = $selectedCategoryId;
-}
-
-$sql = "
+/* user summaries (one row per user; restricted by selected category if any) */
+$usersql = "
     SELECT 
         u.id,
         CONCAT(u.firstname, ' ', u.lastname) AS fullname,
         u.email,
         COUNT(DISTINCT c.id) AS total_courses,
-        COUNT(DISTINCT CASE 
-            WHEN cp.progress_percent = 100 THEN c.id 
-        END) AS completed_courses,
-        COUNT(DISTINCT CASE 
-            WHEN cp.progress_percent > 0 AND cp.progress_percent < 100 THEN c.id 
-        END) AS inprogress_courses,
-        COUNT(DISTINCT CASE 
-            WHEN cp.progress_percent IS NULL OR cp.progress_percent = 0 THEN c.id 
-        END) AS notstarted_courses,
+        COUNT(DISTINCT CASE WHEN cp.progress_percent = 100 THEN c.id END) AS completed_courses,
+        COUNT(DISTINCT CASE WHEN cp.progress_percent > 0 AND cp.progress_percent < 100 THEN c.id END) AS inprogress_courses,
+        COUNT(DISTINCT CASE WHEN cp.progress_percent IS NULL OR cp.progress_percent = 0 THEN c.id END) AS notstarted_courses,
         ROUND(SUM(COALESCE(g.finalgrade, 0)), 0) AS total_points_earned,
         ROUND(SUM(COALESCE(gi.grademax, 0)), 0) AS max_total_points
     FROM {user} u
     LEFT JOIN {user_enrolments} ue ON u.id = ue.userid
-    LEFT JOIN {enrol} e ON ue.enrolid = e.id
-    LEFT JOIN {course} c ON c.id = e.courseid
+    LEFT JOIN {enrol} e            ON ue.enrolid = e.id
+    LEFT JOIN {course} c           ON c.id = e.courseid
     LEFT JOIN (
         SELECT 
             cmc.userid, 
@@ -1063,20 +1068,234 @@ $sql = "
         GROUP BY cmc.userid, cm.course
     ) cp ON cp.userid = u.id AND cp.course = c.id
     LEFT JOIN {grade_items} gi ON gi.courseid = c.id AND gi.itemtype = 'course'
-    LEFT JOIN {grade_grades} g ON g.itemid = gi.id AND g.userid = u.id
+    LEFT JOIN {grade_grades} g ON g.itemid   = gi.id AND g.userid = u.id
     WHERE u.deleted = 0 AND u.suspended = 0
     $categoryWhere
     GROUP BY u.id, u.firstname, u.lastname, u.email
-    ORDER BY u.firstname ASC
+    ORDER BY u.firstname ASC, u.lastname ASC
     LIMIT 500
 ";
+$userSummaries = $DB->get_records_sql($usersql, $userparams);
 
-$userSummaries = $DB->get_records_sql($sql, $params);
 $templatecontext['userSummaries'] = array_values($userSummaries);
+
+/* keep user filter on the User export button */
 $templatecontext['summaryExportUrl'] = (new moodle_url('/my/export.php', [
-    'categoryid' => $selectedCategoryId,
-    'type' => 'summary'
+    'type'   => 'summary',
+    'usercat'=> $userCategoryId ?: null,
 ]))->out(false);
+
+/**** ===== COURSE-WISE REPORT (ADMIN) ===== ****/
+$download = optional_param('download', '', PARAM_ALPHA);
+
+/* Read filters coming from your Mustache/JS */
+$courseCategoryId = optional_param('coursecat', -1, PARAM_INT);            // primary (from #courseCategorySelect)
+if ($courseCategoryId < 0) {                                               // backward-compat
+    $courseCategoryId = optional_param('coursecatid', 0, PARAM_INT);
+}
+$courseq    = trim(optional_param('courseq', '', PARAM_TEXT));             // optional course search
+$sortby     = optional_param('sortby', 'name', PARAM_ALPHA);               // name|enrolled|completed|avg
+$dirraw     = strtolower(optional_param('dir', 'asc', PARAM_ALPHA));
+$dir        = ($dirraw === 'desc') ? 'DESC' : 'ASC';
+
+/* Small helper for the course category dropdown (only define once) */
+if (!function_exists('build_category_tree_with_selected')) {
+    function build_category_tree_with_selected(array $all, int $selectedid): array {
+        $tops = [];
+        foreach ($all as $c) {
+            if ((int)$c->parent === 0) {
+                $tops[$c->id] = [
+                    'id'            => (int)$c->id,
+                    'name'          => $c->name,
+                    'selected'      => ((int)$selectedid === (int)$c->id),
+                    'subcategories' => [],
+                ];
+            }
+        }
+        foreach ($all as $c) {
+            if ((int)$c->parent !== 0 && isset($tops[$c->parent])) {
+                $tops[$c->parent]['subcategories'][] = [
+                    'id'       => (int)$c->id,
+                    'name'     => $c->name,
+                    'selected' => ((int)$selectedid === (int)$c->id),
+                ];
+            }
+        }
+        return array_values($tops);
+    }
+}
+
+/* Build category list for the COURSE dropdown */
+$allCats = $DB->get_records('course_categories', [], 'sortorder ASC');
+$templatecontext['categoriesCourse']  = build_category_tree_with_selected($allCats, (int)$courseCategoryId);
+$templatecontext['courseSelectedAll'] = empty($courseCategoryId);
+
+/* WHERE + params */
+$where  = ['c.visible = 1', 'c.id <> 1'];
+$params = [];
+if ($courseCategoryId) {
+    $where[] = 'c.category = :coursecat';
+    $params['coursecat'] = $courseCategoryId;
+}
+if ($courseq !== '') {
+    $like = $DB->sql_like('LOWER(c.fullname)', ':cq1', false) . ' OR ' .
+            $DB->sql_like('LOWER(c.shortname)', ':cq2', false);
+    $params['cq1'] = '%' . $DB->sql_like_escape(core_text::strtolower($courseq)) . '%';
+    $params['cq2'] = $params['cq1'];
+    $where[] = '(' . $like . ')';
+}
+$whereclause = 'WHERE ' . implode(' AND ', $where);
+
+/* ORDER BY (avgprogress is computed in SQL so we can sort in SQL) */
+switch ($sortby) {
+    case 'enrolled':  $orderby = "enrolled $dir, c.fullname ASC";   break;
+    case 'completed': $orderby = "completed $dir, c.fullname ASC";  break;
+    case 'avg':       $orderby = "avgprogress $dir, c.fullname ASC";break;
+    default:          $orderby = "c.fullname $dir";
+}
+
+/*
+ * MAIN SQL
+ * - Per-user progress = (# completed trackable, visible modules in non-0 sections) / (total trackable, visible modules) * 100
+ * - Aggregate enrolled/completed/inprogress/notstarted and avgprogress per course
+ */
+$sql = "
+    SELECT
+        c.id,
+        c.fullname,
+        cat.name AS categoryname,
+
+        COUNT(DISTINCT ue.userid) AS enrolled,
+
+        COUNT(DISTINCT CASE WHEN COALESCE(up.progress_pct, 0) >= 99.9 THEN ue.userid END) AS completed,
+
+        COUNT(DISTINCT CASE WHEN COALESCE(up.progress_pct, 0) > 0
+                             AND COALESCE(up.progress_pct, 0) < 99.9 THEN ue.userid END) AS inprogress,
+
+        COUNT(DISTINCT CASE WHEN COALESCE(up.progress_pct, 0) <= 0.0 THEN ue.userid END) AS notstarted,
+
+        ROUND(AVG(COALESCE(up.progress_pct, 0))) AS avgprogress,
+
+        (
+            SELECT COUNT(1)
+              FROM {course_modules} cm
+              JOIN {course_sections} cs ON cs.id = cm.section
+             WHERE cm.course = c.id
+               AND cm.visible = 1
+               AND cm.completion > 0
+               AND cs.section >= 1
+        ) AS totalmodules
+
+    FROM {course} c
+    JOIN {course_categories} cat ON cat.id = c.category
+
+    LEFT JOIN {enrol} e
+           ON e.courseid = c.id AND e.status = 0
+    LEFT JOIN {user_enrolments} ue
+           ON ue.enrolid = e.id AND ue.status = 0
+
+    /* Per-user progress % (only trackable & visible modules in real sections) */
+    LEFT JOIN (
+        SELECT
+            cm.course AS courseid,
+            cmc.userid,
+            ROUND(
+                SUM(CASE WHEN cmc.completionstate = 1 THEN 1 ELSE 0 END) * 100.0
+                / NULLIF(COUNT(*), 0)
+            , 0) AS progress_pct
+        FROM {course_modules} cm
+        JOIN {course_sections} cs ON cs.id = cm.section
+        LEFT JOIN {course_modules_completion} cmc ON cmc.coursemoduleid = cm.id
+        WHERE cm.completion > 0
+          AND cm.visible = 1
+          AND cs.section >= 1
+        GROUP BY cm.course, cmc.userid
+    ) up
+      ON up.courseid = c.id
+     AND up.userid   = ue.userid
+
+    $whereclause
+    GROUP BY c.id, c.fullname, cat.name
+    ORDER BY $orderby
+";
+
+$courserows = $DB->get_records_sql($sql, $params);
+
+/* Build template rows */
+$courseSummaries = [];
+foreach ($courserows as $r) {
+    $courseSummaries[] = [
+        'id'           => (int)$r->id,
+        'categoryname' => format_string($r->categoryname),
+        'fullname'     => format_string($r->fullname),
+        'enrolled'     => (int)$r->enrolled,
+        'completed'    => (int)$r->completed,
+        'inprogress'   => (int)$r->inprogress,
+        'notstarted'   => (int)$r->notstarted,
+        'avgprogress'  => (int)$r->avgprogress,
+        'totalmodules' => (int)$r->totalmodules,
+        'detailsurl'   => (new moodle_url('/my/course_report.php', ['id' => $r->id]))->out(false),
+    ];
+}
+$templatecontext['courseSummaries'] = array_values($courseSummaries);
+
+/* Keep current filters on the Course export link */
+$templatecontext['courseSummaryExportUrl'] = (new moodle_url('/my/index.php', [
+    'coursecat'  => $courseCategoryId ?: null,
+    'courseq'    => $courseq !== '' ? $courseq : null,
+    'sortby'     => $sortby,
+    'dir'        => strtolower($dir),
+    'download'   => 'coursecsv',
+]))->out(false);
+
+/* CSV export */
+if ($download === 'coursecsv') {
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="course_report.csv"');
+    $out = fopen('php://output', 'w');
+    fputcsv($out, ['Course','Enrolled','Completed','In_Progress','Not_Started','Avg_Progress_%','Trackable_Modules']);
+    foreach ($courseSummaries as $row) {
+        fputcsv($out, [
+            $row['fullname'],
+            $row['enrolled'],
+            $row['completed'],
+            $row['inprogress'],
+            $row['notstarted'],
+            $row['avgprogress'],
+            $row['totalmodules'],
+        ]);
+    }
+    fclose($out);
+    exit;
+}
+// --- push to template ---
+$templatecontext['courseSummaries'] = array_values($courseSummaries);
+
+$templatecontext['courseFilters'] = [
+    'coursecatid' => $courseCategoryId,
+    'courseq'     => $courseq,
+    'sortby'      => [
+        'isname'      => ($sortby === 'name'),
+        'isenrolled'  => ($sortby === 'enrolled'),
+        'iscompleted' => ($sortby === 'completed'),
+        'isavg'       => ($sortby === 'avg'),
+    ],
+    'dir' => [
+        'value'  => ($dir === 'DESC') ? 'desc' : 'asc',
+        'isdesc' => ($dir === 'DESC'),
+    ],
+];
+
+// Keep current filters on export link
+$templatecontext['courseSummaryExportUrl'] = (new moodle_url('/my/index.php', [
+    'coursecatid' => $courseCategoryId ?: null,
+    'courseq'     => $courseq !== '' ? $courseq : null,
+    'sortby'      => $sortby,
+    'dir'         => strtolower($dir),
+    'download'    => 'coursecsv',
+]))->out(false);
+
+
 
 }
     // ADMIN DASHBOARD
