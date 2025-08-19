@@ -5,7 +5,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
     /* Carousel Styles (keep your existing carousel styles) */
-
+/* Never allow sideways scrolling */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
     :root{
   --content-gutter: clamp(12px, 2vw, 24px);
   --card-gap: clamp(12px, 2vw, 20px);
@@ -106,35 +110,73 @@
     }
 }
 
-/* SM screens (below 768px) */
 @media (max-width: 767px) {
-    .carousel-overlay-box {
-        position: relative;
-        top:-70%;
-        width: 100%;
-        max-width: 95%;
-        padding: 15px;
-        border-radius: 8px;
-        border-width: 1px;
-    }
+  /* show only the right side of the poster on phones */
+  #heroCarousel .carousel-item{
+    background-position: right center;   /* crop to the right */
+    background-size: cover;
+    background-position:  center;   /* crop to the right */
+    
+  }
+
+  /* keep the white bordered card visible on top of the hero */
+  .carousel-overlay-box{
+    position: absolute;                  /* sit on top of the image */
+    left: 6%;
+    right: 6%;
+    top: 8%;                            /* tweak if needed (55–65%) */
+    transform: translateY(-50%);
+    width: auto;
+    max-width: none;
+
+    background: rgba(255,255,255,.92);   /* bring the box back */
+    border: 1.5px solid #204070;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    z-index: 5;
+  }
+
+  /* phone sizing for text inside the card */
+  .carousel-overlay-box h2{ font-size: 1.3rem; line-height: 1.15; }
+  .carousel-overlay-box p{  font-size: .9rem; }
+
+  /* don’t pull the course buttons up over the hero on phones */
+  .carousel-course-btn{
+    margin-left: 0;
+    margin-top: 12px;        /* was -48% */
+    gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .carousel-control-prev-icon{
+    display:none;
+  }
+  .carousel-control-next-icon{
+    display:none;
+  }
+
+
+   .hero {
+  background: url('/moodle/theme/academi/pix/newsletterbanner.png');
+    background-size: cover;
+    background-position: center;
+    animation: none !important;   /* stop movement/animation */
+    height: 60vh;                 /* adjust height if needed */
+  }
+  
+
+  #backToTop {
+    height: auto;
+    border: 1px solid #fff;
+    padding: 0 10px;
+    position: fixed;
+    right: 1rem;
+    bottom: 3rem;
+    z-index: 1;
+  }
 }
 
-.carousel-overlay-box h2 {
-  font-size: 2.5rem;
-  line-height: 1.2;
- 
-  margin-bottom: 0.5rem;
-}
-
-.carousel-overlay-box h2 span {
-  color: #003366;
-  font-weight: 700;
-}
-
-.carousel-overlay-box p {
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
-}
 
 @media (max-width: 1535px) {
   .carousel-overlay-box h2 {
