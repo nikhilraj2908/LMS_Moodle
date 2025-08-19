@@ -5,6 +5,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
     /* Carousel Styles (keep your existing carousel styles) */
+
+    :root{
+  --content-gutter: clamp(12px, 2vw, 24px);
+  --card-gap: clamp(12px, 2vw, 20px);
+}
     #heroCarousel {
         position: relative;
         height: 68vh;
@@ -47,6 +52,7 @@
     width: 32%;
     z-index: 2;
 }
+
 
 /* 2XL screens and above (1536px+) - original styling */
 
@@ -1030,81 +1036,83 @@ display:none;
 .news-footer{
   display:none;
 }
-.announcement-card {
-     display: flex;
-    align-content: center;
-    align-items: center;
-    font-size: 1rem;
-    padding: 20px;
-    height: 130px;
-     border-left: 5px solid #204070;
-    padding: 15px 20px;
-    margin: 10px !important;  /* More space between announcements */
-    border-radius: 15px;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.12); /* More visible shadow */
-     background: linear-gradient(to right, #ffffff 0%, rgb(204 242 255) 100%);
-    padding:30px;
-    border-bottom-right-radius: 45px 45px;
-    border-bottom-left-radius: 45px 45px;
-    width:45%
+.announcement-card{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1rem;
+
+  /* spacing & size */
+  padding: 20px;                    /* single source of truth */
+  min-height: 120px;                /* consistent height */
+  width: auto;                      /* let grid control width */
+
+  /* visuals */
+  border-left: 5px solid #204070;
+  border-radius: 15px 15px 45px 45px;  /* keep your rounded bottom corners */
+  background: linear-gradient(to right, #ffffff 0%, rgb(204 242 255) 100%);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  transition: transform .18s ease, box-shadow .18s ease;
+  margin: 0 !important;             /* grid creates spacing; kill outer margins */
 }
 
 .announcement-card:hover{
-  cursor:pointer;
-  padding-bottom:5px;
+  cursor: pointer;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.14);
 }
-.announcement-icon {
-    width: 40px;
-    height: 40px;
-    background: url(https://cdn-icons-png.flaticon.com/512/1827/1827392.png) no-repeat center;
-    background-size: contain;
-    position: relative;
-    margin-bottom: 20px;
-    margin-left: 10px;
-}
-
-.announcement-icon::after {
-    content: "";
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: red;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 2px solid #fff;
+.announcement-icon{
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  background: url(https://cdn-icons-png.flaticon.com/512/1827/1827392.png) no-repeat center / contain;
+  position: relative;
+  margin: 0 0 0 6px;                 /* small left inset, no bottom margin */
 }
 
-.announcement-content {
-    flex: 1;
+.announcement-icon::after{
+  content: "";
+  position: absolute;
+  top: -5px; right: -5px;
+  width: 12px; height: 12px;
+  background: red; border-radius: 50%;
+  border: 2px solid #fff;
 }
 
-.announcement-title {
-    font-weight: bold;
-    font-size: 1rem;
-    color: #333;
-    text-decoration: none;
-    margin-left: 10px;
+/* Text area grows */
+.announcement-content{ flex: 1; min-width: 0; }
+
+
+/* Typography */
+.announcement-title{
+
+  font-size: clamp(1rem, 1.2vw, 1.25rem);
+  color: #0e2a55;
+  text-decoration: none;
+  line-height: 1.2;
+  margin-left: 6px;
+  display: inline-block;
+} 
+
+.announcement-title:hover{ text-decoration: underline; }
+
+
+.announcement-meta{
+  font-size: .9rem;
+  color: #667085;
+  margin: 6px 0 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Tighten on small screens */
+@media (max-width: 575.98px){
+  .announcement-card{ padding: 16px; min-height: 110px; }
+  .announcement-icon{ width: 34px; height: 34px; }
+  .announcement-meta{ font-size: .85rem; }
 }
 
-.announcement-title:hover {
-    text-decoration: underline;
-}
 
-.announcement-meta {
-    font-size: 0.85em;
-    color: #777;
-    margin-top: 4px;
-    margin-left: 10px;
-    margin-bottom: 10px;   
-}
-
-.bg-announcements ul{
-    overflow: scroll;
-    scrollbar-width: none;
-    height:300px;
-  
-}
 .unlist, .unlist li, .inline-list, .inline-list li, .block .list, .block .list li, .section li.movehere, .tabtree li {
     margin-bottom:20px;
   
@@ -1148,52 +1156,13 @@ display:none;
 
 
 
-/* General Layout for the Newsletter */
-.newsletter-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 2%;
-  align-items: stretch;
-}
-
-.newsletter-box {
-  background-color: rgba(255, 255, 255, 0.95);
-  position: relative;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  height: 100%;
-}
-
-.newsletter-box .bg-texture {
-  background-image: url('/moodle/theme/academi/pix/newsletterbanner.png');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.2;
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: 16px;
-}
-
-.newsletter-box h2 {
-  color: #003366;
-}
-
-.newsletter-posts {
-  width:45%;
-  background-color: rgba(255, 255, 255, 0.75);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-<<<<<<< HEAD
-=======
-  height:420px;
-}
-.bg-announcements .unlist{
-  display:flex;
-  flex-wrap:wrap;
->>>>>>> dafc134d084f800ba10a0bde74acd7601bdf1870
+/* Animation safety */
+@media (prefers-reduced-motion: reduce){
+  .animated-element{
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
 }
 /* For Laptop and Desktop (larger screens) */
 @media (min-width: 768px) {
@@ -1202,37 +1171,10 @@ display:none;
     max-width: 100%;
   }
 
-  .col-md-5 {
-    max-width: 41.66666667%;
-  }
-
-  .col-md-7 {
-    padding: 0 15px;
-  }
-
-  .newsletter-box h2 {
-    font-size: 2rem;
-  }
 }
 
-/* Adjust the columns at 1200px */
-@media (max-width: 1200px) {
-  .col-md-5 {
-    flex: 0 0 50%;
-    max-width: 50%;
-  }
 
-  .col-md-7 {
-    flex: 0 0 50%;
-    max-width: 50%;
-  }
-}
 
-/* Ensure posts cards fit inside */
-.newsletter-posts .card {
-  margin-bottom: 1rem;
-  border-radius: 12px;
-}
 
 /* Default button style for subscription */
 .subscription-toggle-btn {
@@ -1250,37 +1192,9 @@ display:none;
   background-color: #002244;
 }
 
-/* For Mobile (smaller devices) */
-@media (max-width: 767px) {
-  .newsletter-wrapper {
-    flex-direction: column;
-    margin: 0;
-  }
 
-  .col-md-5, .col-md-7 {
-            margin-bottom: 10px;
-    flex: 0 0 100%;
-    max-width: 100%;
-  }
 
-  .newsletter-box .bg-texture {
-    background-size: contain;
-    background-position: center;
-  }
 
-  .newsletter-img {
-    height: 25vh;
-    max-width: 100%;
-  }
-
-  .newsletter-box h2 {
-    font-size: 1.5rem;
-  }
-
-  .newsletter-posts {
-    padding: 15px;
-  }
-}
 
 /* ===== ANIMATION CLASSES ===== */
     /* Initial hidden state */
@@ -1336,7 +1250,7 @@ html {
   overflow: hidden;
   height: 8px;
   margin: 8px 0;
-  width:65%
+  width:64%
 }
 
 .progress-bar {
@@ -1390,25 +1304,10 @@ html {
 }
 
 
-.announcement-box {
-  background: linear-gradient(to right, #f4faff, #eaf4fb);
-  border-radius: 20px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 30px;
-  height: 420px;
-}
-
 .announcement-icon-wrapper {
   flex-shrink: 0;
 }
 
-.announcement-icon-img {
-  width: 300px;
-  height: auto;
-}
 
 .announcement-text-content h3 {
   font-size: 2rem;
@@ -1416,11 +1315,7 @@ html {
 
 }
 
-.announcement-subtext {
-  color: #666;
-  font-size: 1rem;
-  padding: 10px;
-}
+
 
 .btn:not(:disabled):not(.disabled)
 
@@ -1449,11 +1344,130 @@ html {
   color: white;
 }
 
-.d-flex
- {
-    display: flex !important;
-    gap: 10px;
+
+
+/* Grid layout for the two columns */
+.newsletter-wrapper{
+  display: grid;
+  grid-template-columns: 1fr;            /* mobile: stack */
+  gap: var(--card-gap);
+  margin: var(--content-gutter);
+  align-items: stretch;
 }
+
+/* >= md: 5/7 split */
+@media (min-width: 1200px){
+  .newsletter-wrapper{
+    grid-template-columns: 5fr 7fr;
+  }
+}
+/* Left box styles (kept from your code) */
+
+.announcement-box{
+  display:flex;
+  background-color: rgba(255, 255, 255, 0.80);
+  position: relative;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.1);
+  overflow: hidden;
+  height: 100%;            /* stretch to match right column */
+}
+
+.announcement-icon-img{
+  max-width: clamp(160px, 22vw, 300px);
+  height: auto;
+}
+
+/* Right panel – remove fixed width, let it fill the grid column */
+.newsletter-posts{
+  width: 100%;
+  background-color: rgba(255,255,255,.75);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.1);
+  max-height: 46vh;       /* scroll if long */
+  overflow: auto;
+}
+.newsletter-posts .unlist{
+  display: grid;
+  grid-template-columns: 1fr;                 /* mobile: single column */
+  gap: 14px;                                   /* card gap */
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.newsletter-left {
+  background-image: url('/moodle/theme/academi/pix/newsletterbanner.png');
+  background-size: cover;
+  background-position: center;
+  inset: 0;
+  z-index: 0;
+  border-radius: 16px;
+}
+
+
+@media (min-width: 992px){
+  .newsletter-posts .unlist{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+/* Tweak heading sizing */
+.newsletter-box h2,
+.announcement-title{
+  color: #003366;
+  font-size: clamp(1.25rem, 2rem);
+  margin: 0 0 .25rem;
+}
+
+.announcement-subtext{
+  color: #666;
+  font-size: clamp(.9rem, 1.6vw, 1rem);
+}
+
+/* Mobile refinements */
+@media (max-width: 767.98px){
+  .newsletter-wrapper{ margin: 0 var(--content-gutter); }
+  .newsletter-posts{ padding: 15px; max-height: none; }
+  .announcement-icon-img{ max-width: 180px; }
+}
+
+@media(max-width:550px){
+    .announcement-box{
+      display:block;    
+    }
+    .announcement-icon-wrapper {
+display:flex;
+justify-content:center;
+}
+}
+/* Keep your motion-safety rule */
+@media (prefers-reduced-motion: reduce){
+  .animated-element{
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+.announcement-btns{
+  display:flex;
+  gap:20px;
+}
+
+@media(max-width:1790px){
+  .announcement-btns{
+  display:block;
+  gap:20px;
+
+}
+  .announcement-btns a{
+    width:100%;
+    margin-top:10px;
+  }
+}
+
+
 
     </style>
 </head>
@@ -1513,7 +1527,7 @@ html {
             </div>
 
             <div class="carousel-overlay-box animated-element slide-in-left delay-1">
-    <h2>Transform Your <br>  <span style="color: #003366; font-weight: 750; font-size: 50px;">Learning Journey</span> <br> With <span style="color: #003366; font-weight: 700;">ALOGICDATA</span></h2>
+    <h2>Transform Your <br>  <span style="color: #003366; font-weight: 750; font-size: 1.3em;">Learning Journey</span> <br> With <span style="color: #003366; font-weight: 700;">ALOGICDATA</span></h2>
     <p>Bringing Education to Your Fingertips</p>
     <div>
         <!-- Admin buttons -->
@@ -1592,41 +1606,40 @@ html {
     </div>
     </div>
     <div class="container my-5">
- <div class=" align-items-start newsletter-wrapper">
-  <!-- Left Side: Subscribe Box -->
-  <div class="col-md-5 col-12 animated-element slide-in-left delay-1">
-  <div class="announcement-box d-flex align-items-center p-4 shadow rounded-4">
-    <div class="announcement-icon-wrapper me-4">
-      <img src="{{config.wwwroot}}/theme/academi/pix/Newsletter.png" alt="Newsletter Icon" class="announcement-icon-img">
-    </div>
-    <div class="announcement-text-content">
-      <h3 class="announcement-title mb-1">Important Announcements</h3>
-      <p class="announcement-subtext mb-3">Stay Updated! with the latest newsletters and announcements</p>
-      <div class="d-flex gap-2">
+  <div class="newsletter-wrapper align-items-start">
+    <!-- Left -->
+    <div class="newsletter-left animated-element slide-in-left delay-1 h-100">
+      <div class="announcement-box  align-items-center p-4 shadow rounded-4">
+        <div class="announcement-icon-wrapper me-4">
+          <img src="{{config.wwwroot}}/theme/academi/pix/Newsletter.png" alt="Newsletter Icon" class="announcement-icon-img">
+        </div>
+        <div class="announcement-text-content">
+          <h3 class="announcement-title mb-1">Important Announcements</h3>
+          <p class="announcement-subtext mb-3">Stay Updated! with the latest newsletters and announcements</p>
+          <div class="announcement-btns">
             {{#isadmin}}
-  <!-- Show Add Button Only to Admins -->
-              <a href="{{config.wwwroot}}/mod/forum/post.php?forum={{forumid}}" class="btn btn-dark rounded-pill px-4 py-2">
-                <i class="fa fa-plus me-2"></i>Add New
-              </a>
+            <a href="{{config.wwwroot}}/mod/forum/post.php?forum={{forumid}}" class="btn btn-dark rounded-pill px-4 py-2">
+              <span class="fa fa-plus me-2"></span><span>Add New</span>
+            </a>
             {{/isadmin}}
+            <a href="{{config.wwwroot}}/mod/forum/view.php?f={{forumid}}" class="btn btn-outline-dark rounded-pill px-4 py-2">
+              All Announcements
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<a href="{{config.wwwroot}}/mod/forum/view.php?f={{forumid}}" class="btn btn-outline-dark rounded-pill px-4 py-2">
-  All Announcements
-</a>
- 
+    <!-- Right -->
+    <div class="newsletter-right animated-element slide-in-right delay-1">
+      <div class="newsletter-posts">
+        <h3 class="p-2 text-primary">Announcement Board</h3>
+        {{{newsitems_html}}}
       </div>
     </div>
   </div>
 </div>
 
-  <!-- Right Side: Forum Newsletter Items -->
-  <div class="col-md-7 d-flex  animated-element slide-in-right delay-1">
-    <span class="newsletter-posts w-100 px-2">
-    <h3 class="p-2 text-primary"> Announcement Board</h3>
-      {{{newsitems_html}}}
-    </span>
-  </div>
-</div>
 
 
       <div id="page" data-region="mainpage" data-usertour="scroller" class="drawers {{#courseindexopen}}show-drawer-left{{/courseindexopen}} {{#blockdraweropen}}show-drawer-right{{/blockdraweropen}} drag-container {{jumbotronclass}}">
