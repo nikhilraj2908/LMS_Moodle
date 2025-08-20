@@ -204,6 +204,9 @@
     margin-left:10px;
 }
 
+.user-dashboard{
+  display:flex;
+}
 /* 1) define the slide‐up keyframes */
 @keyframes slideUp {
   from {
@@ -306,6 +309,187 @@ tr th{
 /* Optional spacing tweaks */
 .course-report .cr-filters{padding-bottom:.25rem}
 
+
+/* Container breathes a bit more on small screens */
+.admin-container{padding:0 clamp(12px,2.5vw,24px) 40px;}
+
+/* Fluid heading sizes */
+.dashboard-header h3{font-size:clamp(1.2rem,1.6vw + .8rem,1.8rem);}
+.card-header h2{font-size:clamp(1.05rem,1.2vw + .6rem,1.5rem);}
+.stat-value{font-size:clamp(1.5rem,2vw + .6rem,2.8rem);}
+.stat-icon{width:clamp(56px,6vw,80px); height:clamp(56px,6vw,80px); font-size:clamp(1.3rem,2.2vw,2.5rem);}
+
+
+/* Large laptop (≤1440px): give columns a touch more room */
+@media (max-width:1440px){
+  .col-lg-8{width:65%;}
+  .col-lg-4{width:35%;}
+}
+
+/* Laptop (≤1280px): stack side panel under main, stats become two per row */
+@media (max-width:1280px){
+  .col-lg-8,.col-lg-4{width:100%;}
+  .row{row-gap:16px;}
+  .col-md-3{width:50%;}
+}
+
+/* Tablet (≤768px): single column everywhere */
+@media (max-width:768px){
+  .col-md-3,.col-md-4,.col-md-8,.col-lg-4,.col-lg-8{width:100%;}
+  .dashboard-header{flex-direction:column; text-align:center; gap:10px;}
+  .dashboard-header .user-info,.header-controls{flex-direction:column;}
+  .admin-card{padding:18px;}
+}
+
+/* Small phones (≤576px): tighten paddings/gaps a bit more */
+@media (max-width:486px){
+  .admin-card{padding:16px;}
+  .quick-link{padding:10px 12px; margin-bottom:10px;}
+  .online-users-list{max-height:50vh;}  /* more room before scrolling */
+  .online-user{padding:10px 12px;}
+  .manager-card{padding:12px;}
+
+
+  .stat-icon {
+    font-size: 1rem;
+    color: var(--accent);
+    background: rgba(109, 149, 255, 0.1);
+     width: 35px; 
+     height: 35px; 
+    border-radius: 50%;
+    margin:0px;
+
+    transition: var(--transition);
+}
+
+.stat-card {
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items:center;
+}
+
+}
+/* Let tables scroll horizontally on ≤768px (simple + robust) */
+@media (max-width:768px){
+  .table-responsive{height:auto; max-height:none; overflow-x:auto; -webkit-overflow-scrolling:touch;}
+  .table{min-width:720px;} /* prevents squishing columns too much */
+}
+
+.footer-content-popover{
+  display:none;
+}
+
+
+/* System Logs header: allow wrapping on small screens */
+@media (max-width: 576px){
+  .admin-card .card-header{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .admin-card .card-header h2{
+    margin: 0;
+  }
+  .admin-card .log-controls{
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 0;
+  }
+  .admin-card .log-controls .btn{
+    white-space: nowrap;
+  }
+  .user-info .user-dashboard{
+    display:block;
+  } 
+
+  /* ==== Stat card: icon left, text stacked (works desktop + mobile) ==== */
+.stat-card{
+  display: grid;                      /* keeps your current HTML, no wrapper needed */
+  grid-template-columns: auto 1fr;    /* icon | text area */
+  align-items: center;
+  column-gap: 14px;
+  text-align: left;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 12px 26px rgba(31,62,112,.08);
+}
+
+.stat-icon{
+  grid-column: 1;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #6D95FF;                         /* icon color */
+  background: rgba(109,149,255,0.15);     /* soft circle bg */
+}
+
+.stat-value{
+  grid-column: 2;
+  line-height: 1;
+  font-weight: 800;
+  font-size: 1.8rem;                      /* big number */
+  color: #1f3e70;                         /* deep navy */
+}
+
+.stat-label{
+  grid-column: 2;
+  margin-top: 2px;
+  font-size: .95rem;
+  color: #6f86a5;                         /* subtle grey */
+  opacity: 1;                              /* ensure visible (we had .7 before) */
+}
+
+/* Hover motion stays light */
+.stat-card:hover .stat-icon{ transform: none; }
+.admin-card.stat-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(31,62,112,.12);
+}
+
+/* Optional: slightly smaller on very small phones */
+@media (max-width: 420px){
+  .stat-icon{ width: 42px; height: 42px; font-size: 1.1rem; }
+  .stat-value{ font-size: 1.6rem; }
+  .stat-label{ font-size: .9rem; }
+}
+
+}
+
+/* User Report Summary: make the table scrollable on mobile + desktop */
+.user-summary-scroll{
+  max-height: 60vh;           /* vertical scroll area */
+  overflow: auto;             /* both axes as needed */
+}
+
+/* Improve mobile behavior */
+@media (max-width: 768px){
+  .user-summary-scroll{
+    max-height: 55vh;
+    -webkit-overflow-scrolling: touch;  /* smooth iOS scroll */
+  }
+
+  /* keep columns readable; allow horizontal scroll */
+  .user-summary-scroll .table{ min-width: 720px; }
+
+  /* sticky header so labels stay visible while scrolling */
+  .user-summary-scroll thead th{
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+    z-index: 1;
+  }
+}
+
+
 </style>
 
 <div class="admin-container">
@@ -313,7 +497,7 @@ tr th{
   <!-- Header -->
   <div class="dashboard-header">
     <div class="user-info my-1">
-      <div class="d-flex">
+      <div class="user-dashboard">
          {{{userpicture}}}
         <div>
           <h3 style="color:white;">{{username}}</h3>
@@ -399,7 +583,7 @@ tr th{
    
 </div>
 
-  <div class="table-responsive">
+  <div class="table-responsive user-summary-scroll">
     <table class="table table-striped">
       <thead>
         <tr>
