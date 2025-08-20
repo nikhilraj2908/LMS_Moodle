@@ -294,6 +294,11 @@ html, body {
 }
 
 
+
+
+
+
+
     .course-cards-container {
         display: flex;
         flex-wrap: wrap;
@@ -531,6 +536,12 @@ body.has-admin-menu .btn-user {
 
 /* SM screens (below 768px) */
 @media (max-width: 767px) {
+  .announcement-title{
+    text-align:center;
+  }
+  .announcement-subtext{
+    text-align:center;
+  }
     .carousel-course-btn {
         margin-left: 1%;
         gap: 8px;
@@ -571,7 +582,7 @@ body.has-admin-menu .btn-user {
     top: 0 !important;
     margin-top: 0 !important;
     padding-top: 0 !important;
-    z-index: 1050;
+    z-index: 1100;
     
 }
 
@@ -590,6 +601,7 @@ body, #page-wrapper {
     background-size: cover;
       position: relative;
   box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
+
 }
 
 .performer-container-wrapper {
@@ -656,6 +668,7 @@ body, #page-wrapper {
 
 
 .performer-card {
+
   background: #d3f4ff;  /* light blue */
   border-radius: 20px;
   border: none; /* remove main border */
@@ -668,7 +681,33 @@ body, #page-wrapper {
     2px 2px 8px rgba(0, 0, 0, 0.1); /* subtle outer shadow */
   min-width: 320px;
 }
+/* Make the rail snap and each card center on the rail */
+.performers-carousel{
+  scroll-snap-type: x mandatory;
+}
+.performer-card{
+  scroll-snap-align: center;
+  
+}
+@media (max-width: 640px){
+  .performer-container-wrapper{ overflow: hidden; } /* hide edge bleed */
+  .performers-carousel{
+    gap: 0;                 /* remove gap that causes the peek */
+    padding: 16px 0;        /* small vertical padding only */
+    scroll-padding: 0 16px; /* makes snapping feel centered */
+  }
+  .performer-card{
+    flex: 0 0 100% !important;   /* full viewport width */
+    min-width: 100% !important;
+    margin:16px;              /* optional side breathing room */
+    border-radius: 12px;
+  }
+}
 
+/* Very small phones: keep it strict one-per-view */
+@media (max-width: 480px){
+ 
+}
 /* Large screens (lg and xl) */
 @media (max-width: 1535px) {
   .performer-card {
@@ -724,24 +763,23 @@ body, #page-wrapper {
     z-index: 0;       /* behind main card */
 }
 
-
+.footer-content-popover{
+  display:none;
+}
 
 
 @media (max-width: 480px) {
-  .performers-carousel {
-    gap: 1rem;
-    padding: 20px 5px !important;
-  }
+  
 
-  .performer-card {
-    flex: 0 0 95% !important;
-    padding: 15px 15px 15px 20px !important;
-    border-radius: 12px;
-    margin: 0 auto;
-  }
+   .performers-carousel{ padding: 12px 0; }
+  .performer-card{
+    flex-basis: 100% !important;
+    min-width: 100% !important;
+    margin: 0px 30px 30px 30px;              /* optional side breathing room */
 
+  }
   .performer-pic {
-    top: 10px !important;
+   
     left: 10px !important;
     width: 60px !important;
     height: 60px !important;
@@ -795,33 +833,47 @@ body, #page-wrapper {
   transform: scaleX(-1) scaleY(-1);
 }
 .carousel-nav {
-    background: none;
-    border: none;
-    font-weight: 600;
-    color: #27408b;
-    cursor: pointer;
-    font-size: 2rem;
-    padding: 0.5rem 1rem;
-    transition: color 0.3s ease;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  width: 36px;                  /* smaller circle */
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #204070;    /* subtle border */
+  background: #ffffffcc;        /* semi-transparent white */
+  color: #204070;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  z-index: 5;                   /* stay above cards */
+}
+
+.carousel-nav i {
+  font-size: 1rem;              /* smaller arrow icon */
+  pointer-events: none;
 }
 
 .carousel-nav:hover {
-    color: #003366;
-    background-color: rgba(255, 255, 255, 0.9);
+  background: #204070;
+  color: #fff;
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Hide arrows on small screens (use swipe) */
+@media (max-width: 640px) {
+  .carousel-nav {
+    visibility: hidden;
+  }
 }
 
 
-.top-performer-heading{
 
- margin-top: 30px;
+.top-performer-heading{
+  /* min   fluid (based on viewport)   max */
+  font-size: clamp(1.2rem, 2.2vw + 0.4rem, 2rem);
+  line-height: 1.15;
+  margin-top: clamp(12px, 2vw, 30px);
 }
 /* Rest of your existing performer card styles remain the same */
 
@@ -889,10 +941,9 @@ body, #page-wrapper {
 /* Extra small screens (mobile portrait) */
 @media (max-width: 479px) {
   .performer-pic {
-    top: 50px;
+   
     left: -30px;
-    width: 70px;
-    height: 70px;
+   
   }
 }
 
@@ -1473,7 +1524,12 @@ html {
   .newsletter-wrapper{ margin: 0 var(--content-gutter); }
   .newsletter-posts{ padding: 15px; max-height: none; }
   .announcement-icon-img{ max-width: 180px; }
+
+      .drawer-toggles .drawer-right-toggle, .drawer-toggles .drawer-left-toggle {
+         top: 8vh; 
+    }
 }
+
 
 @media(max-width:550px){
     .announcement-box{
@@ -1606,13 +1662,15 @@ justify-content:center;
 
                 <div class="section-top-performers animated-element slide-in-right delay-3">
     <div class="top-performer d-flex justify-content-center">
-                            <h2  class="top-performer-heading">
+                            <span  class="top-performer-heading fs-4">
                                 Our Top <span style="color:#204070;">Performers</span> <span style="color: gold;">⭐</span>
-                            </h2>
+                            </span>
                     </div>
 
     <div class="performer-container-wrapper">
-        <button class="carousel-nav prev-slide fa-regular fa-arrow-left"></button>
+        <button class="carousel-nav prev-slide" aria-label="Previous">
+    <i class="fa-solid fa-chevron-left"></i>
+  </button>
         
         <div class="performers-carousel">
             {{#topperformers}}
@@ -1637,7 +1695,9 @@ justify-content:center;
             {{/topperformers}}
         </div>
         
-        <button class="carousel-nav next-slide fa-solid fa-arrow-right"></button>
+        <button class="carousel-nav next-slide" aria-label="Next">
+    <i class="fa-solid fa-chevron-right"></i>
+  </button>
     </div>
     </div>
     <div class="container my-5">
