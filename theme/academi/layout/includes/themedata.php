@@ -30,6 +30,10 @@ $phoneno = theme_academi_get_setting('phoneno');
 $emailid = theme_academi_get_setting('emailid');
 $themestyleheader = theme_academi_get_setting('themestyleheader');
 $navstyle = theme_academi_get_setting('navstyle');
+// NEW: mobile logo URL (if uploaded).
+$smalllogourl = $PAGE->theme->setting_file_url('smalllogo', 'smalllogo');
+
+
 
 switch ($navstyle) {
     case LOGO:
@@ -59,5 +63,7 @@ $templatecontext = [
     "themestyleheader" => $themestyleheader,
     'showsitename' => $showsitename,
     'showlogo' => $showlogo,
+    "smalllogourl" => $smalllogourl,   ///////////added for small logo
+
 ];
 $templatecontext += footer();

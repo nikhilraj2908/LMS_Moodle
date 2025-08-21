@@ -205,7 +205,12 @@
      .header-main .search-input-wrapper {
   display:none;
   }
+
 }
+.dropdown-toggle{
+    padding:0px;
+}
+
 
 </style>
 
@@ -221,10 +226,19 @@
                     ">
                 {{#showlogo}}
                     {{# logourl }}
-                        <span class="logo">
-                            <img src="{{logourl}}" alt="{{sitename}}" >
-                        </span>
-                    {{/ logourl }}
+  <span class="logo d-flex align-items-center">
+    {{!-- Desktop / md and up --}}
+    <img class="d-none d-md-block" src="{{logourl}}" alt="{{sitename}}" style="max-height:44px; height:auto;"/>
+
+    {{!-- Mobile / under md: use small logo if provided, else fall back --}}
+    {{#smalllogourl}}
+      <img class="d-md-none" src="{{smalllogourl}}" alt="{{sitename}}" style="max-height:36px; height:auto;"/>
+    {{/smalllogourl}}
+    {{^smalllogourl}}
+      <img class="d-md-none" src="{{logourl}}" alt="{{sitename}}" style="max-height:36px; height:auto;"/>
+    {{/smalllogourl}}
+  </span>
+{{/ logourl }}
                     {{^ logourl }}
                         <span class="site-name hidden-sm-down">{{{ sitename }}}</span>
                     {{/ logourl }}

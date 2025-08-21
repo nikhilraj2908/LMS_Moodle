@@ -267,3 +267,7 @@ $string['viewallcourses'] = 'View all courses';
 
 $string['loginguest'] = 'Login as Guest';
 $string['guestlogin'] = 'Guest Login';
+
+
+$string['smalllogo'] = 'Mobile logo';
+$string['smalllogodesc'] = 'Upload a compact logo used on phones and small screens. Recommended height ~36–40px, square or short-wide.';

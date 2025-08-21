@@ -49,6 +49,21 @@ $setting = new admin_setting_configstoredfile($name, $title, $description, 'logo
 $setting->set_updatedcallback('theme_reset_all_caches');
 $temp->add($setting);
 
+
+
+
+
+// Small (mobile) logo when it is responsive
+$setting = new admin_setting_configstoredfile(
+    'theme_academi/smalllogo',
+    get_string('smalllogo', 'theme_academi'),
+    get_string('smalllogodesc', 'theme_academi'),
+    'smalllogo'
+);
+$setting->set_updatedcallback('theme_reset_all_caches');
+$temp->add($setting); // $page here is an admin_settingpage (OK).
+
+
 // Favicon upload option.
 $name = 'theme_academi/favicon';
 $title = get_string('favicon', 'theme_academi', null, true);
