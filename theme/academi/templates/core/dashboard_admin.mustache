@@ -94,7 +94,7 @@
     padding:5px 15px; border-radius:20px; font-weight:600; font-size:.9rem;
   }
   .online-users-list { overflow-y:auto; max-height:300px; padding-right:5px; }
-  .online-user {
+  .online-user {   
     display:flex; align-items:center; padding:12px 15px; margin-bottom:10px;
     background:rgba(240,246,252,0.5); border-radius:12px; transition:var(--transition);
   }
@@ -346,8 +346,9 @@ tr th{
   .admin-card{padding:16px;}
   .quick-link{padding:10px 12px; margin-bottom:10px;}
   .online-users-list{max-height:50vh;}  /* more room before scrolling */
-  .online-user{padding:10px 12px;}
+  .online-user{padding:10px 12px;width: fit-content;}
   .manager-card{padding:12px;}
+
 
 
   .stat-icon {
@@ -562,7 +563,7 @@ tr th{
   <div class="d-flex gap-2 flex-wrap mb-3 align-items-center">
   <div class="d-flex gap-2 align-items-center">
     <label for="userCategorySelect" class="form-label mb-0">Select Category:</label>
-<select id="userCategorySelect" class="form-select form-select-lg p-1 ms-2" style="width:200px;">
+<select id="userCategorySelect" class="form-select form-select-lg p-1 ms-2">
   <option value="0" {{#userSelectedAll}}selected{{/userSelectedAll}}>All Categories</option>
   {{#categoriesUser}}
     <option value="{{id}}" {{#selected}}selected{{/selected}}>{{name}}</option>
@@ -633,7 +634,7 @@ tr th{
   <div class="d-flex gap-2 flex-wrap mb-3 align-items-center">
     <div class="d-flex gap-2 align-items-center">
       <label for="courseCategorySelect" class="form-label mb-0">Select Category:</label>
-<select id="courseCategorySelect" class="form-select form-select-lg p-1 ms-2" style="width:200px;">
+<select id="courseCategorySelect" class="form-select form-select-lg p-1 ms-2" >
   <option value="0" {{#courseSelectedAll}}selected{{/courseSelectedAll}}>All Categories</option>
   {{#categoriesCourse}}
     <option value="{{id}}" {{#selected}}selected{{/selected}}>{{name}}</option>
@@ -700,7 +701,12 @@ tr th{
         <option value="60" selected>Last 1 Hour</option>
         <option value="1440">Last 1 Day</option>
       </select>
-      <button id="getLogsBtn" class="btn btn-sm"><i class="fas fa-sync"></i> Get Logs</button>
+      <button id="getLogsBtn" class="btn btn-sm">
+        <!-- Icon always visible -->
+        <i class="fas fa-sync"></i>
+        <!-- Text visible only on medium+ screens -->
+        <span class="d-none d-md-inline"> Get Logs</span>
+      </button>
     </div>
   </div>
   

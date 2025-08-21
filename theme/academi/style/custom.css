@@ -687,3 +687,12 @@ body#page-login-forgot_password {
 .ms-auto .singlebutton{
     display: none;
 }
+
+html,body { font-size: clamp(13px, 1vw + 0.2rem, 14px); }
+
+.footer-content-popover{
+    display:none;
+}
+.page-header-headings .h2{
+    margin-left: 0px !important;
+}

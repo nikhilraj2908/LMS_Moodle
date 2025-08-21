@@ -22,6 +22,34 @@
     background-position: center;
     background-size: cover;
 }
+html { font-size: clamp(13px, 1vw + 0.2rem, 17px); }
+
+
+
+@media (max-width: 600px) {
+    .page-context-header .page-header-headings h1 {
+        font-size: 16px !important;
+    }
+    .page-header-headings .h2{
+        margin-bottom:15px !important; 
+    }
+}
+@media (max-width: 430px) {
+    .page-context-header .page-header-headings h1 {
+        font-size: 12px !important;
+        font-weight:bold;
+        border-bottom:1px solid black;
+    }
+    .page-header-headings .h2{
+        margin-bottom:15px !important; 
+    }
+}
+.dropdown button{
+    padding:0px 5px;
+}
+.footer-content-popover{
+    display:none;
+}
 
 </style>
 <?php
