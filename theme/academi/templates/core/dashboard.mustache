@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -551,16 +551,396 @@
             max-width: 32%;
         }
 
-        @media (max-width: 768px) {
-
-            .top-row,
-            .bottom-row {
-                flex-direction: column;
+        /* ===== RESPONSIVE DESIGN ===== */
+        
+        /* Large Desktop (1200px and up) */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1400px;
+                padding-left: 40px !important;
+                padding-right: 40px !important;
             }
-
+            
+            .dashboard-row {
+                grid-template-columns: 8fr 4fr;
+                gap: 30px;
+            }
+            
+            .top-row {
+                gap: 30px;
+            }
+            
+            .learning-card {
+                padding: 40px;
+            }
+        }
+        
+        /* Desktop (992px to 1199px) */
+        @media (max-width: 1199px) and (min-width: 992px) {
+            .container {
+                padding-left: 30px !important;
+                padding-right: 30px !important;
+            }
+            
+            .top-row {
+                gap: 20px;
+            }
+            
+            .learning-card {
+                padding: 25px;
+            }
+        }
+        
+        /* Tablet (768px to 991px) */
+        @media (max-width: 991px) and (min-width: 768px) {
+            .container {
+                padding-left: 20px !important;
+                padding-right: 20px !important;
+            }
+            
+            .top-row {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .learning-card {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 25px;
+            }
+            
             .dashboard-card.flex-grow-1 {
                 max-width: 100% !important;
                 margin-bottom: 20px;
+            }
+            
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .d-flex.justify-content-between .dashboard-card {
+                max-width: 100% !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+        }
+        
+        /* Mobile (up to 767px) */
+        @media (max-width: 767px) {
+            .container {
+                padding-left: 15px !important;
+                padding-right: 15px !important;
+            }
+            
+            .dashboard-header {
+                padding: 10px 15px;
+                font-size: 18px;
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .dashboard-header img {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            .top-row {
+                flex-direction: column;
+                gap: 15px;
+                margin: 10px 15px;
+            }
+            
+            .learning-card {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+            
+            .card-title {
+                font-size: 24px;
+            }
+            
+            .card-subtitle {
+                font-size: 14px;
+            }
+            
+            .progress-container {
+                width: 200px !important;
+                height: 200px !important;
+                margin: 40px auto 40px !important;
+            }
+            
+            .progress-inner {
+                width: 160px !important;
+                height: 160px !important;
+                top: 20px !important;
+                left: 20px !important;
+            }
+            
+            .progress-value {
+                font-size: 36px !important;
+            }
+            
+            .progress-label {
+                font-size: 16px !important;
+            }
+            
+            .streak-hover-container {
+                width: 180px !important;
+                height: 180px !important;
+                margin-top: 20px !important;
+            }
+            
+            .lift-circle {
+                width: 180px !important;
+                height: 180px !important;
+            }
+            
+            .lift-inner-circle {
+                width: 130px !important;
+                height: 130px !important;
+            }
+            
+            #streak-count {
+                font-size: 36px !important;
+            }
+            
+            .lift-flame {
+                width: 50px !important;
+                height: 70px !important;
+                top: -40px !important;
+            }
+            
+            .lift-flame svg {
+                width: 60px !important;
+                height: 120px !important;
+            }
+            
+            .badge-preview {
+                gap: 15px;
+                margin-top: 20px;
+            }
+            
+            .badge-wrapper img {
+                width: 40px !important;
+            }
+            
+            .badge-wrapper div {
+                font-size: 11px;
+            }
+            
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 15px;
+                margin: 0 15px;
+            }
+            
+            .d-flex.justify-content-between .dashboard-card {
+                max-width: 100% !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                padding: 20px;
+            }
+            
+            .hours-activity-section {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .hours-activity-chart {
+                width: 100%;
+                height: 250px;
+            }
+            
+            .hours-total-section {
+                width: 100%;
+                display: flex;
+                justify-content: space-around;
+            }
+            
+            .points-section {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .points-bars {
+                width: 100%;
+            }
+            
+            .points-total {
+                text-align: center;
+            }
+            
+            .course-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-item {
+                margin: 0;
+            }
+            
+            .course-image img {
+                height: 140px;
+            }
+            
+            .course-name {
+                font-size: 20px;
+            }
+            
+            .continue-button {
+                padding: 12px 25px;
+                font-size: 16px;
+            }
+            
+            .progress-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .stat-item {
+                text-align: center;
+            }
+        }
+        
+        /* Small Mobile (up to 480px) */
+        @media (max-width: 480px) {
+            .container {
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+            }
+            
+            .top-row {
+                margin: 10px 10px;
+                gap: 10px;
+            }
+            
+            .learning-card {
+                padding: 15px;
+            }
+            
+            .card-title {
+                font-size: 22px;
+            }
+            
+            .card-subtitle {
+                font-size: 13px;
+            }
+            
+            .progress-container {
+                width: 160px !important;
+                height: 160px !important;
+                margin: 30px auto 30px !important;
+            }
+            
+            .progress-inner {
+                width: 120px !important;
+                height: 120px !important;
+                top: 20px !important;
+                left: 20px !important;
+            }
+            
+            .progress-value {
+                font-size: 28px !important;
+            }
+            
+            .progress-label {
+                font-size: 14px !important;
+            }
+            
+            .streak-hover-container {
+                width: 150px !important;
+                height: 150px !important;
+                margin-top: 15px !important;
+            }
+            
+            .lift-circle {
+                width: 150px !important;
+                height: 150px !important;
+            }
+            
+            .lift-inner-circle {
+                width: 110px !important;
+                height: 110px !important;
+            }
+            
+            #streak-count {
+                font-size: 28px !important;
+            }
+            
+            .lift-flame {
+                width: 40px !important;
+                height: 60px !important;
+                top: -35px !important;
+            }
+            
+            .lift-flame svg {
+                width: 50px !important;
+                height: 100px !important;
+            }
+            
+            .badge-preview {
+                gap: 10px;
+                margin-top: 15px;
+            }
+            
+            .badge-wrapper img {
+                width: 35px !important;
+            }
+            
+            .badge-wrapper div {
+                font-size: 10px;
+            }
+            
+            .d-flex.justify-content-between {
+                margin: 0 10px;
+            }
+            
+            .d-flex.justify-content-between .dashboard-card {
+                padding: 15px;
+            }
+            
+            .course-image img {
+                height: 120px;
+            }
+            
+            .course-name {
+                font-size: 18px;
+            }
+            
+            .continue-button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            .hours-number {
+                font-size: 24px;
+            }
+            
+            .coursecount {
+                font-size: 40px !important;
+            }
+        }
+        
+        /* Landscape Mobile (up to 767px and height < 500px) */
+        @media (max-width: 767px) and (max-height: 500px) {
+            .top-row {
+                gap: 10px;
+            }
+            
+            .learning-card {
+                padding: 15px;
+            }
+            
+            .progress-container {
+                margin: 20px auto 20px !important;
+            }
+            
+            .streak-hover-container {
+                margin-top: 10px !important;
             }
         }
 
@@ -1291,9 +1671,104 @@ html {
     margin-right: auto;
     margin-left: auto;
 }
-.edit-toggle-wrapper{
-    display:none;
-}
+        .edit-toggle-wrapper{
+            display:none;
+        }
+        
+        /* ===== ADDITIONAL RESPONSIVE IMPROVEMENTS ===== */
+        
+        /* Ensure touch-friendly button sizes on mobile */
+        @media (max-width: 767px) {
+            .continue-button,
+            a.course-link-button {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            /* Improve chart responsiveness */
+            #hoursActivityChart {
+                max-width: 100%;
+                height: auto !important;
+            }
+            
+            /* Better spacing for mobile */
+            .card-header {
+                margin-bottom: 15px;
+            }
+            
+            /* Optimize badge preview for mobile */
+            #badge-preview {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            /* Improve course carousel on mobile */
+            #course-carousel {
+                min-height: 300px;
+            }
+            
+            /* Better mobile navigation */
+            .dashboard-header {
+                position: sticky;
+                top: 0;
+                background: #f5f5f5;
+                z-index: 1000;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+        }
+        
+        /* Ensure proper spacing on very small screens */
+        @media (max-width: 360px) {
+            .container {
+                padding-left: 5px !important;
+                padding-right: 5px !important;
+            }
+            
+            .top-row {
+                margin: 5px 5px;
+            }
+            
+            .learning-card {
+                padding: 12px;
+            }
+            
+            .card-title {
+                font-size: 20px;
+            }
+            
+            .badge-preview {
+                gap: 8px;
+            }
+            
+            .badge-wrapper img {
+                width: 30px !important;
+            }
+        }
+        
+        /* High DPI displays optimization */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .learning-card,
+            .dashboard-card {
+                border: 0.5px solid rgba(0,0,0,0.1);
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            .learning-card,
+            .dashboard-card {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+            
+            .continue-button,
+            .course-link-button {
+                display: none;
+            }
+        }
     </style>
 </head>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1320,7 +1795,7 @@ html {
         <div class="decoration decoration-2"></div>
         <div class="card-header">
           <h1 class="card-title">Start a Daily Streak!</h1>
-          <p class="card-subtitle">You’re off to a great start!</p>
+          <p class="card-subtitle">You're off to a great start!</p>
         </div>
         <div class="streak-hover-container "
           style="position: relative; width: 230px; height: 230px; margin: 0 auto; margin-top: 40px;">
@@ -1614,7 +2089,7 @@ html {
     <!-- Second Row: Hours Activity, Earned Points, Course Enrolled -->
     <div class="d-flex justify-content-between top-row mb-4  ">
       <!-- Hours Activity -->
-      <div class="dashboard-card flex-grow-1 margin-left: 15px;" style=" margin-left: 30px;>
+      <div class="dashboard-card flex-grow-1" style=" margin-left: 30px;>
                     <h2>Hours <span class="img-heading">Activity</span></h2>
         <div class="hours-activity-section d-flex justify-content-around align-items-center">
           <div class="hours-activity-chart">
@@ -1781,11 +2256,39 @@ html {
                 startRotation();
             }
 
-            // Pause on hover
-            if (carouselContainer) {
+            // Pause on hover (only on non-touch devices)
+            if (carouselContainer && !('ontouchstart' in window)) {
                 carouselContainer.addEventListener("mouseenter", stopRotation);
                 // Resume on mouse leave
                 carouselContainer.addEventListener("mouseleave", startRotation);
+            }
+            
+            // Mobile touch handling
+            if ('ontouchstart' in window) {
+                let touchStartX = 0;
+                let touchEndX = 0;
+                
+                carouselContainer.addEventListener('touchstart', function(e) {
+                    touchStartX = e.changedTouches[0].screenX;
+                });
+                
+                carouselContainer.addEventListener('touchend', function(e) {
+                    touchEndX = e.changedTouches[0].screenX;
+                    handleSwipe();
+                });
+                
+                function handleSwipe() {
+                    const swipeThreshold = 50;
+                    if (touchEndX < touchStartX - swipeThreshold) {
+                        // Swipe left - next course
+                        currentIndex = (currentIndex + 1) % courseItems.length;
+                        showNextCourse();
+                    } else if (touchEndX > touchStartX + swipeThreshold) {
+                        // Swipe right - previous course
+                        currentIndex = (currentIndex - 1 + courseItems.length) % courseItems.length;
+                        showNextCourse();
+                    }
+                }
             }
 
             // Hours Activity Chart
@@ -1805,7 +2308,7 @@ html {
 
             var options = {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
                     tooltip: { enabled: true }
@@ -1824,6 +2327,21 @@ html {
                     }
                 }
             };
+            
+            // Adjust chart for mobile devices
+            if (window.innerWidth <= 768) {
+                data.datasets[0].barThickness = 15;
+                options.scales.x.labels = {
+                    font: {
+                        size: 10
+                    }
+                };
+                options.scales.y.labels = {
+                    font: {
+                        size: 10
+                    }
+                };
+            }
 
             new Chart(ctx, { type: "bar", data: data, options: options });
 
