@@ -43,7 +43,7 @@ html, body {
        
     }
 
-      .carousel-overlay-box {
+    .carousel-overlay-box {
     background-color: transparent;
     padding: 30px;
     border: 2px solid #204070;
@@ -64,13 +64,12 @@ html, body {
 /* XL screens (1280px to 1535px) */
 @media (min-width: 1280px) and (max-width: 1555px) {
     .carousel-overlay-box {
-
     background-color: #fff;
     padding: 20px;
     border: 2px solid #204070;
     border-radius: 15px;
     position: absolute;
-    top: 20%;
+    top: 8% !important;
     left: 4%;
     transform: translateY(-50%);
     max-width: 35%; 
@@ -138,8 +137,13 @@ html, body {
   }
 
   /* phone sizing for text inside the card */
-  .carousel-overlay-box h2{ font-size: 1.3rem; line-height: 1.15; }
-  .carousel-overlay-box p{  font-size: .9rem; }
+  .carousel-overlay-box h2{ font-size: clamp(1.1rem, 2vw + 0.5rem, 2.2rem); line-height: 1.15; }
+  
+  .carousel-overlay-box p {
+  font-size: clamp(0.85rem, 0.8vw + 0.6rem, 1.1rem);
+  line-height: 1.4;
+}
+
 
   /* don’t pull the course buttons up over the hero on phones */
   .carousel-course-btn{
@@ -178,67 +182,6 @@ html, body {
 }
 
 
-@media (max-width: 1535px) {
-  .carousel-overlay-box h2 {
-    font-size: 1.3rem;
-    line-height: 1;
-     margin-bottom: 0.2rem;
-  }
-  .carousel-overlay-box p {
-    font-size: 1rem;
-  }
-
-  .carousel-overlay-box h2 span {
-  color: #003366;
-  font-weight: 400;
-  font-size: 1.3rem;
-  line-height: 1;
-}
-}
-
-@media (max-width: 1279px) {
-  .carousel-overlay-box h2 {
-    font-size: 1.9rem;
-  }
-  .carousel-overlay-box p {
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 1023px) {
-  .carousel-overlay-box {
-    padding: 20px;
-  }
-  .carousel-overlay-box h2 {
-    font-size: 1.6rem;
-  }
-  .carousel-overlay-box p {
-    font-size: 0.9rem;
-  }
-}
-
-@media (max-width: 767px) {
-  .carousel-overlay-box {
-    padding: 15px;
-  }
-  .carousel-overlay-box h2 {
-    font-size: 1.3rem;
-  }
-  .carousel-overlay-box p {
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 479px) {
-  .carousel-overlay-box h2 {
-    font-size: 1.1rem;
-  }
-  .carousel-overlay-box p {
-    font-size: 0.8rem;
-  }
-}
-
-
 
 
 
@@ -264,7 +207,7 @@ html, body {
 /* XL screens (1280px - 1535px) */
 @media (min-width: 1280px) and (max-width: 1535px) {
     .course-cards-overlay {
-        margin-top: -120px;
+        margin-top: -100px;
         padding: 0 18px;
     }
 }
