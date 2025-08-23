@@ -1711,22 +1711,93 @@ html {
             }
         }
         
-        /* container controls the height */
-.hours-activity-chart{
-  position:relative;
-  width:100%;
-  height:200px;
-}
-@media (max-width:767px){
-  .hours-activity-chart{ height:250px; }
-}
+                /* container controls the height */
+        .hours-activity-chart{
+          position: relative;
+          width: 100%;
+          height: 230px;
+          overflow: visible;
+          max-width: 100%;
+          max-height: 230px;
+        }
+        
+        @media (max-width: 767px){
+          .hours-activity-chart{ 
+            height: 250px; 
+            min-height: 200px;
+            max-height: 250px;
+          }
+        }
+        
+        @media (max-width: 480px){
+          .hours-activity-chart{ 
+            height: 220px; 
+            min-height: 180px;
+            max-height: 220px;
+          }
+        }
 
-/* canvas fills the container */
-#hoursActivityChart{
-  display:block;
-  width:100% !important;
-  height:100% !important;   /* <- replace the old 'height:auto !important' */
-}
+        /* canvas fills the container */
+        #hoursActivityChart{
+          display: block !important;
+          width: 100% !important;
+          height: 100% !important;
+          max-width: 100% !important;
+          max-height: 100% !important;
+          object-fit: contain;
+        }
+        
+        /* Prevent chart from stretching beyond container */
+        .hours-activity-chart canvas {
+          max-width: 100% !important;
+          max-height: 100% !important;
+          width: 100% !important;
+          height: 100% !important;
+        }
+        
+        /* Ensure chart container is properly sized */
+        .hours-activity-section {
+          min-height: 200px;
+          max-height: 300px;
+          overflow: hidden;
+        }
+        
+        @media (max-width: 767px) {
+          .hours-activity-section {
+            min-height: 250px;
+            max-height: 350px;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden;
+          }
+          
+          .hours-activity-chart {
+            order: 1;
+            flex: 1;
+            min-height: 200px;
+            max-height: 250px;
+            overflow: hidden;
+          }
+          
+          .hours-total-section {
+            order: 2;
+            width: 100% !important;
+            justify-content: space-around;
+            flex-shrink: 0;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .hours-activity-section {
+            min-height: 220px;
+            max-height: 300px;
+          }
+          
+          .hours-activity-chart {
+            min-height: 180px;
+            max-height: 220px;
+          }
+        }
 
        #page #page-header {
     max-width: none;
@@ -2309,6 +2380,25 @@ setTimeout(() => requestAnimationFrame(animateProgress), 300);
             var ctx = document.getElementById("hoursActivityChart").getContext("2d");
             var hoursData = JSON.parse('{{{hoursActivity}}}');
 
+            // Ensure hoursData is valid
+            if (!Array.isArray(hoursData) || hoursData.length === 0) {
+                hoursData = [0, 0, 0, 0, 0, 0, 0]; // Default fallback
+            }
+            
+            // Validate and sanitize data
+            hoursData = hoursData.map(value => {
+                const num = parseFloat(value);
+                return isNaN(num) || num < 0 ? 0 : num;
+            });
+            
+            // Ensure we have exactly 7 values for the week
+            while (hoursData.length < 7) {
+                hoursData.push(0);
+            }
+            if (hoursData.length > 7) {
+                hoursData = hoursData.slice(0, 7);
+            }
+
             var data = {
                 labels: ["sun", "mon", "tue", "wed", "thr", "fri", "sat"],
                 datasets: [{
@@ -2316,7 +2406,9 @@ setTimeout(() => requestAnimationFrame(animateProgress), 300);
                     data: hoursData,
                     backgroundColor: ["#000000", "#808080", "#204070", "#204070", "#204070", "#204070", "#204070"],
                     borderWidth: 0,
-                    barThickness: 20
+                    barThickness: 'flex',
+                    maxBarThickness: 30,
+                    minBarLength: 5
                 }]
             };
 
@@ -2325,39 +2417,157 @@ setTimeout(() => requestAnimationFrame(animateProgress), 300);
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
-                    tooltip: { enabled: true }
+                    tooltip: { 
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false
+                    }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
                         grid: {
                             display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 12
+                            },
+                            stepSize: 1
                         }
                     },
                     x: {
                         grid: {
                             display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 12
+                            }
                         }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                // Prevent infinite stretching
+                layout: {
+                    padding: {
+                        top: 10,
+                        bottom: 10,
+                        left: 10,
+                        right: 10
                     }
                 }
             };
             
-            // Adjust chart for mobile devices
-            if (window.innerWidth <= 768) {
-                data.datasets[0].barThickness = 15;
-                options.scales.x.labels = {
-                    font: {
-                        size: 10
+            // Enhanced mobile responsiveness
+            function adjustChartForScreenSize() {
+                const isMobile = window.innerWidth <= 768;
+                const isSmallMobile = window.innerWidth <= 480;
+                
+                if (isMobile) {
+                    data.datasets[0].maxBarThickness = 25;
+                    options.scales.x.ticks.font.size = isSmallMobile ? 10 : 11;
+                    options.scales.y.ticks.font.size = isSmallMobile ? 10 : 11;
+                    
+                    // Ensure bars are visible on mobile
+                    if (isSmallMobile) {
+                        data.datasets[0].maxBarThickness = 20;
+                        data.datasets[0].minBarLength = 8;
                     }
-                };
-                options.scales.y.labels = {
-                    font: {
-                        size: 10
-                    }
-                };
+                    
+                    // Add mobile-specific constraints
+                    options.layout.padding = {
+                        top: 5,
+                        bottom: 5,
+                        left: 5,
+                        right: 5
+                    };
+                } else {
+                    data.datasets[0].maxBarThickness = 30;
+                    options.scales.x.ticks.font.size = 12;
+                    options.scales.y.ticks.font.size = 12;
+                    
+                    // Desktop padding
+                    options.layout.padding = {
+                        top: 10,
+                        bottom: 10,
+                        left: 10,
+                        right: 10
+                    };
+                }
+                
+                // Update chart if it exists
+                if (window.hoursActivityChart) {
+                    window.hoursActivityChart.update('none');
+                }
             }
 
-            new Chart(ctx, { type: "bar", data: data, options: options });
+            // Create chart
+            window.hoursActivityChart = new Chart(ctx, { 
+                type: "bar", 
+                data: data, 
+                options: options 
+            });
+            
+            // Initial adjustment
+            adjustChartForScreenSize();
+            
+            // Adjust on window resize
+            window.addEventListener('resize', adjustChartForScreenSize);
+            
+            // Adjust on orientation change (for mobile)
+            window.addEventListener('orientationchange', function() {
+                setTimeout(adjustChartForScreenSize, 100);
+            });
+            
+            // Force chart update after a short delay to ensure mobile rendering
+            setTimeout(() => {
+                if (window.hoursActivityChart) {
+                    window.hoursActivityChart.update('none');
+                }
+            }, 500);
+            
+            // Additional mobile-specific chart handling
+            if ('ontouchstart' in window) {
+                // Touch device optimizations
+                setTimeout(() => {
+                    if (window.hoursActivityChart) {
+                        window.hoursActivityChart.resize();
+                        window.hoursActivityChart.update('none');
+                    }
+                }, 1000);
+            }
+            
+            // Force chart to respect container dimensions
+            function constrainChartSize() {
+                const chartContainer = document.querySelector('.hours-activity-chart');
+                const canvas = document.getElementById('hoursActivityChart');
+                
+                if (chartContainer && canvas) {
+                    const containerRect = chartContainer.getBoundingClientRect();
+                    const maxWidth = containerRect.width;
+                    const maxHeight = containerRect.height;
+                    
+                    // Set maximum dimensions
+                    canvas.style.maxWidth = maxWidth + 'px';
+                    canvas.style.maxHeight = maxHeight + 'px';
+                    
+                    // Force chart resize
+                    if (window.hoursActivityChart) {
+                        window.hoursActivityChart.resize();
+                    }
+                }
+            }
+            
+            // Call constraint function after chart creation
+            setTimeout(constrainChartSize, 100);
+            
+            // Call on window resize
+            window.addEventListener('resize', constrainChartSize);
 
             const learningPathCtx = document.getElementById('learningPathPieChart').getContext('2d');
             const completedPercent = parseFloat("{{learningPathPercentage}}") || 0;
