@@ -10,10 +10,15 @@
         body {
             background-color: #f5f5f5;
             font-family: Arial, sans-serif;
+              font-size: clamp(14px, 0.9rem + 0.2vw, 16px);
+  line-height: 1.5;
         }
+
+    
 
         .dashboard-header {
             color: black;
+            margin:0px 1.5em;
             padding: 15px 20px;
             display: flex;
             align-items: center;
@@ -544,8 +549,11 @@
 
         .top-row,
         .bottom-row {
+             align-items: stretch;   
             gap: 20px;
         }
+
+        
 
         .bottom-row .dashboard-card.flex-grow-1 {
             max-width: 32%;
@@ -1122,12 +1130,13 @@
         }
 
         .card-title {
-            font-size: 28px;
+           
             font-weight: 700;
             color: #204070;
             margin-bottom: 5px;
         }
 
+ 
         .card-subtitle {
             font-size: 16px;
             color: #7a8ca5;
@@ -1163,10 +1172,16 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: conic-gradient(#3c6cff, #6d95ff);
+            background: conic-gradient(from 0deg, #3c6cff 0deg, #6d95ff 360deg);
             clip: rect(0, 120px, 240px, 0);
-            transform: rotate(216deg);
-            /* 60% of 360° is 216° */
+            transform: rotate(0deg);
+            transition: transform 0.8s ease;
+            transform-origin: center;
+        }
+        
+        /* Fallback for when JavaScript is disabled */
+        .progress-fill[style*="transform"] {
+            transition: transform 0.8s ease;
         }
 
         .progress-inner {
@@ -1330,12 +1345,7 @@
             margin-bottom: 20px;
         }
 
-        .card-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: #204070;
-            margin-bottom: 5px;
-        }
+    
 
         .card-subtitle {
             font-size: 16px;
@@ -1711,14 +1721,23 @@ html {
             
             /* Better mobile navigation */
             .dashboard-header {
-                position: sticky;
                 top: 0;
                 background: #f5f5f5;
                 z-index: 1000;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                margin:0px;
+                align-items:start;
+            }
+            .dashboard-header a{
+                margin-left:1.5em;
             }
         }
         
+       #page #page-header {
+    max-width: none;
+    display: none;
+    margin-bottom: 0px;
+    padding-top: 0px;
+}
         /* Ensure proper spacing on very small screens */
         @media (max-width: 360px) {
             .container {
@@ -1794,7 +1813,7 @@ html {
         <div class="decoration decoration-1"></div>
         <div class="decoration decoration-2"></div>
         <div class="card-header">
-          <h1 class="card-title">Start a Daily Streak!</h1>
+          <h2 class="card-title">Start a Daily Streak!</h2>
           <p class="card-subtitle">You're off to a great start!</p>
         </div>
         <div class="streak-hover-container "
@@ -1905,7 +1924,7 @@ html {
         <div class="decoration decoration-1"></div>
         <div class="decoration decoration-2"></div>
         <div class="card-header">
-          <h1 class="card-title">Continue Learning</h1>
+          <h2 class="card-title">Continue Learning</h2>
           <p class="card-subtitle">Pick up where you left off</p>
         </div>
         <div class="card-content">
@@ -1962,7 +1981,7 @@ html {
         <div class="decoration decoration-1"></div>
         <div class="decoration decoration-2"></div>
         <div class="card-header">
-          <h1 class="card-title">Recent Enrollments</h1>
+          <h2 class="card-title">Recent Enrollments</h2>
           <p class="card-subtitle">Explore your recently enrolled courses</p>
         </div>
         <div id="course-carousel" style="flex: 1; position: relative; overflow: hidden;">
@@ -2043,13 +2062,13 @@ html {
         <div class="decoration decoration-1"></div>
         <div class="decoration decoration-2"></div>
         <div class="card-header">
-          <h1 class="card-title">Learning Path</h1>
+          <h2 class="card-title">Learning Path</h2>
           <p class="card-subtitle">Track your progress and continue learning</p>
         </div>
         <div class="progress-container" style="margin: 60px auto 60px;">
           <div class="progress-bg"></div>
           <div class="progress-circle">
-            <div class="progress-fill"></div>
+            <div class="progress-fill" id="learningPathProgressFill" style="transform: rotate({{learningPathPercentage}}deg);"></div>
           </div>
           <div class="progress-inner">
             <div class="progress-value" id="progressValue">{{learningPathPercentage}}%</div>
@@ -2089,7 +2108,7 @@ html {
     <!-- Second Row: Hours Activity, Earned Points, Course Enrolled -->
     <div class="d-flex justify-content-between top-row mb-4  ">
       <!-- Hours Activity -->
-      <div class="dashboard-card flex-grow-1" style=" margin-left: 30px;>
+      <div class="dashboard-card flex-grow-1" style=" margin-left: 30px;">
                     <h2>Hours <span class="img-heading">Activity</span></h2>
         <div class="hours-activity-section d-flex justify-content-around align-items-center">
           <div class="hours-activity-chart">
@@ -2200,28 +2219,53 @@ html {
             progressBarFill.style.width = learningPathPercentage + '%';
 
             // Animate circular progress
-            const progressFill = document.querySelector('.progress-fill');
+            const progressFill = document.getElementById('learningPathProgressFill');
             const progressValue = document.getElementById('progressValue');
 
-            let progress = 0;
-            const targetProgress = learningPathPercentage;
-            const duration = 1500; // milliseconds
-            const increment = targetProgress / (duration / 16); // ~60fps
+            if (progressFill && progressValue) {
+                let progress = 0;
+                const targetProgress = learningPathPercentage;
+                const duration = 1500; // milliseconds
+                const increment = targetProgress / (duration / 16); // ~60fps
 
-            function animateProgress() {
-                if (progress < targetProgress) {
-                    progress += increment;
-                    if (progress > targetProgress) progress = targetProgress;
+                function animateProgress() {
+                    if (progress < targetProgress) {
+                        progress += increment;
+                        if (progress > targetProgress) progress = targetProgress;
 
-                    const degrees = (progress / 100) * 360;
-                    progressFill.style.transform = `rotate(${degrees}deg)`;
-                    progressValue.textContent = `${Math.round(progress)}%`;
+                        const degrees = (progress / 100) * 360;
+                        progressFill.style.transform = `rotate(${degrees}deg)`;
+                        progressValue.textContent = `${Math.round(progress)}%`;
+                        
+                        // Debug log to verify calculation
+                        console.log(`Progress: ${progress}%, Degrees: ${degrees}`);
 
-                    requestAnimationFrame(animateProgress);
+                        requestAnimationFrame(animateProgress);
+                    } else {
+                        // Ensure final value is exact
+                        const finalDegrees = (targetProgress / 100) * 360;
+                        progressFill.style.transform = `rotate(${finalDegrees}deg)`;
+                        progressValue.textContent = `${targetProgress}%`;
+                    }
                 }
-            }
 
-            setTimeout(animateProgress, 300);
+                // Start animation after a short delay
+                setTimeout(animateProgress, 300);
+                
+                // Also set initial state immediately
+                const initialDegrees = (targetProgress / 100) * 360;
+                progressFill.style.transform = `rotate(${initialDegrees}deg)`;
+                
+                // Ensure the progress circle shows the correct value
+                console.log(`Initial Progress: ${targetProgress}%, Initial Degrees: ${initialDegrees}`);
+                
+                // Fallback: if animation fails, set the final value
+                setTimeout(() => {
+                    const finalDegrees = (targetProgress / 100) * 360;
+                    progressFill.style.transform = `rotate(${finalDegrees}deg)`;
+                    progressValue.textContent = `${targetProgress}%`;
+                }, 2000);
+            }
         });
         document.addEventListener("DOMContentLoaded", function () {
             // Course Carousel Functionality
