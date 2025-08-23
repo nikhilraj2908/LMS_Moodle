@@ -156,15 +156,12 @@
             padding: 20px 0;
         }
 
-        .progress-container {
-            position: relative;
-            width: 180px;
-            height: 180px;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-            overflow: visible;
-        }
+       .progress-container {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  margin: 0 auto 30px;
+}
 
         .progress-container canvas {
             width: 180px !important;
@@ -292,11 +289,7 @@
             color: red;
         }
 
-        .hours-activity-chart {
-            width: 70%;
-            height: 200px;
-            text-align: center;
-        }
+      
 
         .hours-total-section {
             width: 30%;
@@ -1150,55 +1143,45 @@
             margin: 0 auto 30px;
         }
 
-        .progress-bg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: #f0f3f8;
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
-        }
+    .progress-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #f0f3f8;
+  box-shadow: inset 0 0 15px rgba(0,0,0,.1);
+}
 
-        .progress-circle {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            clip: rect(0, 120px, 240px, 0);
-        }
 
-        .progress-fill {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(from 0deg, #3c6cff 0deg, #6d95ff 360deg);
-            clip: rect(0, 120px, 240px, 0);
-            transform: rotate(0deg);
-            transition: transform 0.8s ease;
-            transform-origin: center;
-        }
-        
-        /* Fallback for when JavaScript is disabled */
-        .progress-fill[style*="transform"] {
-            transition: transform 0.8s ease;
-        }
+     .progress-circle{
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+      .progress-fill {
+  --p: 0; /* percentage */
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  /* start at top (−90deg), sweep to p*3.6deg, then background */
+  background: conic-gradient(
+    from -90deg,
+    #3c6cff 0deg,
+    #6d95ff calc(var(--p) * 3.6deg),
+    #f0f3f8 0
+  );
+}
 
-        .progress-inner {
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            background: white;
-            border-radius: 50%;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-
+      .progress-inner {
+  position: absolute;
+  inset: 20px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,.05);
+}
         .progress-value {
             font-size: 48px;
             font-weight: 700;
@@ -1697,11 +1680,7 @@ html {
                 justify-content: center;
             }
             
-            /* Improve chart responsiveness */
-            #hoursActivityChart {
-                max-width: 100%;
-                height: auto !important;
-            }
+         
             
             /* Better spacing for mobile */
             .card-header {
@@ -1732,6 +1711,23 @@ html {
             }
         }
         
+        /* container controls the height */
+.hours-activity-chart{
+  position:relative;
+  width:100%;
+  height:200px;
+}
+@media (max-width:767px){
+  .hours-activity-chart{ height:250px; }
+}
+
+/* canvas fills the container */
+#hoursActivityChart{
+  display:block;
+  width:100% !important;
+  height:100% !important;   /* <- replace the old 'height:auto !important' */
+}
+
        #page #page-header {
     max-width: none;
     display: none;
@@ -2068,7 +2064,7 @@ html {
         <div class="progress-container" style="margin: 60px auto 60px;">
           <div class="progress-bg"></div>
           <div class="progress-circle">
-            <div class="progress-fill" id="learningPathProgressFill" style="transform: rotate({{learningPathPercentage}}deg);"></div>
+            <div class="progress-fill"></div>
           </div>
           <div class="progress-inner">
             <div class="progress-value" id="progressValue">{{learningPathPercentage}}%</div>
@@ -2218,54 +2214,28 @@ html {
             const progressBarFill = document.getElementById('progressBarFill');
             progressBarFill.style.width = learningPathPercentage + '%';
 
-            // Animate circular progress
-            const progressFill = document.getElementById('learningPathProgressFill');
+          const progressFill = document.querySelector('.progress-fill');
             const progressValue = document.getElementById('progressValue');
 
-            if (progressFill && progressValue) {
-                let progress = 0;
-                const targetProgress = learningPathPercentage;
-                const duration = 1500; // milliseconds
-                const increment = targetProgress / (duration / 16); // ~60fps
+            let p = 0;
+            const target = Math.max(0, Math.min(100, parseFloat('{{learningPathPercentage}}') || 0));
+            const duration = 1500;
+            const step = target / (duration / 16);
 
-                function animateProgress() {
-                    if (progress < targetProgress) {
-                        progress += increment;
-                        if (progress > targetProgress) progress = targetProgress;
-
-                        const degrees = (progress / 100) * 360;
-                        progressFill.style.transform = `rotate(${degrees}deg)`;
-                        progressValue.textContent = `${Math.round(progress)}%`;
-                        
-                        // Debug log to verify calculation
-                        console.log(`Progress: ${progress}%, Degrees: ${degrees}`);
-
-                        requestAnimationFrame(animateProgress);
-                    } else {
-                        // Ensure final value is exact
-                        const finalDegrees = (targetProgress / 100) * 360;
-                        progressFill.style.transform = `rotate(${finalDegrees}deg)`;
-                        progressValue.textContent = `${targetProgress}%`;
-                    }
-                }
-
-                // Start animation after a short delay
-                setTimeout(animateProgress, 300);
-                
-                // Also set initial state immediately
-                const initialDegrees = (targetProgress / 100) * 360;
-                progressFill.style.transform = `rotate(${initialDegrees}deg)`;
-                
-                // Ensure the progress circle shows the correct value
-                console.log(`Initial Progress: ${targetProgress}%, Initial Degrees: ${initialDegrees}`);
-                
-                // Fallback: if animation fails, set the final value
-                setTimeout(() => {
-                    const finalDegrees = (targetProgress / 100) * 360;
-                    progressFill.style.transform = `rotate(${finalDegrees}deg)`;
-                    progressValue.textContent = `${targetProgress}%`;
-                }, 2000);
+            function animateProgress() {
+            if (p < target) {
+                p = Math.min(target, p + step);
+                const safe = p >= 100 ? 99.999 : p; // avoid 360°→0° snap
+                progressFill.style.setProperty('--p', safe);
+                progressValue.textContent = `${Math.round(p)}%`;
+                requestAnimationFrame(animateProgress);
+            } else {
+                progressFill.style.setProperty('--p', target >= 100 ? 99.999 : target);
             }
+            }
+
+            // start once (optionally with a slight delay)
+setTimeout(() => requestAnimationFrame(animateProgress), 300);
         });
         document.addEventListener("DOMContentLoaded", function () {
             // Course Carousel Functionality
