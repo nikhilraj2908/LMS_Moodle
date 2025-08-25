@@ -83,6 +83,7 @@
     padding-top: 0 !important;
     z-index: 1100;
 }
+
 }
 
 .container, .container-fluid, .container-sm, .container-md, .container-lg, .container-xl {
@@ -630,6 +631,7 @@
         .bottom-row {
              align-items: stretch;   
             gap: 20px;
+            
         }
 
         
@@ -710,6 +712,14 @@
                 max-width: 100% !important;
                 margin-left: 0 !important;
                 margin-right: 0 !important;
+            }
+        }
+        @media(min-width:1050px)and (max-width:1450px){
+            .progress-container {
+                position: relative;
+                width: 100% !important;
+                height: 32vh !important;
+                margin: 30px auto 30px !important;
             }
         }
         
@@ -1972,6 +1982,178 @@ html {
                 display: none;
             }
         }
+
+        /* ===== BUTTON RESPONSIVENESS (Continue & Go to Course) ===== */
+.continue-button,
+a.course-link-button {
+  /* layout */
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: min(100%, 460px);       /* center on desktop, full width on small screens */
+  margin-inline: auto;
+
+  /* sizing */
+  min-height: 44px;              /* accessible tap target */
+  padding: clamp(10px, 1.6vw, 16px) clamp(16px, 2.4vw, 28px) !important;
+  font-size: clamp(14px, 1.15vw, 18px) !important;
+  line-height: 1.2;
+
+  /* shape */
+  border-radius: clamp(14px, 3vw, 30px) !important;
+
+  /* make sure long text never overflows */
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+
+/* Tablets (768–1199): a touch wider, comfortable padding */
+@media (max-width: 1199px) and (min-width: 768px) {
+  .continue-button,
+  a.course-link-button {
+    width: 100%;
+    max-width: 520px;
+  }
+}
+
+/* Mobiles (≤ 767): full width, slightly larger text for readability */
+@media (max-width: 767px) {
+  .continue-button,
+  a.course-link-button {
+    width: 100% !important;
+    max-width: none;
+    padding: 12px 18px !important;
+    font-size: 16px !important;    /* prevents iOS zoom on focus */
+    border-radius: 16px !important;
+  }
+}
+
+/* Small mobiles (≤ 480): tighter padding, keep tap target */
+@media (max-width: 480px) {
+  .continue-button,
+  a.course-link-button {
+    padding: 12px 16px !important;
+    font-size: 15px !important;
+    border-radius: 14px !important;
+  }
+}
+
+
+
+/* Ignore the inline width="25%" / "23%" on those four cards */
+.top-row .learning-card {
+  width: auto !important;
+  flex: 1 1 auto;          /* keep flex column behavior inside the card */
+  display: flex;
+  flex-direction: column;  /* header -> content -> button */
+  height: 100%;
+}
+
+/* Ensure the main content grows, and the CTA sits at the bottom */
+.top-row .card-content,
+.top-row #course-carousel,
+.top-row .recentcourse-card-inner {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-row .continue-button,
+.top-row a.continue-button,
+.top-row a.course-link-button {
+  margin-top: auto;  /* pins CTA to the bottom so all cards end evenly */
+}
+
+/* Slightly reduce the big progress block spacing so it doesn't force extra height */
+.top-row .progress-container {
+  margin: 40px auto 40px; /* was larger in one card */
+}
+
+/* --- Responsive columns for the row --- */
+@media (max-width: 1199px) {
+  .top-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 991px) {
+  .top-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 767px) {
+  .top-row {
+    grid-template-columns: 1fr; /* stack on mobile */
+    margin: 10px 15px !important;
+  }
+}
+
+
+/* ===========================
+   Equal heights for FIRST ROW only
+   =========================== */
+.container > .top-row:first-of-type {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* Ensure each learning-card stretches fully */
+.container > .top-row:first-of-type .learning-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Make card content grow, button pinned to bottom */
+.container > .top-row:first-of-type .card-content,
+.container > .top-row:first-of-type #course-carousel,
+.container > .top-row:first-of-type .recentcourse-card-inner {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.container > .top-row:first-of-type .continue-button,
+.container > .top-row:first-of-type a.course-link-button {
+  margin-top: auto;
+}
+
+/* Responsive column counts */
+@media (max-width: 1199px) {
+  .container > .top-row:first-of-type {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 991px) {
+  .container > .top-row:first-of-type {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 767px) {
+  .container > .top-row:first-of-type {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===========================
+   Second row stays FLEX layout
+   =========================== */
+.container > .top-row:not(:first-of-type) {
+  display: flex !important;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: stretch;
+}
+.container > .top-row:not(:first-of-type) .dashboard-card {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+
     </style>
 </head>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -2185,7 +2367,7 @@ html {
                   style="width: 100%; height: 170px; object-fit: cover; display: block;">
               </div>
               <div class="course-name"
-                style="font-size: 22px; font-weight: 700; color: #204070; margin-bottom: 20px; text-align: center;">
+                style=" font-weight: 700; color: #204070; margin-bottom: 20px; text-align: center;">
                 {{coursename}}
               </div>
               <div class="progress-section"
@@ -2210,7 +2392,7 @@ html {
                 <div class="stat-item"
                   style="text-align: center; padding: 10px; flex: 1; background: #f8fbff; border-radius: 10px; margin: 0 5px;">
                   <div class="stat-value"
-                    style="font-size: 18px; font-weight: 700; color: #204070; margin-bottom: 5px;">
+                    style=" font-weight: 700; color: #204070; margin-bottom: 5px;">
                     {{total_modules}}
                   </div>
                   <div class="stat-label" style="font-size: 13px; color: #7a8ca5;">Modules</div>
@@ -2218,7 +2400,7 @@ html {
                 <div class="stat-item"
                   style="text-align: center; padding: 10px; flex: 1; background: #f8fbff; border-radius: 10px; margin: 0 5px;">
                   <div id="lastaccessedtime" class="stat-value"
-                    style="font-size: 18px; font-weight: 700; color: #204070; margin-bottom: 5px;">
+                    style=" font-weight: 700; color: #204070; margin-bottom: 5px;">
                     {{last_accessed_time}}
                   </div>
                   <div class="stat-label" style="font-size: 13px; color: #7a8ca5;">Last Viewed</div>

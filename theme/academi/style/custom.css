@@ -683,6 +683,16 @@ body#page-login-forgot_password {
   flex-wrap: wrap;
   gap: 20px;
 }
+.page-context-header{
+    padding: 1.25rem 0 !important;
+    margin-bottom: 0px !important;
+
+}
+#page-header{margin-bottom: 0px !important;}
+
+#page-content .userprofile{
+    padding :0px !important;
+}
  
 .ms-auto .singlebutton{
     display: none;
@@ -696,3 +706,8 @@ html,body { font-size: clamp(13px, 1vw + 0.2rem, 14px); }
 .page-header-headings .h2{
     margin-left: 0px !important;
 }
+.page-header-image img{
+    width:60% !important;
+}
+
+.dropdown #user-menu-toggle{padding: 0px !important;}

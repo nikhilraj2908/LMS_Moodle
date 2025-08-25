@@ -313,31 +313,67 @@
 /* override left-icon positioning for lock/user icons */
 
 
-/* style & position the eye icon on the right */
+
+
+
+/* Left icon (user/lock) stays on the left */
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #204070;
+  font-size: 16px;
+}
+
+/* Ensure there is room for BOTH icons */
+.input-wrapper input {
+  padding: 12px 48px 12px 40px; /* right padding for the eye, left for lock/user */
+}
+
+/* Eye icon on the RIGHT, fully responsive */
 .show-password-icon {
   position: absolute;
-  left: 12px;
-  right: auto;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
   color: var(--primary);
+  width: 36px;               /* large touch target */
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background:transparent;
 }
 
 
 
+/* Improve tap feedback & accessibility */
+.show-password-icon:focus,
+.show-password-icon:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
 
-.fa.fa-eye {
-    position: absolute;
-    left:330px;
-    top:-8px;
-    }
+/* Small screens: keep tap target comfy, adjust paddings if needed */
+@media (max-width: 480px) {
+  .input-wrapper input {
+    padding-right: 52px;
+    padding-left: 38px;
+    font-size: 16px; /* prevents iOS zoom on focus */
+  }
+  .show-password-icon {
+    right: 10px;
+    width: 36px;
+    height: 36px;
+  }
+}
 
-.fa.fa-eye-slash {
-position:absolute;
-left:330px;
-    top:-8px;
-
+.show-password-icon:hover, .show-password-icon:focus, .show-password-icon.active, .show-password-icon:active {
+    color: #205070;
+    background: transparent !important;
+    outline: 0;
 }
 
 </style>
@@ -379,12 +415,14 @@ left:330px;
     <span class="input-icon"><i class="fa fa-user"></i></span>
     <input type="text" name="username" placeholder="Email Address or Username" required />
   </div>
+<div class="input-wrapper">
+  <span class="input-icon"><i class="fa fa-lock" aria-hidden="true"></i></span>
+  <input type="password" name="password" placeholder="Your Password" required />
+  <button type="button" class="show-password-icon" aria-label="Show password" title="Show password">
+    <i class="fa fa-eye" aria-hidden="true"></i>
+  </button>
+</div>
 
-  <div class="input-wrapper">
-    <span class="input-icon"><i class="fa fa-lock"></i></span>
-    <input type="password" name="password" placeholder="Your Password" required />
-     <span class="input-icon show-password-icon"><i class="fa fa-eye"></i></span>
-  </div>
 
   <div class="forgot-pass">
     <a href="{{forgotpasswordurl}}">Forgot Password</a>
