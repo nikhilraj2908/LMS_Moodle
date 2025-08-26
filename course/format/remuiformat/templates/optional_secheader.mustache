@@ -1,11 +1,11 @@
-<div class="rmuiformate-header-wrapper d-none">
+<div class="rmuiformate-header-wrapper  d-none">
     <header id="page-header" class="d-print-none hasbackground design-1 position-relative"
         style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url('{{headercourseimage}}');background-position: {{remuiheaderimagebgposition}}; background-size:{{remuiheaderimagebgsize}};background-repeat: no-repeat;">
    
        <div class="align-self-end" style="z-index:1;">
         {{{turneditingonswitch}}}
        </div>
-        <div class="w-100 header-wrapper" style="z-index:1;">
+        <div class="w-100 header-wrapper " style="z-index:1;">
             <div class="d-flex flex-wrap w-100">
                 <div class="d-flex align-items-center w-100">
                     <div class="dashboard-bar-wrapper w-100">
@@ -89,6 +89,7 @@
     flex-direction: column;
     justify-content: flex-end;
     position: relative;
+    margin-bottom:15px !important;
 }
 
 /* Combined Glass Box */
@@ -186,9 +187,22 @@
 .tool_courserating-widget {
   position: absolute;
   top: 270px;
-  left:100px;  
+  left:95px;  
 
 }
+
+@media(max-width:1200px){
+    .tool_courserating-widget {
+   position:static;
+   margin-top:30px;
+    margin-left:5px;
+ 
+
+}
+
+}
+
+
 
 .tool_courserating-addrating{
     color:white;
@@ -257,6 +271,8 @@
         font-size: 1.5rem;
     }
 }
+
+
 </style>
 
 {{#courseheaderdesign}}
