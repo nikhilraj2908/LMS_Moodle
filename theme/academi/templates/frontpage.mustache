@@ -1477,6 +1477,15 @@ html {
       .drawer-toggles .drawer-right-toggle, .drawer-toggles .drawer-left-toggle {
          top: 10vh; 
     }
+    /* Make the CTA card and the course block visible immediately */
+  .carousel-overlay-box.animated-element,
+  .course-cards-overlay.animated-element {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Keep a gentle motion for other bottom-in elements if you still use it */
+  .slide-in-bottom { transform: translateY(16px); }
 }
 
 
@@ -1513,6 +1522,8 @@ justify-content:center;
     margin-top:10px;
   }
 }
+
+
 
 
 

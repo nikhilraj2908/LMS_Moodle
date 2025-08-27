@@ -45,6 +45,8 @@ html { font-size: clamp(13px, 1vw + 0.2rem, 17px); }
     .page-header-headings .h2{
         margin-bottom:15px !important; 
     }
+
+   
 }
 .dropdown button{
     padding:0px 5px;
@@ -52,6 +54,10 @@ html { font-size: clamp(13px, 1vw + 0.2rem, 17px); }
 .footer-content-popover{
     display:none;
 }
+ .card-footer {
+        padding: 0px !important; 
+
+    }
 
 #region-main {
     float: none;
@@ -59,6 +65,7 @@ html { font-size: clamp(13px, 1vw + 0.2rem, 17px); }
     border-radius: 10px;
     overflow-x: visible;
 }
+
 
 /* === Fluid, mobile-friendly course card typography === */
 
@@ -122,6 +129,8 @@ html { font-size: clamp(13px, 1vw + 0.2rem, 17px); }
   line-height: inherit;
   margin: 0;
 }
+
+
 
 </style>
 <?php
