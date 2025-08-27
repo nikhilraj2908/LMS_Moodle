@@ -717,6 +717,22 @@ html,body { font-size: clamp(13px, 1vw + 0.2rem, 14px); }
     .drawer-toggles .drawer-right-toggle, .drawer-toggles .drawer-left-toggle {
         top: 9%;
     }
+
+
+    /* kill leftover compensation */
+body[style*="padding-right"] { padding-right: 0 !important; }
+
+/* hide right drawer fully when closed */
+#theme_boost-drawers-blocks.drawer-right:not(.show){ transform: translateX(101%); }
+
+/* backdrop must not linger once closed */
+body:not(.drawer-open-right) .drawer-backdrop{
+  display: none !important; opacity: 0 !important; visibility: hidden !important;
+}
+
+/* apply header offset only when drawer is really open */
+.header-main.show-drawer-right { margin-right: 0 !important; }
+body.drawer-open-right .header-main { margin-right: 315px; }
 }
 #theme_boost-drawers-blocks.drawer-right {
 
