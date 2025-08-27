@@ -17,6 +17,7 @@
 }
 
 
+
 .course-card .card-img-top, .theme-card .card-img-top {
     height: 12rem !important;
     background-position: center;
@@ -33,10 +34,11 @@ html { font-size: clamp(13px, 1vw + 0.2rem, 17px); }
     .page-header-headings .h2{
         margin-bottom:15px !important; 
     }
+        
 }
 @media (max-width: 430px) {
     .page-context-header .page-header-headings h1 {
-        font-size: 12px !important;
+          font-size: clamp(0.75rem, 2.5vw + 0.5rem, 1rem);
         font-weight:bold;
         border-bottom:1px solid black;
     }
@@ -49,6 +51,76 @@ html { font-size: clamp(13px, 1vw + 0.2rem, 17px); }
 }
 .footer-content-popover{
     display:none;
+}
+
+#region-main {
+    float: none;
+    padding: 0px !important; 
+    border-radius: 10px;
+    overflow-x: visible;
+}
+
+/* === Fluid, mobile-friendly course card typography === */
+
+/* 1) Course title (works for Boost/Academi variants) */
+.course-card .coursename,
+.course-card .coursename a,
+.course-card .card-title,
+.course-card .course-title,
+.course-card .course-title a {
+  font-size: clamp(0.95rem, 1.1vw + 0.7rem, 1.25rem); /* ~15.2px → 20px */
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: .01em;
+  margin-bottom: .35rem;
+  text-decoration-thickness: .08em;       /* keeps underline neat if used */
+  text-underline-offset: 2px;
+  word-break: break-word;                 /* prevents overflow on long words */
+  overflow-wrap: anywhere;
+  display: -webkit-box;                   /* tidy 2-line clamp on mobiles */
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 2) Category/label “Software”, “Doctors”, etc. */
+.course-card .badge,
+.course-card .categoryname,
+.course-card .course-category {
+  font-size: clamp(0.72rem, 0.4vw + 0.58rem, 0.85rem);
+  line-height: 1.2;
+}
+
+/* 3) Progress text (e.g., “100% complete”) */
+.course-card .progress-text,
+.course-card .progress .percentage,
+.course-card .completioninfo {
+  font-size: clamp(0.75rem, 0.5vw + 0.55rem, 0.875rem);
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+/* 4) Action buttons (“Continue Learning”, menu dots) */
+.course-card .btn,
+.course-card .btn-primary,
+.course-card .btn-outline-secondary {
+  font-size: clamp(0.78rem, 0.5vw + 0.58rem, 0.9rem);
+  line-height: 1.2;
+  padding: .55rem .9rem;
+  border-radius: .55rem;
+}
+
+/* 5) Tighten spacing on small screens */
+@media (max-width: 480px) {
+  .course-card { padding: .75rem .75rem 1rem; }
+  .course-card .card-img-top { height: 10.5rem !important; }
+}
+
+/* 6) Prevent any layout jiggle from inherited huge headings inside cards */
+.course-card h3, .course-card h4, .course-card h5 {
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
 }
 
 </style>
