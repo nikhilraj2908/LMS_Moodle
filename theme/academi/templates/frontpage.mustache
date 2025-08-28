@@ -1523,7 +1523,16 @@ justify-content:center;
   }
 }
 
+.popup-content{
 
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 25em;
+      margin: auto;
+      position: relative;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
 
 
 
@@ -1783,22 +1792,14 @@ justify-content:center;
     </div>
 {{#showpopup}}
 <div id="customPopup" class="popup-overlay" style="display: none;">
-  <div class="popup-content" style="
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      max-width: 500px;
-      margin: auto;
-      position: relative;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  ">
+  <div class="popup-content">
     <button class="btn-close" onclick="closePopup()" style="
         position: absolute;
         top: 10px;
         right: 10px;
         background: none;
         border: none;
-        font-size: 24px;
+        font-size: 20px;
         cursor: pointer;
     ">&times;</button>
     <img src="{{alert_gif}}" alt="Alert" style="max-width: 100%; margin-bottom: 20px;" />
