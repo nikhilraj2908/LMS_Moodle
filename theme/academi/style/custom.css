@@ -730,9 +730,17 @@ body:not(.drawer-open-right) .drawer-backdrop{
   display: none !important; opacity: 0 !important; visibility: hidden !important;
 }
 
-/* apply header offset only when drawer is really open */
-.header-main.show-drawer-right { margin-right: 0 !important; }
-body.drawer-open-right .header-main { margin-right: 315px; }
+/* Default: no offset */
+.header-main {
+  margin-right: 0 !important;
+  transition: margin-right 0.3s ease; /* smooth */
+}
+
+/* Apply offset only when drawer is really open */
+body.drawer-open-right .header-main {
+  margin-right: 315px !important;
+}
+
 }
 #theme_boost-drawers-blocks.drawer-right {
 
