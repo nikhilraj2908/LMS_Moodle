@@ -588,7 +588,7 @@ tr th{
 
     </div>
     <div>
-      <a href="{{summaryExportUrl}}" class="btn btn-sm btn-danger ms-auto">
+      <a href="{{summaryExportUrl}}" class="btn btn-sm btn-danger ms-auto" id="userExportBtn">
         <i class="fas fa-download"></i> Export 
       </a>
       <a class="btn btn-sm btn-primary" id="mailReportBtn">
@@ -657,7 +657,7 @@ tr th{
       </select>
     </div>
 
-    <a href="{{courseSummaryExportUrl}}" class="btn btn-sm btn-danger ms-auto">
+    <a href="{{courseSummaryExportUrl}}" class="btn btn-sm btn-danger ms-auto" id="courseExportBtn">
       <i class="fas fa-download"></i> Export 
     </a>
   </div>
@@ -855,12 +855,14 @@ tr th{
     </div>
   </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-////////// added for dropdown inside the new summary report
-   function bindCategorySelect(id, paramName) {
+/* 0) Moodle base URL works on localhost (/moodle) and prod (/) */
+const moodleRoot =
+  (window.M && M.cfg && M.cfg.wwwroot) || "{{{config.wwwroot}}}" || "";
+
+/** 1) Category dropdowns → update URL (server re-renders the tables) */
+function bindCategorySelect(id, paramName) {
   const el = document.getElementById(id);
   if (!el) return;
   el.addEventListener('change', function () {
@@ -869,183 +871,112 @@ tr th{
     window.location.href = url.toString();
   });
 }
+bindCategorySelect('userCategorySelect', 'usercat');
+bindCategorySelect('courseCategorySelect', 'coursecat');
 
-bindCategorySelect('userCategorySelect', 'usercat');     // affects only user table
-bindCategorySelect('courseCategorySelect', 'coursecat'); // affects only course table
+document.addEventListener('DOMContentLoaded', function () {
+  /** 2) SYSTEM LOGS (unchanged) */
+  const logDuration   = document.getElementById('logDuration');
+  const getLogsBtn    = document.getElementById('getLogsBtn');
+  const logTableBody  = document.getElementById('logTableBody');
+  const noLogsMessage = document.getElementById('noLogsMessage');
 
+  if (logDuration && getLogsBtn && logTableBody && noLogsMessage) {
+    async function fetchLogs() {
+      const minutes = logDuration.value;
+      try {
+        logTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Loading logs...</td></tr>';
+        const response = await fetch(
+          location.pathname.split('?')[0] + '?ajaxlogs=1&range=' + minutes,
+          { credentials: 'same-origin' }
+        );
+        const text = await response.text();
 
-    
-    document.addEventListener('DOMContentLoaded', function() {
-      const exportBtn = document.querySelector('.btn.btn-sm.btn-danger.ms-auto');
-      if (exportBtn) {
-        exportBtn.addEventListener('click', exportReport);
-      }
+        let jsonStart = text.lastIndexOf('[');
+        let jsonEnd   = text.lastIndexOf(']');
 
-      // Log table functionality
-      const logDuration = document.getElementById('logDuration');
-      const getLogsBtn = document.getElementById('getLogsBtn');
-      const logTableBody = document.getElementById('logTableBody');
-      const noLogsMessage = document.getElementById('noLogsMessage');
-
-      if (logDuration && getLogsBtn && logTableBody && noLogsMessage) {
-        async function fetchLogs() {
-          const minutes = logDuration.value;
-          try {
-            logTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Loading logs...</td></tr>';
-            const response = await fetch(
-              location.pathname.split('?')[0] + '?ajaxlogs=1&range=' + minutes,
-              { credentials: 'same-origin' }
-            );
-            const text = await response.text();
-            
-            // Extract JSON from response text
-            let jsonStart = text.lastIndexOf('[');
-            let jsonEnd = text.lastIndexOf(']');
-            
-            if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-              const jsonText = text.substring(jsonStart, jsonEnd + 1);
-              const logs = JSON.parse(jsonText);
-              
-              logTableBody.innerHTML = '';
-              if (logs.length === 0) {
-                noLogsMessage.style.display = 'block';
-                return;
-              }
-              noLogsMessage.style.display = 'none';
-              logs.forEach(log => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                  <td>${log.time}</td>
-                  <td>${log.user}</td>
-                  <td>${log.event}</td>
-                  <td>${log.description}</td>
-                  <td>${log.ip}</td>
-                `;
-                logTableBody.appendChild(row);
-              });
-            } else {
-              throw new Error('Invalid response format from server');
-            }
-          } catch (error) {
-            logTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Error loading logs: ${error.message}</td></tr>`;
-            console.error('Error fetching logs:', error);
-          }
+        if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+          const logs = JSON.parse(text.substring(jsonStart, jsonEnd + 1));
+          logTableBody.innerHTML = '';
+          if (logs.length === 0) { noLogsMessage.style.display = 'block'; return; }
+          noLogsMessage.style.display = 'none';
+          logs.forEach(log => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${log.time}</td>
+              <td>${log.user}</td>
+              <td>${log.event}</td>
+              <td>${log.description}</td>
+              <td>${log.ip}</td>`;
+            logTableBody.appendChild(row);
+          });
+        } else {
+          throw new Error('Invalid response format from server');
         }
-        
-        fetchLogs();
-        getLogsBtn.addEventListener('click', fetchLogs);
-        logDuration.addEventListener('change', fetchLogs);
+      } catch (error) {
+        logTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Error loading logs: ${error.message}</td></tr>`;
+        console.error('Error fetching logs:', error);
       }
-      
-      // Region selection handler - FIXED
-      const regionSelect = document.getElementById('regionSelect');
-      if (regionSelect) {
-        // Set current selection from URL parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedRegionId = urlParams.get('regionid');
-        if (selectedRegionId) {
-          regionSelect.value = selectedRegionId;
-        }
-        
-        // Handle selection change
-        regionSelect.addEventListener('change', function() {
-          const regionId = this.value;
-          const url = new URL(window.location.href);
-          url.searchParams.set('regionid', regionId);
-          window.location.href = url.toString();
-        });
-      }
-    });
-
-    function exportReport() {
-      const regionSelect = document.getElementById('regionSelect');
-      const selectedOption = regionSelect.options[regionSelect.selectedIndex];
-      
-      // Get region name from selected option
-      let regionName = selectedOption.textContent.trim();
-      
-      // Clean region name for filename (remove indentation spaces)
-      regionName = regionName.replace(/\s+/g, '_').replace(/&nbsp;/g, '');
-      
-      // Prepare data for export
-      const rows = [];
-      
-      // Add header row
-      rows.push(['User', 'Course', 'Region', 'Score', 'Rating', 'Progress', 'Status']);
-      
-      // Add data rows
-      {{#reportData}}
-      rows.push([
-          `"{{username}}"`,
-          `"{{coursename}}"`,
-          `"{{region}}"`,
-          `"{{score}}%"`,
-          `"{{#rating}}{{rating}} ★{{/rating}}{{^rating}}N/A{{/rating}}"`,
-          `"{{progress}}%"`,
-          `"{{#is_completed}}Completed{{/is_completed}}{{#is_progress}}In Progress{{/is_progress}}{{#is_review}}Needs Review{{/is_review}}"`
-      ]);
-      {{/reportData}}
-      
-      // Convert to CSV string
-      const csvContent = "data:text/csv;charset=utf-8," + 
-          rows.map(e => e.join(",")).join("\n");
-      
-      // Create download link
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      
-      // Create filename with region name
-      const dateStr = new Date().toISOString().slice(0,10);
-      const filename = `report_${regionName}_${dateStr}.csv`;
-      
-      link.setAttribute("download", filename);
-      document.body.appendChild(link);
-      
-      // Trigger download
-      link.click();
-      document.body.removeChild(link);
     }
+    fetchLogs();
+    getLogsBtn.addEventListener('click', fetchLogs);
+    logDuration.addEventListener('change', fetchLogs);
+  }
 
-    const moodleRoot = "http://localhost/moodle";
-const mailReportBtn = document.getElementById('mailReportBtn');
-const mailModal = new bootstrap.Modal(document.getElementById('mailReportModal'));
-const sendMailConfirm = document.getElementById('sendMailConfirm');
+  /** 3) EXPORT BUTTONS — only selected category */
+  // USER export
+  const userExportBtn = document.getElementById('userExportBtn');
+  if (userExportBtn) {
+    userExportBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const userCatEl  = document.getElementById('userCategorySelect');
+      const categoryid = userCatEl ? userCatEl.value : 0;
+      window.location.href =
+        `${moodleRoot}/my/export.php?type=summary&categoryid=${encodeURIComponent(categoryid)}`;
+    });
+  }
+
+  // COURSE export
+  const courseExportBtn = document.getElementById('courseExportBtn');
+  if (courseExportBtn) {
+    courseExportBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const courseCatEl = document.getElementById('courseCategorySelect');
+      const coursecat   = courseCatEl ? courseCatEl.value : 0;
+      window.location.href =
+        `${moodleRoot}/my/export.php?type=course_summary&coursecat=${encodeURIComponent(coursecat)}`;
+    });
+  }
+});
+
+/** 4) MAIL (Bulk + Modal) — use moodleRoot */
+const mailReportBtn       = document.getElementById('mailReportBtn');
+const mailModal           = new bootstrap.Modal(document.getElementById('mailReportModal'));
+const sendMailConfirm     = document.getElementById('sendMailConfirm');
 const recipientEmailInput = document.getElementById('recipientEmail');
-const mailError = document.getElementById('mailError');
-/*
-if (mailReportBtn) {
-  mailReportBtn.addEventListener('click', function() {
-    recipientEmailInput.value = '';
-    mailError.style.display = 'none';
-    mailModal.show();
-  });
-}//////old 
-*/
+const mailError           = document.getElementById('mailError');
 
+// Bulk Mail (no modal)
 if (mailReportBtn) {
   mailReportBtn.addEventListener('click', async function () {
-    const categorySelect = document.getElementById('categorySelect');
-    const selectedCategoryId = categorySelect ? categorySelect.value : 0;
+    const userCatEl = document.getElementById('userCategorySelect');
+    const selectedCategoryId = userCatEl ? userCatEl.value : 0;
 
     mailReportBtn.disabled = true;
     mailReportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
     try {
-      const response = await fetch(moodleRoot + '/my/send_report.php', {
+      const response = await fetch(`${moodleRoot}/my/send_report.php`, {
         method: 'POST',
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ categoryid: selectedCategoryId })
       });
 
-      const contentType = response.headers.get("content-type") || "";
-      if (!contentType.includes("application/json")) {
-        throw new Error("Server did not return JSON. Check PHP for errors.");
-      }
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) throw new Error('Server did not return JSON.');
 
       const data = await response.json();
-
       if (data.success) {
         mailReportBtn.innerHTML = '<i class="fas fa-check"></i> Sent!';
         mailReportBtn.classList.remove('btn-primary');
@@ -1053,7 +984,6 @@ if (mailReportBtn) {
       } else {
         throw new Error(data.message || 'Unknown error');
       }
-
     } catch (err) {
       console.error(err);
       mailReportBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Failed';
@@ -1070,16 +1000,16 @@ if (mailReportBtn) {
   });
 }
 
+// Modal “Send”
 if (sendMailConfirm) {
-    sendMailConfirm.addEventListener('click', async function() {
-    const categorySelect = document.getElementById('categorySelect');
-    const selectedCategoryId = categorySelect ? categorySelect.value : 0;
+  sendMailConfirm.addEventListener('click', async function () {
+    const userCatEl = document.getElementById('userCategorySelect');
+    const selectedCategoryId = userCatEl ? userCatEl.value : 0;
 
     const recipientEmail = recipientEmailInput.value.trim();
     mailError.style.display = 'none';
-
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(recipientEmail)) {
-      mailError.textContent = "Please enter a valid email address.";
+      mailError.textContent = 'Please enter a valid email address.';
       mailError.style.display = 'block';
       return;
     }
@@ -1088,50 +1018,42 @@ if (sendMailConfirm) {
     sendMailConfirm.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
     try {
-      const response = await fetch(moodleRoot + '/my/send_report.php', {
+      const response = await fetch(`${moodleRoot}/my/send_report.php`, {
         method: 'POST',
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          categoryid: selectedCategoryId,
-          email: recipientEmail
-        })
-
+        body: JSON.stringify({ categoryid: selectedCategoryId, email: recipientEmail })
       });
-      
 
-      const contentType = response.headers.get("content-type") || "";
-      if (!contentType.includes("application/json")) {
-        throw new Error("Server did not return JSON. Check PHP for errors.");
-      }
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) throw new Error('Server did not return JSON.');
 
       const data = await response.json();
       if (data.success) {
-    mailError.style.display = 'block';
-    mailError.style.color = 'green';
-    mailError.textContent = 'Report sent successfully to ' + recipientEmail;
+        mailError.style.display = 'block';
+        mailError.style.color = 'green';
+        mailError.textContent = 'Report sent successfully to ' + recipientEmail;
 
-    sendMailConfirm.classList.remove('btn-primary');
-    sendMailConfirm.classList.add('btn-success');
-    sendMailConfirm.disabled = true;
-    sendMailConfirm.innerHTML = '<i class="fas fa-check"></i> Sent';
+        sendMailConfirm.classList.remove('btn-primary');
+        sendMailConfirm.classList.add('btn-success');
+        sendMailConfirm.disabled = true;
+        sendMailConfirm.innerHTML = '<i class="fas fa-check"></i> Sent';
 
-    setTimeout(() => {
-        mailModal.hide();
-        sendMailConfirm.disabled = false;
-        sendMailConfirm.classList.remove('btn-success');
-        sendMailConfirm.classList.add('btn-primary');
-        sendMailConfirm.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
-        mailError.style.display = 'none';
-    }, 6000);
-}
- else {
-        mailError.textContent = "Failed to send: " + data.message;
+        setTimeout(() => {
+          mailModal.hide();
+          sendMailConfirm.disabled = false;
+          sendMailConfirm.classList.remove('btn-success');
+          sendMailConfirm.classList.add('btn-primary');
+          sendMailConfirm.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+          mailError.style.display = 'none';
+        }, 6000);
+      } else {
+        mailError.textContent = 'Failed to send: ' + (data.message || 'Unknown error');
         mailError.style.display = 'block';
       }
     } catch (error) {
       console.error(error);
-      mailError.textContent = "Error: " + error.message;
+      mailError.textContent = 'Error: ' + error.message;
       mailError.style.display = 'block';
     } finally {
       sendMailConfirm.disabled = false;
@@ -1139,7 +1061,5 @@ if (sendMailConfirm) {
     }
   });
 }
+</script>
 
-
-  </script>
- 
