@@ -132,6 +132,8 @@ html { font-size: clamp(13px, 1vw + 0.2rem, 17px); }
 
 
 
+
+
 </style>
 <?php
 // Moodle My Courses Page
@@ -255,7 +257,7 @@ echo $OUTPUT->custom_block_region('content');
 <!-- ✅ Admin Popup -->
 <?php if ($showpopup_admin) { ?>
     <div id="adminPopup" class="popup-overlay" style="display: none;">
-        <div class="popup-content">
+        <div class="popup-content" style=" max-width:25em;">
             <button class="btn-close" onclick="closePopup('adminPopup')">×</button>
             <img src="<?php echo $alert_gif; ?>" alt="Alert Image" class="popup-image">
             <h3>Important Notice:</h3>
@@ -268,7 +270,7 @@ echo $OUTPUT->custom_block_region('content');
 <!-- ✅ User Inactivity Popup (ONLY FOR NON-ADMINS) -->
 <?php if ($showpopup_user) { ?>
     <div id="userPopup" class="popup-overlay" style="display: none;">
-        <div class="popup-content">
+        <div class="popup-content" style=" max-width:25em;">
             <button class="btn-close" onclick="closePopup('userPopup')">×</button>
             <img src="<?php echo $alert_gif; ?>" alt="Alert Image" class="popup-image">
             <h3>Hey there!</h3>
