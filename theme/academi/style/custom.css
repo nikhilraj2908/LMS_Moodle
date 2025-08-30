@@ -748,3 +748,9 @@ body.drawer-open-right .header-main {
     z-index: 1100;
 }
 
+@media (min-width: 992px) {
+    .container-fluid, .container-sm, .container-md, .container-lg, .container-xl {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+}

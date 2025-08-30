@@ -1534,7 +1534,9 @@ justify-content:center;
       box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
-
+.edit-toggle-wrapper{
+  display:none;
+}
 
     </style>
 </head>
@@ -2038,9 +2040,7 @@ function renderCourses(courses, type) {
     button.addEventListener('click', function () {
         const targetId = this.getAttribute('data-target');
         const drawer = document.getElementById(targetId);
-        if (drawer) {
-            drawer.classList.toggle('show');
-        }
+     
     });
 });
 
@@ -2049,9 +2049,7 @@ function renderCourses(courses, type) {
         button.addEventListener('click', function () {
             const targetId = this.getAttribute('data-target');
             const drawer = document.getElementById(targetId);
-            if (drawer) {
-                drawer.classList.toggle('show');
-            }
+           
         });
     });
 });
