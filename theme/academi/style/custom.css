@@ -741,6 +741,19 @@ body.drawer-open-right .header-main {
   margin-right: 315px !important;
 }
 
+
+.modal {align-content: center !important;}
+.modal-content{height:auto !important;}
+}
+
+@media (max-width: 575.98px) {
+.modal {align-content: center !important;}
+.modal-content{height:50% !important; }
+    .path-course-view .modal-dialog.modal-lg, .path-course-view .modal-content, .modchooser .modal-body, .modchooser .modal-body .carousel, .modchooser .modal-body .carousel-inner, .modchooser .modal-body .carousel-item, .modchooser .modal-body .optionsummary, .modchoosercontainer, .optionscontainer, .searchresultitemscontainer {
+        min-height: auto;
+        height: auto ;
+        overflow-y: auto;
+    }
 }
 #theme_boost-drawers-blocks.drawer-right {
 
