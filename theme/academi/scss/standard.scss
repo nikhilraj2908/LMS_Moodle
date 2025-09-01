@@ -1416,6 +1416,7 @@ body:not(.pagelayout-frontpage) {
     }
     .filepicker {
         max-width: 360px;
+        z-index:1099;
     }
     .file-picker {
         max-width: 360px;
