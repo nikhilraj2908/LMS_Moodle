@@ -69,7 +69,12 @@ $THEME->blockrtlmanipulations = [
 $THEME->javascripts_footer[] = 'autodescription';
 $THEME->javascripts_footer[] = 'search';
 
+$THEME->javascripts_footer = isset($THEME->javascripts_footer)
+  ? array_merge($THEME->javascripts_footer, ['help-autoclose'])
+  : ['help-autoclose'];
 
+
+  
 $THEME->layouts = [
     // Most backwards compatible layout without the blocks.
     'base' => [
