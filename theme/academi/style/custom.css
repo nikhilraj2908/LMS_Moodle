@@ -767,3 +767,40 @@ body.drawer-open-right .header-main {
         padding-right: 15px !important;
     }
 }
+
+
+
+
+/* Participants page responsive fix */
+.path-user #participantsform .generaltable,
+.path-user #participantsform .table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  table-layout: fixed;
+}
+
+.path-user #participantsform .generaltable th,
+.path-user #participantsform .generaltable td {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+@supports (overflow-wrap: anywhere) {
+  .path-user #participantsform td[class*="email"],
+  .path-user #participantsform td.c2 {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 576px) {
+  #participantsform table.generaltable th:nth-child(6),
+  #participantsform table.generaltable td:nth-child(6),
+  #participantsform table.generaltable th:nth-child(5),
+  #participantsform table.generaltable td:nth-child(5) {
+    display: none;
+  }
+}
