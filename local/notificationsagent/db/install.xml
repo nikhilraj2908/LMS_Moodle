@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/notificationsagent/db" VERSION="20240603" COMMENT="XMLDB file for Moodle local/notificationsagent"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="notificationsagent_rule" COMMENT="Instances for notifications rules">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="createdby" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="createdat" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="shared" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Shared rule"/>
+        <FIELD NAME="defaultrule" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Mark as default rule"/>
+        <FIELD NAME="template" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Rule marked as template"/>
+        <FIELD NAME="forced" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Rule marked as forced"/>
+        <FIELD NAME="timesfired" TYPE="int" LENGTH="11" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Number of times a rule is executed"/>
+        <FIELD NAME="runtime" TYPE="int" LENGTH="11" NOTNULL="true" DEFAULT="86400" SEQUENCE="false" COMMENT="How often the rule is evaluated"/>
+        <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Softdelete flag"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_idstatustemplatedeleted" UNIQUE="true" FIELDS="id, status, template, deleted"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="notificationsagent_condition" COMMENT="Data for subplugins">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="pluginname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Type of subplugin, condtion, action"/>
+        <FIELD NAME="parameters" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="cmid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false" COMMENT="The course module id"/>
+        <FIELD NAME="complementary" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether a condition is a exception"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_rule" TYPE="foreign" FIELDS="ruleid" REFTABLE="notificationsagent_rule" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_ruleidpluginname" UNIQUE="false" FIELDS="ruleid, pluginname"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="notificationsagent_action" COMMENT="Data for action subplugins">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="pluginname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Type of subplugin, condtion, action"/>
+        <FIELD NAME="parameters" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_rule" TYPE="foreign" FIELDS="ruleid" REFTABLE="notificationsagent_rule" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="notificationsagent_triggers" COMMENT="Data for timetriggers">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="conditionid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="startdate" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="ruleoff" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false" COMMENT="Time in which we do not evaluate the rule again."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_conditionid" TYPE="foreign" FIELDS="conditionid" REFTABLE="notificationsagent_condition" REFFIELDS="id"/>
+        <KEY NAME="fk_ruleid" TYPE="foreign" FIELDS="ruleid" REFTABLE="notificationsagent_rule" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_ruleidstartdate" UNIQUE="false" FIELDS="ruleid, startdate"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="notificationsagent_cache" COMMENT="Data for timecache">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="conditionid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="pluginname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="startdate" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timeto" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="cache" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_conditionid" TYPE="foreign" FIELDS="conditionid" REFTABLE="notificationsagent_condition" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="notificationsagent_report" COMMENT="Rules reporting">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="actionid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="actiondetail" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Action details"/>
+        <FIELD NAME="timestamp" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of triggered rule."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_ruleid" TYPE="foreign" FIELDS="ruleid" REFTABLE="notificationsagent_rule" REFFIELDS="id"/>
+        <KEY NAME="fk_actionid" TYPE="foreign" FIELDS="actionid" REFTABLE="notificationsagent_action" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_userid" UNIQUE="false" FIELDS="userid" COMMENT="userid index"/>
+        <INDEX NAME="idx_courseid" UNIQUE="false" FIELDS="courseid" COMMENT="Courseid index"/>
+        <INDEX NAME="idx_timestamp" UNIQUE="false" FIELDS="timestamp" COMMENT="Timestamp index"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="notificationsagent_context" COMMENT="Rules relation with context">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="objectid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="id of course or category"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_ruleid" TYPE="foreign" FIELDS="ruleid" REFTABLE="notificationsagent_rule" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_ruleidcontextidobjectid" UNIQUE="true" FIELDS="ruleid, contextid, objectid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="notificationsagent_launched" COMMENT="Number of times a rule was executed">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timesfired" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_ruleid" TYPE="foreign" FIELDS="ruleid" REFTABLE="notificationsagent_rule" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_ruleidcourseiduserid" UNIQUE="true" FIELDS="ruleid, courseid, userid"/>
+        <INDEX NAME="idx_ruleiduserid" UNIQUE="false" FIELDS="ruleid, userid"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

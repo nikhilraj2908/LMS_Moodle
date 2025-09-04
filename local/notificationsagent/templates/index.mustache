@@ -1,0 +1,300 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+    Project implemented by the \"Recovery, Transformation and Resilience Plan.
+    Funded by the European Union - Next GenerationEU\".
+
+    Produced by the UNIMOODLE University Group: Universities of
+    Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+    Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+    Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
+    Version details
+
+    @package    local_notificationsagent
+    @copyright  2023 Proyecto UNIMOODLE
+    @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+    @author     ISYC <soporte@isyc.com>
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+}}
+{{!
+    @template local_notificationsagent/index
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * All data attributes are required
+
+    Context variables required for this template:
+    * userid The logged in user id
+    * urls The URLs for the popover
+
+    Example context (json):
+    {}
+
+}}
+
+<div class="d-flex mb-4">
+    {{#capabilities.import}}
+        <button type="button" class="btn btn-outline-primary importtemplate d-block mr-3" data-courseid={{{ courseid }}} data-toggle="modal" data-target="#importTemplateModal">{{#str}}import, local_notificationsagent{{/str}}</button>
+    {{/capabilities.import}}
+    {{#capabilities.create}}
+        {{^ iscontextsite}}
+            <a href="{{{url.addrule}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_clonerule, local_notificationsagent{{/str}}</a>
+        {{/ iscontextsite}}
+        {{# iscontextsite}}
+            <a href="{{{url.newrule}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_newrule, local_notificationsagent{{/str}}</a>
+            <a href="{{{url.addtemplate}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_newtemplate, local_notificationsagent{{/str}}</a>
+        {{/ iscontextsite}}
+    {{/capabilities.create}}
+    {{#capabilities.report}}
+        <a href="{{{url.reporturl}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_reports, local_notificationsagent{{/str}}</a>
+    {{/capabilities.report}}
+    <div class="d-flex flex-wrap ml-auto align-items-end">
+        <button type="button" id="applyordergroupbtn" class="btn btn-outline-primary mr-2">
+            {{#str}}editrule_orderby, local_notificationsagent{{/str}}
+        </button>
+        <select id="orderrulesid" class="select custom-select">
+            <option value="1">{{#str}}status_active, local_notificationsagent{{/str}}</option>
+            <option value="2">{{#str}}status_paused, local_notificationsagent{{/str}}</option>
+            <option value="3">{{#str}}status_required, local_notificationsagent{{/str}}</option>
+            <option value="4">{{#str}}editrule_sharedallrule, local_notificationsagent{{/str}}</option>
+            <option value="5">{{#str}}status_broken, local_notificationsagent{{/str}}</option>
+            {{#iscontextsite}}
+                <option value="6">{{#str}}fullrule, local_notificationsagent{{/str}}</option>
+                <option value="7">{{#str}}fulltemplate, local_notificationsagent{{/str}}</option>
+            {{/iscontextsite}}
+        </select>
+    </div>
+</div>
+
+
+<div class="d-flex flex-wrap">
+    {{#rulecontent}}
+        <div id="card-{{{ id }}}" class="card card-{{{ type }}}{{^ forced}} card-required{{/ forced}}" data-type="{{{ type }}}" data-forced="{{{ forced }}}">
+            <div class="card-header bg-transparent mx-3 px-0">
+                <div class="d-flex justify-content-between">
+                    <span class="badge badge-type badge-{{{ type }}}{{^ shared}} shared{{/ shared}}">{{{ type_lang }}}</span>
+                    {{#isrule}}
+                        <div class="d-flex">
+                            {{# canshare}}
+                                {{^ isallshared}}
+                                    <span class="badge badge-shared"><i class="fa fa-star mr-2"></i><span>{{#str}}editrule_sharedallrule, local_notificationsagent{{/str}}</span></span>
+                                {{/ isallshared}}
+                            {{/ canshare}}
+                            <span class="badge badge-status{{^ forced }} badge-required{{/ forced}}{{# forced }} badge-{{^ validation }}broken{{/ validation }} badge-{{# status }}paused{{/ status }}{{^ status }}active{{/ status }}{{/forced}}"><i class="fa fa-circle mr-2"></i><span>{{{ status_lang }}}</span></span>
+                        </div>
+                    {{/isrule}}
+                </div>
+                <div class="d-flex flex-column justify-content-between">
+                    <h5 class="name mt-4 mb-1">{{{ name }}}</h5>
+                    <span class="createby d-flex align-items-center"><i class="fa fa-user mr-1"></i>{{{ owner }}}</span>
+                </div>
+            </div>
+            <div class="card-body d-flex flex-column mx-3 my-2 p-0">
+                <div class="card-content">
+                    {{#conditions}}
+                        {{#hascontent}}
+                            <div class="conditions-content">
+                                <span class="d-block font-weight-bold mb-1">{{#str}}cardif, local_notificationsagent{{/str}}</span>
+                                {{#content}}
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fa fa-clock-o mr-3"></i>
+                                        {{.}}
+                                    </div>
+                                {{/content}}
+                            </div>
+                        {{/hascontent}}
+                    {{/conditions}}
+                    {{#exceptions}}
+                        {{#hascontent}}
+                            <div class="exceptions-content">
+                                <span class="d-block font-weight-bold mb-1">{{#str}}cardunless, local_notificationsagent{{/str}}</span>
+                                {{#content}}
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fa fa-check-square-o mr-3"></i>
+                                        {{.}}
+                                    </div>
+                                {{/content}}
+                            </div>
+                        {{/hascontent}}
+                    {{/exceptions}}
+                    {{#actions}}
+                        {{#hascontent}}
+                            <div class="actions-content">
+                                <span class="d-block font-weight-bold mb-1">{{#str}}cardthen, local_notificationsagent{{/str}}</span>
+                                {{#content}}
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fa fa-bell-o mr-3"></i>
+                                        {{.}}
+                                    </div>
+                                {{/content}}
+                            </div>
+                        {{/hascontent}}
+                    {{/actions}}
+                </div>
+            </div>
+            <div class="card-footer bg-transparent">
+                <div class="card-assignment d-flex justify-content-between align-items-center">
+                    {{#capabilities.resume}}
+                        {{#isrule}}
+                            {{#validation}}
+                                <a data-toggle="modal"{{^ iscontextsite}}{{^ forced }} class="disabled"{{/ forced}}{{/ iscontextsite}} id="status-rule-{{{ id }}}" data-ruleid="{{{ id }}}" data-status="{{{ status }}}" href="#">
+                                    {{^status}}
+                                        <i class="fa fa-pause mr-2"></i>{{#str}}editrule_pauserule, local_notificationsagent{{/str}}
+                                    {{/status}}
+                                    {{#status}}
+                                        <i class="fa fa-play mr-2"></i>{{#str}}editrule_activaterule, local_notificationsagent{{/str}}
+                                    {{/status}}
+                                </a>
+                            {{/validation}}
+                        {{/isrule}}
+                    {{/capabilities.resume}}
+                    {{#capabilities.edit}}
+                        {{# iscontextsite}}
+                            <a href="{{{editurl}}}"><i class="fa fa-pencil mr-2"></i>{{#str}}editrule_editrule, local_notificationsagent{{/str}}</a>
+                        {{/ iscontextsite}}
+                        {{^ iscontextsite}}
+                            {{# isrule}}
+                                <a{{# forced}} href="{{{editurl}}}"{{/ forced}}{{^ forced }} class="disabled"{{/ forced}}><i class="fa fa-pencil mr-2"></i>{{#str}}editrule_editrule, local_notificationsagent{{/str}}</a>
+                            {{/ isrule}}
+                        {{/ iscontextsite}}
+                    {{/capabilities.edit}}
+                    {{#capabilities.report}}
+                        {{# isrule}}
+                            {{#validation}}
+                                <a href="{{{reporturl}}}"><i class="fa fa-file mr-2"></i>{{#str}}editrule_reportrule, local_notificationsagent{{/str}}</a>
+                            {{/validation}}
+                        {{/ isrule}}
+                    {{/capabilities.report}}
+                    {{#capabilities.export}}
+                        {{# iscontextsite}}
+                            <a href="{{{exporturl}}}"><i class="fa fa-download mr-2"></i>{{#str}}export, local_notificationsagent{{/str}}</a>
+                        {{/ iscontextsite}}
+                        {{^ iscontextsite}}
+                            {{# isrule}}
+                                {{#validation}}
+                                    <a href="{{{exporturl}}}"><i class="fa fa-download mr-2"></i>{{#str}}export, local_notificationsagent{{/str}}</a>
+                                {{/validation}}
+                            {{/ isrule}}
+                        {{/ iscontextsite}}
+                    {{/capabilities.export}}
+                    {{#capabilities.assign}}
+                        {{# iscontextsite}}
+                            <a data-toggle="modal" data-idtemplate="{{{ id }}}" data-target="#assignTemplateModal" href="#"><i class="fa fa-graduation-cap mr-1"></i>{{#str}}assign, local_notificationsagent{{/str}}</a>
+                        {{/ iscontextsite}}
+                    {{/capabilities.assign}}
+                    {{#capabilities.share}}
+                        {{^ iscontextsite}}
+                            {{# isrule}}
+                                {{#validation}}
+                                    {{# canshare}}
+                                        {{# isallshared}}
+                                            <a data-toggle="modal" {{^ forced }} class="disabled"{{/ forced}} id="share-rule-{{{ id }}}" data-ruleid="{{{ id }}}" data-shared="{{{ shared }}}" href="#">
+                                                {{^ shared}}
+                                                    <i class="fa fa-chain-broken mr-2"></i>{{#str}}editrule_unsharerule, local_notificationsagent{{/str}}
+                                                {{/ shared}}
+                                                {{# shared}}
+                                                    <i class="fa fa-link mr-2"></i>{{#str}}editrule_sharerule, local_notificationsagent{{/str}}
+                                                {{/ shared}}
+                                            </a>
+                                        {{/ isallshared}}
+                                    {{/ canshare}}
+                                {{/validation}}
+                            {{/ isrule}}
+                        {{/ iscontextsite}}
+                        {{# iscontextsite}}
+                            {{# isrule}}
+                                {{^ shared}}
+                                    <a data-toggle="modal" id="share-all-rule-{{{ id }}}" data-ruleid="{{{ id }}}" href="#">
+                                        <i class="fa fa-share-alt mr-2"></i>{{#str}}editrule_shareallrule, local_notificationsagent{{/str}}
+                                    </a>
+                                {{/ shared}}
+                            {{/ isrule}}
+                        {{/ iscontextsite}}
+                    {{/capabilities.share}}
+                    {{#capabilities.delete}}
+                        {{# candelete}}
+                            {{# iscontextsite}}
+                                {{# isrule}}
+                                    {{# shared}}
+                                        <a data-toggle="modal" id="delete-rule-{{{ id }}}" data-ruleid="{{{ id }}}" data-type="{{{ type_lang }}}" href="#">
+                                            <i class="fa fa-trash mr-2"></i>{{#str}}editrule_deleterule, local_notificationsagent{{/str}}
+                                        </a>
+                                    {{/ shared}}
+                                    {{^ shared}}
+                                        <a data-toggle="modal" id="unshare-all-rule-{{{ id }}}" data-ruleid="{{{ id }}}" data-type="{{{ type_lang }}}" href="#">
+                                            <i class="fa fa-chain-broken mr-2"></i>{{#str}}editrule_unshareallrule, local_notificationsagent{{/str}}
+                                        </a>
+                                    {{/ shared}}
+                                {{/ isrule}}
+                                {{^ isrule}}
+                                    <a data-toggle="modal" id="delete-rule-{{{ id }}}" data-ruleid="{{{ id }}}" data-type="{{{ type_lang }}}" href="#">
+                                        <i class="fa fa-trash mr-2"></i>{{#str}}editrule_deleterule, local_notificationsagent{{/str}}
+                                    </a>
+                                {{/ isrule}}
+                            {{/ iscontextsite}}
+                            {{^ iscontextsite}}
+                                {{# isrule}}
+                                    <a data-toggle="modal" id="delete-rule-{{{ id }}}" {{^ forced }} class="disabled"{{/ forced}} data-ruleid="{{{ id }}}" data-type="{{{ type_lang }}}" href="#">
+                                        <i class="fa fa-trash mr-2"></i>{{#str}}editrule_deleterule, local_notificationsagent{{/str}}
+                                    </a>
+                                {{/ isrule}}
+                            {{/ iscontextsite}}
+                        {{/ candelete}}
+                    {{/capabilities.delete}}
+                    {{^ iscontextsite}}
+                        {{^ isrule}}
+                            <a href="{{{editurl}}}" class="btn btn-outline-primary">{{#str}}editrule_usetemplate, local_notificationsagent{{/str}}</a>
+                        {{/ isrule}}
+                    {{/ iscontextsite}}
+                </div>
+            </div>
+        </div>
+    {{/rulecontent}}
+</div>
+
+<div class="modal fade" id="assignTemplateModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title font-weight-bold">{{#str}}assignassign, local_notificationsagent{{/str}}<span></span></h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center">
+                    <span class="badge"></span>
+                    <h4 class="name font-weight-bold mb-0"></h4>
+                </div>
+                <hr/>
+                {{{ output_categoriescourses }}}
+                {{{ capabilities.force }}}
+                    <div id="forced-content" class="mt-3">
+                    </div>
+                {{{ capabilities.force }}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light mb-1 mr-4" data-dismiss="modal">{{#str}}assigncancel, local_notificationsagent{{/str}}</button>
+                <button type="button" id="saveassignTemplateModal" class="btn btn-primary mb-1">{{#str}}assignsave, local_notificationsagent{{/str}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
