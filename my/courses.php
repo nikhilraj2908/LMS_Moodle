@@ -17,6 +17,10 @@
 }
 
 
+.navbar-nav{
+    margin-right:-10px;
+}
+
 
 .course-card .card-img-top, .theme-card .card-img-top {
     height: 12rem !important;
