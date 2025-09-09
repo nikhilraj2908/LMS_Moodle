@@ -1,0 +1,21 @@
+<div class="tts-player" id="ttsPlayer">
+  <div class="row">
+    <button id="ttsPlay" class="primary">Play</button>
+    <button id="ttsPause">Pause</button>
+    <button id="ttsStop">Stop</button>
+  </div>
+  <div class="row">
+    <label style="min-width:60px">Speed</label>
+    <input id="ttsRate" type="range" min="0.5" max="2" step="0.1" value="{{defaultSpeed}}">
+    <span id="ttsRateVal">{{defaultSpeed}}</span>
+  </div>
+  <div class="row">
+    <label style="min-width:60px">Voice</label>
+    <select id="ttsVoice"></select>
+  </div>
+  <div class="row">
+    <label style="min-width:60px">Highlight</label>
+    <input id="ttsColor" type="color" value="{{highlight}}">
+  </div>
+</div>
+<div id="ttsBubble" class="tts-bubble">🔊 Listen</div>

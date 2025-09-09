@@ -38821,7 +38821,7 @@ div.editor_atto_toolbar button .icon {
   background-color: #f8f9fa;
 }
 .moremenu .dropdownmoremenu > .dropdown-menu .dropdown-menu .dropdown-item:hover, .moremenu .dropdownmoremenu > .dropdown-menu .dropdown-menu .dropdown-item:focus {
-  color: #fff;
+  color: #fff; 
   background-color: #0f6cbf;
 }
 .moremenu .dropdownmoremenu > .dropdown-menu .dropdown-menu .dropdown-divider {
