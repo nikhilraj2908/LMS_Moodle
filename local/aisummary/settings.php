@@ -24,7 +24,7 @@ if ($hassiteconfig) {
             'local_aisummary/model',
             get_string('model', 'local_aisummary'),
             get_string('model_desc', 'local_aisummary'),
-            'meta-llama/llama-3.1-8b-instruct:free'
+            'meta-llama/llama-3-8b-instruct:free'
         ));
 
         $settings->add(new admin_setting_configtext(

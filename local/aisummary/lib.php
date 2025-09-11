@@ -2,7 +2,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Load our AMD on every page (the JS itself will exit unless on /course/edit.php).
+ * Load our AMD module; it will self-exit on non-course-edit pages.
  */
 function local_aisummary_extend_navigation(global_navigation $nav) {
     global $PAGE;

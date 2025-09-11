@@ -29,7 +29,7 @@ class generate_summary extends external_api {
         // --- settings ---
         $apibase   = trim((string)get_config('local_aisummary', 'apibase'));
         $apikey    = trim((string)get_config('local_aisummary', 'apikey'));
-        $model     = trim((string)(get_config('local_aisummary', 'model') ?: 'meta-llama/llama-3-8b-instruct:free'));
+        $model     = trim((string)(get_config('local_aisummary', 'model') ?: 'meta-llama/llama-3-8b-instruct:free')); // <- working default
         $maxtokens = (int)(get_config('local_aisummary', 'maxtokens') ?? 180);
 
         if ($apibase === '') {
@@ -47,13 +47,13 @@ class generate_summary extends external_api {
             $headers[] = 'Authorization: Bearer ' . $apikey;
         }
         if ($isopenrouter) {
+            // Use your real Moodle URL
             $headers[] = 'HTTP-Referer: ' . rtrim($CFG->wwwroot, '/');
             $headers[] = 'X-Title: Moodle AI Summary';
         }
 
-        // Updated prompts to be more directive
-        $system = "You generate concise Moodle course summaries (3–5 sentences, ~120–160 words) based ONLY on the course title. Do NOT ask for more details. Use general knowledge if needed.";
-        $user   = "Generate a course summary about: {$title}";
+        $system = "You generate concise Moodle course summaries (3–5 sentences, ~120–160 words), neutral tone.";
+        $user   = "Course title: {$title}\nWrite a short course summary suitable for the Moodle Course summary field.";
 
         $payloadBase = [
             'messages'    => [
@@ -64,6 +64,7 @@ class generate_summary extends external_api {
             'max_tokens'  => $maxtokens,
         ];
 
+        // Try configured model, then a few free fallbacks (prevents future 404s)
         $candidates = [$model];
         if ($isopenrouter) {
             $candidates = array_unique(array_filter([
@@ -103,6 +104,7 @@ class generate_summary extends external_api {
                 break;
             }
 
+            // Retry only if this is the specific "No endpoints found" 404
             if (!($status == 404 && stripos($raw, 'No endpoints found') !== false)) {
                 $lastRaw = $raw; $lastStatus = $status;
                 break;
