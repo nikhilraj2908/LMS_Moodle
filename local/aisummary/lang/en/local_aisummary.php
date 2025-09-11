@@ -1,11 +1,11 @@
 <?php
 $string['pluginname'] = 'AI Summary';
 $string['apibase'] = 'API base URL';
-$string['apibase_desc'] = 'OpenRouter: https://openrouter.ai/api/v1/chat/completions. Ollama: http://127.0.0.1:11434/v1/chat/completions';
+$string['apibase_desc'] = 'OpenRouter Chat Completions endpoint by default. You may replace with another compatible endpoint.';
 $string['apikey'] = 'API key';
-$string['apikey_desc'] = 'Required for OpenRouter. Leave blank for local endpoints like Ollama.';
+$string['apikey_desc'] = 'Paste your OpenRouter (or other provider) API key. Some models on OpenRouter have a free tier.';
 $string['model'] = 'Model';
-$string['model_desc'] = 'OpenRouter free examples: google/gemma-2-9b-it:free, qwen/qwen2.5-7b-instruct:free, mistralai/mistral-7b-instruct:free, meta-llama/llama-3-8b-instruct:free. For Ollama use a local tag (e.g., llama3.1).';
+$string['model_desc'] = 'Example (OpenRouter free): meta-llama/llama-3.1-8b-instruct:free. You can use any model your key allows.';
 $string['maxtokens'] = 'Max tokens';
 $string['missingconfig'] = 'AI Summary plugin is not configured.';
 $string['curlerror'] = 'Network error while contacting the AI service.';
