@@ -95,21 +95,43 @@ $sql = "
         ), 0) AS progress_percent,
 
         -- completion label (prefer Moodle's course_completions; fallback to module progress)
-        CASE
-            WHEN cc.timecompleted IS NOT NULL THEN 'Completed'
-            WHEN (
-                SELECT SUM(CASE WHEN cmc2.completionstate = 1 THEN 1 ELSE 0 END)
-                  FROM {course_modules} cm2
-                  JOIN {course_sections} cs2 ON cs2.id = cm2.section
-             LEFT JOIN {course_modules_completion} cmc2
-                    ON cmc2.coursemoduleid = cm2.id AND cmc2.userid = u.id
-                 WHERE cm2.course    = :cid_b
-                   AND cm2.visible   = 1
-                   AND cm2.completion> 0
-                   AND cs2.section  >= 1
-            ) > 0 THEN 'In Progress'
-            ELSE 'Not Started'
-        END AS completion_status,
+CASE
+    -- Completed if course_completions has a record
+    WHEN cc.timecompleted IS NOT NULL THEN 'Completed'
+
+    -- OR if user has finished 100% of required modules
+    WHEN (
+        SELECT ROUND(
+            SUM(CASE WHEN cmc2.completionstate = 1 THEN 1 ELSE 0 END) * 100.0
+            / NULLIF(COUNT(*), 0), 0
+        )
+          FROM {course_modules} cm2
+          JOIN {course_sections} cs2 ON cs2.id = cm2.section
+     LEFT JOIN {course_modules_completion} cmc2
+            ON cmc2.coursemoduleid = cm2.id AND cmc2.userid = u.id
+         WHERE cm2.course    = :cid_b1
+           AND cm2.visible   = 1
+           AND cm2.completion> 0
+           AND cs2.section  >= 1
+    ) >= 100 THEN 'Completed'
+
+    -- If some modules done but <100% → In Progress
+    WHEN (
+        SELECT SUM(CASE WHEN cmc2.completionstate = 1 THEN 1 ELSE 0 END)
+          FROM {course_modules} cm2
+          JOIN {course_sections} cs2 ON cs2.id = cm2.section
+     LEFT JOIN {course_modules_completion} cmc2
+            ON cmc2.coursemoduleid = cm2.id AND cmc2.userid = u.id
+         WHERE cm2.course    = :cid_b2
+           AND cm2.visible   = 1
+           AND cm2.completion> 0
+           AND cs2.section  >= 1
+    ) > 0 THEN 'In Progress'
+
+    -- Otherwise → Not Started
+    ELSE 'Not Started'
+END AS completion_status,
+
 
         ROUND(COALESCE(gg.finalgrade, 0), 0) AS points_earned,
         ROUND(COALESCE(gi.grademax, 0), 0)   AS max_points
@@ -123,7 +145,13 @@ $sql = "
      WHERE e.courseid = :cid_c
   ORDER BY u.lastname, u.firstname
 ";
-$params = ['cid_a' => $courseid, 'cid_b' => $courseid, 'cid_c' => $courseid];
+$params = [
+    'cid_a'  => $courseid,
+    'cid_b1' => $courseid,
+    'cid_b2' => $courseid,
+    'cid_c'  => $courseid
+];
+
 $userrows = array_values($DB->get_records_sql($sql, $params));
 
 // Transform, filter, sort
