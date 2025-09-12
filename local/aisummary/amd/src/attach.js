@@ -1,27 +1,65 @@
 /* eslint-disable */
 define(['core/ajax','core/notification'],function(Ajax,Notification){'use strict';
 
+  // ---- find TinyMCE editor bound to the Summary field ----
+  function findTinySummaryEditor(){
+    if(!(window.tinymce && tinymce.editors && tinymce.editors.length)) return null;
+    var ed = tinymce.get && tinymce.get('id_summary_editor'); // Moodle's usual id
+    if (ed) return ed;
+    for (var i=0;i<tinymce.editors.length;i++){
+      ed = tinymce.editors[i]; if(!ed) continue;
+      var tid=(ed.id||'').toLowerCase();
+      var tnm=(ed.targetElm && (ed.targetElm.name||ed.targetElm.id||'')).toLowerCase();
+      if (tid.includes('summary') || tnm.includes('summary')) return ed;
+    }
+    return null;
+  }
+
+  // ---- clear autosave so old drafts don't reappear ----
+  function clearAutosave(){
+    try{
+      var ed=findTinySummaryEditor();
+      if (ed && ed.plugins && ed.plugins.autosave && typeof ed.plugins.autosave.removeDraft==='function'){
+        try{ ed.plugins.autosave.removeDraft(); }catch(e){}
+      }
+      try{
+        for (var k in localStorage){
+          if(!Object.prototype.hasOwnProperty.call(localStorage,k)) continue;
+          if (k.indexOf('tinymce-autosave')===0 || k.indexOf('atto_autosave')===0) localStorage.removeItem(k);
+        }
+      }catch(e){}
+      setTimeout(function(){
+        try{ document.querySelectorAll('.tox .tox-notification,.atto_autosave_message').forEach(function(el){el.style.display='none';}); }catch(e){}
+      },150);
+    }catch(e){}
+  }
+
+  // ---- write HTML into TinyMCE/Atto/hidden/textarea and sync ----
   function setSummaryHTML(html){
     var updated=false;
 
-    // TinyMCE 6: update any editor whose id includes "summary"
-    if (window.tinymce && window.tinymce.editors && window.tinymce.editors.length){
-      for (var i=0;i<tinymce.editors.length;i++){
-        var ed=tinymce.editors[i];
-        if (!ed || !ed.id) continue;
-        if (ed.id.indexOf('summary') !== -1){ try{ ed.setContent(html);}catch(e){} updated=true; }
+    // TinyMCE
+    var ed = findTinySummaryEditor();
+    if (ed){
+      try{
+        ed.setContent(html);
+        ed.fire('change');   // notify TinyMCE of content change
+        ed.save();           // sync back to the underlying textarea
+        updated = true;
+      }catch(e){}
+    }
+
+    // Atto (contenteditable div)
+    if (!updated){
+      var editable = document.querySelector('[id^="id_summary_editoreditable"]') ||
+                     document.querySelector('.editor_atto [contenteditable="true"]');
+      if (editable){
+        editable.innerHTML = html.replace(/\n/g,'<br>');
+        updated = true;
       }
     }
 
-    // Atto / contenteditable visual area
-    if (!updated){
-      var editable =
-        document.querySelector('[id^="id_summary_editoreditable"]') ||
-        document.querySelector('.editor_atto [contenteditable="true"]');
-      if (editable){ editable.innerHTML = html.replace(/\n/g,'<br>'); updated=true; }
-    }
-
-    // Hidden input that Moodle actually submits
+    // Hidden inputs Moodle submits
     var hidden = document.querySelector('#id_summary_editor') ||
                  document.querySelector('input[name="summary_editor[text]"]') ||
                  document.querySelector('textarea[name="summary_editor[text]"]');
@@ -29,6 +67,12 @@ define(['core/ajax','core/notification'],function(Ajax,Notification){'use strict
       hidden.value = html;
       try{ hidden.dispatchEvent(new Event('change',{bubbles:true})); }catch(e){}
     }
+
+    // Raw textarea fallback (some themes expose #id_summary)
+    var raw = document.querySelector('#id_summary');
+    if (raw){ raw.value = html; }
+
+    clearAutosave();
   }
 
   function onClick(btn){
@@ -53,6 +97,7 @@ define(['core/ajax','core/notification'],function(Ajax,Notification){'use strict
           return;
         }
         setSummaryHTML(summary);
+        setTimeout(function(){ try{ document.querySelectorAll('.tox .tox-notification,.atto_autosave_message').forEach(function(el){el.style.display='none';}); }catch(e){} },200);
         btn.disabled=false; btn.textContent='Regenerate';
       }).catch(function(err){
         btn.disabled=false; btn.textContent='Generate with AI';
@@ -66,6 +111,13 @@ define(['core/ajax','core/notification'],function(Ajax,Notification){'use strict
 
   function mount(){
     if(!/\/course\/edit\.php$/.test(location.pathname)) return;
+
+    // Clear leftover autosave drafts on NEW course pages
+    try{
+      var p=new URLSearchParams(location.search);
+      var editing=p.has('id') && p.get('id');
+      if(!editing) setTimeout(clearAutosave, 500);
+    }catch(e){}
 
     var wrap = document.querySelector('[id^="fitem_id_summary"]') ||
                (function(){var el=document.querySelector('#id_summary_editoreditable'); return el?el.closest('.fitem'):null; })();
