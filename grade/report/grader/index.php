@@ -18,7 +18,7 @@
  * The gradebook grader report
  *
  * @package   gradereport_grader
- * @copyright 2007 Moodle Pty Ltd (http://moodle.com)
+ * @copyright 2007 Moodle Pty Ltd
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -133,8 +133,7 @@ $reportname = get_string('pluginname', 'gradereport_grader');
 // Do this check just before printing the grade header (and only do it once).
 grade_regrade_final_grades_if_required($course);
 
-//Initialise the grader report object that produces the table
-//the class grade_report_grader_ajax was removed as part of MDL-21562
+// Initialise the grader report object that produces the table.
 if ($sort && strcasecmp($sort, 'desc') !== 0) {
     $sort = 'asc';
 }
@@ -156,6 +155,32 @@ $actionbar = new \gradereport_grader\output\action_bar($context, $report, $numus
 print_grade_page_head($COURSE->id, 'report', 'grader', false, false, $buttons, true,
     null, null, null, $actionbar);
 
+/**
+ * Inject a tiny CSS block inline (no css_code() API needed).
+ * Makes only the table scroll horizontally on small screens.
+ */
+$css = <<<CSS
+body#page-grade-report-grader-index .grade-table-wrap{
+  display:block;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  width:100%;
+  max-width:100%;
+}
+body#page-grade-report-grader-index .grade-table-wrap > table{
+  width:max-content;
+  min-width:640px;             /* adjust if you like */
+  border-collapse:separate;    /* plays nicer with sticky headers/cols */
+}
+@media (max-width: 767.98px){
+  body#page-grade-report-grader-index .gradestable th,
+  body#page-grade-report-grader-index .gradestable td{
+    position: static !important;  /* avoid misalignment on very small screens */
+  }
+}
+CSS;
+echo html_writer::tag('style', $css);
+
 // make sure separate group does not prevent view
 if ($report->currentgroup == -2) {
     echo $OUTPUT->heading(get_string("notingroup"));
@@ -174,7 +199,7 @@ if ($isediting && ($data = data_submitted()) && confirm_sesskey()) {
 $report->load_users();
 $report->load_final_grades();
 
-//show warnings if any
+// show warnings if any
 foreach ($warnings as $warning) {
     echo $OUTPUT->notification($warning);
 }
@@ -216,8 +241,8 @@ foreach ($pagingoptions as $key => $name) {
 }
 
 $footercontent = html_writer::div(
-    $OUTPUT->render_from_template('gradereport_grader/perpage', $perpagedata)
-    , 'col-auto'
+    $OUTPUT->render_from_template('gradereport_grader/perpage', $perpagedata),
+    'col-auto'
 );
 
 // The number of students per page is always limited even if it is claimed to be unlimited.
@@ -229,7 +254,7 @@ $footercontent .= html_writer::div(
 
 // print submit button
 if (!empty($USER->editing) && $report->get_pref('quickgrading')) {
-    echo '<form action="index.php" enctype="application/x-www-form-urlencoded" method="post" id="gradereport_grader">'; // Enforce compatibility with our max_input_vars hack.
+    echo '<form action="index.php" enctype="application/x-www-form-urlencoded" method="post" id="gradereport_grader">';
     echo '<div>';
     echo '<input type="hidden" value="'.s($courseid).'" name="id" />';
     echo '<input type="hidden" value="'.sesskey().'" name="sesskey" />';
@@ -237,19 +262,21 @@ if (!empty($USER->editing) && $report->get_pref('quickgrading')) {
     echo '<input type="hidden" value="grader" name="report"/>';
     echo '<input type="hidden" value="'.$page.'" name="page"/>';
     echo $gpr->get_form_fields();
-    echo $reporthtml;
 
-    $footercontent .= html_writer::div(
-        '<input type="submit" id="gradersubmit" class="btn btn-primary" value="'.s(get_string('savechanges')).'" />',
-        'col-auto'
-    );
+    // Responsive wrapper: only the table scrolls sideways on small screens.
+    echo '<div class="grade-table-wrap">';
+    echo $reporthtml;
+    echo '</div>';
 
     $stickyfooter = new core\output\sticky_footer($footercontent);
     echo $OUTPUT->render($stickyfooter);
 
     echo '</div></form>';
 } else {
+    // Responsive wrapper: only the table scrolls sideways on small screens.
+    echo '<div class="grade-table-wrap">';
     echo $reporthtml;
+    echo '</div>';
 
     $stickyfooter = new core\output\sticky_footer($footercontent);
     echo $OUTPUT->render($stickyfooter);
