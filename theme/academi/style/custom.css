@@ -874,3 +874,19 @@ footer#page-footer, #page-footer, .page-footer{
 }
 
 /* if plugin CSS forces right positioning, neutralize it */
+@media (min-width: 992px) {
+  .drawer-left,
+  .drawer-right {
+    top: 50px;
+    /* height: calc(100vh - 50px); */
+  }
+}
+
+.drawer.drawer-right {
+
+    height:100vh;   
+    width: 315px;
+    max-width: 315px;
+    right: calc(-315px + -10px);
+    visibility: hidden;
+}
