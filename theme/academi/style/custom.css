@@ -804,3 +804,33 @@ body.drawer-open-right .header-main {
     display: none;
   }
 }
+.drawer-right-toggle button{
+  padding-top:4px !important;
+}
+
+
+/* --- Sticky footer for Boost pages --- */
+html, body { height: 100%; }                 /* allow full-height layout */
+
+#page-wrapper{
+  min-height: 100svh;                        /* 100vh also fine */
+  display: flex;
+  flex-direction: column;
+}
+
+#page{
+  flex: 1 0 auto;                            /* let page grow */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;                             
+}
+
+#page-content{
+  flex: 1 1 auto;                            /* content takes the rest */
+  min-height: 0;
+}
+
+/* Footer sits at the bottom when content is short */
+footer#page-footer, #page-footer, .page-footer{
+  margin-top: auto;
+}

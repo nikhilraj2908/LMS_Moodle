@@ -6,6 +6,8 @@
     <style>
     /* Carousel Styles (keep your existing carousel styles) */
 /* Never allow sideways scrolling */
+
+
 html, body {
   max-width: 100%;
   overflow-x: hidden;
@@ -527,22 +529,14 @@ body.has-admin-menu .btn-user {
     font-weight: bold;
 }
 /* Fix drawer starting from the top */
-#theme_boost-drawers-blocks.drawer-right {
-    top: 0 !important;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-    z-index: 1100;
-    
-}
 
-/* Prevent outer containers from pushing it down */
-body, #page-wrapper {
-    margin-top: 0 !important;
-}
+
+/* Usually you don't need this at all. If you keep it, don't hard-code 0 */
+#theme_boost-drawers-blocks.drawer-right { top: var(--fixed-navbar-height, 56px); }
+
 .show-drawer-right{
   margin-right:300px !important;
 }
-
 
 
 .section-top-performers {
@@ -1470,9 +1464,7 @@ html {
   color: #666;
   font-size: clamp(.9rem, 1.6vw, 1rem);
 }
- .drawer-right-toggle {
-  right:13px !important;
- }
+
 /* Mobile refinements */
 @media (max-width: 767.98px){
   .newsletter-wrapper{ margin: 0 var(--content-gutter); }
@@ -1545,38 +1537,6 @@ justify-content:center;
 
     </style>
 </head>
-
-{{#courseindex}}
-  {{< theme_boost/drawer }}
-    {{$id}}theme_boost-drawers-courseindex{{/id}}
-    {{$drawerclasses}}drawer drawer-left {{#courseindexopen}}show{{/courseindexopen}}{{/drawerclasses}}
-    {{$drawercontent}} {{{courseindex}}} {{/drawercontent}}
-    {{$drawerpreferencename}}drawer-open-index{{/drawerpreferencename}}
-    {{$drawerstate}}show-drawer-left{{/drawerstate}}
-    {{$tooltipplacement}}right{{/tooltipplacement}}
-    {{$closebuttontext}}{{#str}}closecourseindex, core{{/str}}{{/closebuttontext}}
-  {{/ theme_boost/drawer}}
-{{/courseindex}}
-
-{{#hasblocks}}
-  {{< theme_boost/drawer }}
-    {{$id}}theme_boost-drawers-blocks{{/id}}
-    {{$drawerclasses}}drawer drawer-right {{#blockdraweropen}}show{{/blockdraweropen}}{{/drawerclasses}}
-    {{$drawercontent}}
-      <section class="d-print-none" aria-label="{{#str}}blocks{{/str}}">
-        {{{ addblockbutton }}}
-        {{{ sidepreblocks }}}
-      </section>
-    {{/drawercontent}}
-    {{$drawerpreferencename}}drawer-open-block{{/drawerpreferencename}}
-    {{$forceopen}}{{#forceblockdraweropen}}1{{/forceblockdraweropen}}{{/forceopen}}
-    {{$drawerstate}}show-drawer-right{{/drawerstate}}
-    {{$tooltipplacement}}left{{/tooltipplacement}}
-    {{$drawercloseonresize}}1{{/drawercloseonresize}}
-    {{$closebuttontext}}{{#str}}closeblockdrawer, core{{/str}}{{/closebuttontext}}
-  {{/ theme_boost/drawer}}
-{{/hasblocks}}
-
 
 
 
@@ -1714,6 +1674,39 @@ justify-content:center;
 
 
       <div id="page" data-region="mainpage" data-usertour="scroller" class="drawers {{#courseindexopen}}show-drawer-left{{/courseindexopen}} {{#blockdraweropen}}show-drawer-right{{/blockdraweropen}} drag-container {{jumbotronclass}}">
+            {{#courseindex}}
+  {{< theme_boost/drawer }}
+    {{$id}}theme_boost-drawers-courseindex{{/id}}
+    {{$drawerclasses}}drawer drawer-left {{#courseindexopen}}show{{/courseindexopen}}{{/drawerclasses}}
+    {{$drawercontent}} {{{courseindex}}} {{/drawercontent}}
+    {{$drawerpreferencename}}drawer-open-index{{/drawerpreferencename}}
+    {{$drawerstate}}show-drawer-left{{/drawerstate}}
+    {{$tooltipplacement}}right{{/tooltipplacement}}
+    {{$closebuttontext}}{{#str}}closecourseindex, core{{/str}}{{/closebuttontext}}
+  {{/ theme_boost/drawer}}
+{{/courseindex}}
+
+{{#hasblocks}}
+  {{< theme_boost/drawer }}
+    {{$id}}theme_boost-drawers-blocks{{/id}}
+    {{$drawerclasses}}drawer drawer-right {{#blockdraweropen}}show{{/blockdraweropen}}{{/drawerclasses}}
+    {{$drawercontent}}
+      <section class="d-print-none" aria-label="{{#str}}blocks{{/str}}">
+        {{{ addblockbutton }}}
+        {{{ sidepreblocks }}}
+      </section>
+    {{/drawercontent}}
+    {{$drawerpreferencename}}drawer-open-block{{/drawerpreferencename}}
+    {{$forceopen}}{{#forceblockdraweropen}}1{{/forceblockdraweropen}}{{/forceopen}}
+    {{$drawerstate}}show-drawer-right{{/drawerstate}}
+    {{$tooltipplacement}}left{{/tooltipplacement}}
+    {{$drawercloseonresize}}1{{/drawercloseonresize}}
+    {{$closebuttontext}}{{#str}}closeblockdrawer, core{{/str}}{{/closebuttontext}}
+  {{/ theme_boost/drawer}}
+{{/hasblocks}}
+
+
+
             <div id="topofscroll" class="main-inner">
                 <div class="drawer-toggles d-flex">
                     {{#courseindex}}
