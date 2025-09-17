@@ -684,11 +684,10 @@ body#page-login-forgot_password {
   gap: 20px;
 }
 .page-context-header{
-    padding: .15rem 0 !important;
+    padding: 1.25rem 0 !important;
     margin-bottom: 0px !important;
 
 }
-
 #page-header{margin-bottom: 0px !important;}
 
 #page-content .userprofile{
@@ -837,6 +836,42 @@ footer#page-footer, #page-footer, .page-footer{
 }
 
 
+
+/* put the whole FAB wrapper at the bottom-center */
+.learningtools-action-info .floating-button{
+  position: fixed;
+  right: 0.4%;
+  transform: translateX(-50%);
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px)); /* safe on iOS, etc. */
+  z-index: 1050; /* above footer background, below drawers */
+  bottom: 60px;
+}
+
+/* shrink the round button */
+#tool-action-button{
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  box-shadow: 0 6px 20px rgba(0,0,0,.18);
+}
+
+/* smaller icon */
+#tool-action-button i{
+  font-size: 15px;
+  line-height: 1;
+}
+
+/* center any tool lists/panels above the button and make text smaller */
+.learningtools-action-info .list-learningtools,
+.learningtools-action-info .sticky-tools-list{
+  position: fixed;
+
+  transform: translateX(-50%);
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px) + 56px); /* 56px = button + gap */
+  width: min(92vw, 420px);
+  font-size: 0.9rem;
+}
 
 /* if plugin CSS forces right positioning, neutralize it */
 @media (min-width: 992px) {
