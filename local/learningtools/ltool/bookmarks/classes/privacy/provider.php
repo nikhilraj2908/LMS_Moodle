@@ -26,10 +26,10 @@ namespace ltool_bookmarks\privacy;
 use context;
 
 use core_privacy\local\metadata\collection;
-use \core_privacy\local\request\contextlist;
-use \core_privacy\local\request\userlist;
-use \core_privacy\local\request\approved_userlist;
-use \core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\contextlist;
+use core_privacy\local\request\userlist;
+use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\helper;
 use core_privacy\local\request\transform;
 use core_privacy\local\request\writer;
@@ -57,6 +57,8 @@ class provider implements
             'pagetype' => 'privacy:metadata:bookmarks:pagetype',
             'pagetitle' => 'privacy:metadata:bookmarks:pagetitle',
             'pageurl' => 'privacy:metadata:bookmarks:pageurl',
+            'itemtype' => 'privacy:metadata:bookmarks:itemtype',
+            'itemid' => 'privacy:metadata:bookmarks:itemid',
             'timemodified' => 'privacy:metadata:bookmarks:timemodified'
         ];
         $collection->add_database_table('ltool_bookmarks_data', $bookmarksmetadata, 'privacy:metadata:bookmarksmetadata');
@@ -85,7 +87,7 @@ class provider implements
      * @param  int         $userid      The user to search.
      * @return contextlist $contextlist The list of contexts used in this plugin.
      */
-    public static function get_contexts_for_userid(int $userid) : contextlist {
+    public static function get_contexts_for_userid(int $userid): contextlist {
         $contextlist = new \core_privacy\local\request\contextlist();
 
         if (self::user_has_bookmark_data($userid)) {
@@ -205,6 +207,8 @@ class provider implements
                 'pagetitle' => $record->pagetitle,
                 'pagetype' => $record->pagetype,
                 'pageurl' => $record->pageurl,
+                'itemtype' => $record->itemtype,
+                'itemid' => $record->itemid,
                 'timecreated' => ($record->timecreated) ? transform::datetime($record->timecreated) : '-',
             ];
         }, $records);

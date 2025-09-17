@@ -27,10 +27,10 @@ use stdClass;
 use context;
 
 use core_privacy\local\metadata\collection;
-use \core_privacy\local\request\contextlist;
-use \core_privacy\local\request\userlist;
-use \core_privacy\local\request\approved_userlist;
-use \core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\contextlist;
+use core_privacy\local\request\userlist;
+use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\helper;
 use core_privacy\local\request\transform;
 use core_privacy\local\request\writer;
@@ -60,8 +60,10 @@ class provider implements
             'pagetitle' => 'privacy:metadata:note:pagetitle',
             'pageurl' => 'privacy:metadata:note:pageurl',
             'note' => 'privacy:metadata:note:note',
+            'itemtype' => 'privacy:metadata:note:itemtype',
+            'itemid' => 'privacy:metadata:note:itemid',
             'timecreated' => 'privacy:metadata:note:timecreated',
-            'timemodified' => 'privacy:metadata:note:timemodified'
+            'timemodified' => 'privacy:metadata:note:timemodified',
         ];
         $collection->add_database_table('ltool_note_data', $notemetadata, 'privacy:metadata:notemetadata');
 
@@ -89,7 +91,7 @@ class provider implements
      * @param   int           $userid       The user to search.
      * @return  contextlist   $contextlist  The list of contexts used in this plugin.
      */
-    public static function get_contexts_for_userid(int $userid) : contextlist {
+    public static function get_contexts_for_userid(int $userid): contextlist {
         $contextlist = new \core_privacy\local\request\contextlist();
         // Check user has stored any notes.
         if (self::user_has_note_data($userid)) {
@@ -207,6 +209,8 @@ class provider implements
                 'pagetype' => $note->pagetype,
                 'pageurl' => $note->pageurl,
                 'note' => $note->note,
+                'itemtype' => $note->itemtype,
+                'itemid' => $note->itemid,
                 'timecreated' => ($note->timecreated) ? transform::datetime($note->timecreated) : '-',
                 'timemodified' => ($note->timemodified) ? transform::datetime($note->timemodified) : '-',
             ];

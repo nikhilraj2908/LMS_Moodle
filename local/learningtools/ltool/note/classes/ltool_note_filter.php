@@ -55,12 +55,10 @@ class ltool_note_filter {
      */
     public $sort;
 
-
     /**
      * @var int
      */
     public $activity;
-
 
     /**
      * @var int
@@ -71,7 +69,6 @@ class ltool_note_filter {
      * @var string
      */
     public $courseid;
-
 
     /**
      * @var int
@@ -92,7 +89,6 @@ class ltool_note_filter {
      * @var string
      */
     public $totalnotes;
-
 
     /**
      * Loads the notes info data.
@@ -210,7 +206,7 @@ class ltool_note_filter {
         $userparams = $usercondition['params'];
         $sql = "SELECT lnd.coursemodule, lnd.course FROM {ltool_note_data} lnd
         LEFT JOIN {course_modules} cm ON cm.id = lnd.coursemodule
-        WHERE $usersql AND cm.deletioninprogress != 0 AND lnd.course = :course AND lnd.coursemodule != 0
+        WHERE $usersql AND cm.deletioninprogress = 0 AND lnd.course = :course AND lnd.coursemodule != 0
         GROUP BY lnd.coursemodule, lnd.course";
         $params = [
             'course' => $this->selectcourse,
@@ -252,7 +248,7 @@ class ltool_note_filter {
         $coursesortparams = array_merge($this->urlparams, $coursesortparams);
         $datesortparams = ['sort' => 'date'];
         $datesortparams = array_merge($this->urlparams, $datesortparams);
-        $activitysortparams = array('sort' => 'activity');
+        $activitysortparams = ['sort' => 'activity'];
         $activitysortparams = array_merge($this->urlparams, $activitysortparams);
         $dateselect = '';
         $courseselect = '';
@@ -462,7 +458,7 @@ class ltool_note_filter {
                 } else if ($sorttype == 'desc') {
                     $queryfunction = 'querycoursesortdesc';
                 }
-                usort($data, array($this, $queryfunction));
+                usort($data, [$this, $queryfunction]);
             }
         }
 
@@ -480,7 +476,7 @@ class ltool_note_filter {
         $template['enableactivityfilter'] = !empty($this->selectcourse) ? true : false;
 
         if ($this->selectcourse) {
-            $coursefilterparams = array('selectcourse' => $this->selectcourse);
+            $coursefilterparams = ['selectcourse' => $this->selectcourse];
             $coursefilterparams = array_merge($coursefilterparams, $this->urlparams);
             unset($coursefilterparams['activity']);
             $coursefilterurl = new moodle_url('/local/learningtools/ltool/note/list.php', $coursefilterparams);
@@ -531,7 +527,8 @@ class ltool_note_filter {
                 $list['instance'] = $this->get_instance_note($data);
                 $list['base'] = $this->get_title_note($data, $record);
                 $list['note'] = !empty($record->note) ? $record->note : '';
-                $list['time'] = userdate($record->timemodified, get_string("baseformat", "local_learningtools"), '', false);
+                $notetime = !empty($record->timemodified) ? $record->timemodified : $record->timecreated;
+                $list['time'] = userdate($notetime, get_string("baseformat", "local_learningtools"), '', false);
                 $list['viewurl'] = $this->get_view_url($record);
 
                 if (!empty($this->courseid) && !$this->childid) {
@@ -585,7 +582,7 @@ class ltool_note_filter {
         $stredit = get_string('edit');
         $buttons = [];
         $returnurl = new moodle_url('/local/learningtools/ltool/note/editlist.php');
-        $optionyes = array('edit' => $row->id, 'sesskey' => sesskey());
+        $optionyes = ['edit' => $row->id, 'sesskey' => sesskey()];
         $optionyes = array_merge($optionyes, $this->urlparams);
         $url = new moodle_url($returnurl, $optionyes);
         $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/edit', $stredit));
@@ -605,7 +602,7 @@ class ltool_note_filter {
         $strdelete = get_string('delete');
         $buttons = [];
         $returnurl = new moodle_url('/local/learningtools/ltool/note/list.php');
-        $optionyes = array('delete' => $row->id, 'sesskey' => sesskey());
+        $optionyes = ['delete' => $row->id, 'sesskey' => sesskey()];
         $optionyes = array_merge($optionyes, $this->urlparams);
         $url = new moodle_url($returnurl, $optionyes);
         $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/delete', $strdelete));
@@ -660,6 +657,9 @@ class ltool_note_filter {
             $title = local_learningtools_get_course_name($data->courseid);
         } else if ($data->instance == 'mod') {
             $title = ltool_note_get_module_coursesection($data, $record);
+            if ($record->itemtype == 'chapter') {
+                $title = local_learningtools_get_chapter_name($data, $record);
+            }
         } else {
             $title = $record->pagetitle;
         }
