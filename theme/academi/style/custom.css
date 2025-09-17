@@ -684,10 +684,11 @@ body#page-login-forgot_password {
   gap: 20px;
 }
 .page-context-header{
-    padding: 1.25rem 0 !important;
+    padding: .15rem 0 !important;
     margin-bottom: 0px !important;
 
 }
+
 #page-header{margin-bottom: 0px !important;}
 
 #page-content .userprofile{
