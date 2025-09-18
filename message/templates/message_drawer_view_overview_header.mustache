@@ -33,6 +33,20 @@
     {}
 
 }}
+<style>
+/* ——— Smooth, flat conversation header ——— */
+#message-index-{{uniqid}} [data-region="header-container"] {
+  background:#fff;
+  border-bottom:1px solid var(--bs-border-color, #e5e7eb);
+}
+
+/* Make the currently visible conversation header render as a single row */
+#message-index-{{uniqid}} [data-region="view-conversation"][aria-hidden="false"] {
+  padding:.5rem .75rem !important;
+}
+
+
+</style>
 <div class="border-bottom p-1 px-sm-2" aria-hidden="false" {{^isdrawer}}data-in-panel="true"{{/isdrawer}} data-region="view-overview">
     <div class="d-flex align-items-center">
         <div class="input-group simplesearchform">

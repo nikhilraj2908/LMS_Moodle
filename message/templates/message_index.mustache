@@ -31,19 +31,122 @@
 
     Example context (json):
     {}
-
 }}
+
+<style>
+
+#page-message-index #region-main div[role="main"] .message-app.main{
+    height: 60vh;
+    padding:10px 0;
+}
+/* Scope everything to this drawer instance */
+#message-index-{{uniqid}}.whatsapp-nav { --wa-break: 767.98px; }
+
+/* Mobile behavior */
+@media (max-width: 767.98px) {
+  /* Stack both columns full width on phones */
+  #message-index-{{uniqid}} .row > [class^="col-"],
+  #message-index-{{uniqid}} .row > [class*=" col-"] {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Default mobile view: show LIST only */
+  #message-index-{{uniqid}}.whatsapp-nav:not(.show-conversation) [data-region="chat-pane"] {
+    display: none !important;
+  }
+  #message-index-{{uniqid}}.whatsapp-nav:not(.show-conversation) [data-region="footer-container"] {
+    display: none !important;
+  }
+
+  /* When a chat is open: show CHAT only */
+  #message-index-{{uniqid}}.whatsapp-nav.show-conversation [data-region="list-pane"] {
+    display: none !important;
+  }
+  #message-index-{{uniqid}}.whatsapp-nav.show-conversation [data-region="chat-pane"] {
+    display: flex !important;
+  }
+
+  /* Replace right border with bottom border when stacked */
+  #message-index-{{uniqid}} .conversationcontainer .border-end {
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+  }
+}
+.simplesearchform .btn-submit{
+
+    align-content:center;
+}
+ .text-muted{margin-top:10px;}
+ /* Kill horizontal scroll on this screen */
+#message-index-{{uniqid}} {
+  overflow-x: hidden;
+}
+
+/* Crucial for flex columns: allow them to shrink inside the row */
+#message-index-{{uniqid}} [data-region="list-pane"],
+#message-index-{{uniqid}} [data-region="chat-pane"],
+#message-index-{{uniqid}} .conversationcontainer,
+#message-index-{{uniqid}} .conversationpane {
+  min-width: 0 !important;   /* stops flex children from forcing overflow */
+}
+
+/* Also ensure major inner containers can shrink */
+#message-index-{{uniqid}} [data-region="panel-header-container"],
+#message-index-{{uniqid}} [data-region="panel-body-container"],
+#message-index-{{uniqid}} [data-region="body-container"],
+#message-index-{{uniqid}} [data-region="footer-container"] {
+  min-width: 0;
+}
+
+/* Defensive: zero out row margins/padding that can push past the viewport */
+#message-index-{{uniqid}} .container-fluid { padding-left: 0; padding-right: 0; }
+#message-index-{{uniqid}} .row.h-100 { margin-left: 0; margin-right: 0; }
+
+/* Keep anything inside from exceeding the viewport width */
+#message-index-{{uniqid}} * { max-width: 100%; box-sizing: border-box; }
+
+/* Messages/text: break long words/URLs instead of overflowing */
+#message-index-{{uniqid}} [data-region="view-conversation"] .message .content {
+  overflow-wrap: anywhere;      /* modern wrap */
+  word-break: break-word;       /* fallback */
+  white-space: normal;
+}
+
+/* Popovers/menus should not introduce scrollbars */
+#message-index-{{uniqid}} .popover,
+#message-index-{{uniqid}} .dropdown-menu {
+  max-width: 96vw;
+}
+
+/* Sticky bars should not extend wider than viewport */
+#message-index-{{uniqid}} [data-region="header-container"],
+#message-index-{{uniqid}} [data-region="footer-container"] {
+  left: 0; right: 0; width: 100%;
+}
+
+/* Images/icons in lists and headers shouldn’t push width */
+#message-index-{{uniqid}} img,
+#message-index-{{uniqid}} svg {
+  max-width: 100%;
+  height: auto;
+}
+
+</style>
+
 <div
-        id="message-index-{{uniqid}}"
-        class="message-app main bg-light border flex-row"
-        aria-expanded="false"
-        aria-hidden="true"
-        data-region="message-index"
-        role="region"
+    id="message-index-{{uniqid}}"
+    class="message-app main whatsapp-nav bg-light border flex-row"
+    aria-expanded="false"
+    aria-hidden="true"
+    data-region="message-index"
+    role="region"
 >
     <div class="container-fluid">
         <div class="row h-100 g-0">
-            <div class="col-4 d-flex flex-column conversationcontainer">
+
+            {{! LEFT PANE (list) — full width on mobile, 4/12 on md+ }}
+            <div class="col-12 col-md-4 d-flex flex-column conversationcontainer" data-region="list-pane">
                 <div class="border-end h-100">
                     <div class="panel-header-container" data-region="panel-header-container">
                         {{> core_message/message_drawer_view_overview_header }}
@@ -55,12 +158,24 @@
                     </div>
                 </div>
             </div>
-            <div class="col-8 d-flex flex-column">
-                <div class="header-container position-relative" data-region="header-container">
+
+            {{! RIGHT PANE (chat) — full width on mobile, 8/12 on md+ }}
+            <div class="col-12 col-md-8 d-flex flex-column conversationpane" data-region="chat-pane">
+                <div class="header-container position-relative d-flex align-items-center" data-region="header-container">
+                    {{! Mobile-only Back to list button }}
+                    <button type="button"
+                            class="btn btn-link px-2 d-md-none js-back-to-list"
+                            aria-label="Back to list"
+                            style="margin-right:.25rem;">
+                        <i class="icon fa fa-chevron-left" aria-hidden="true"></i>
+                        {{#str}} back, core {{/str}}
+                    </button>
+
                     {{> core_message/message_drawer_view_contacts_header }}
                     {{> core_message/message_drawer_view_conversation_header }}
                     {{> core_message/message_drawer_view_settings_header }}
                 </div>
+
                 <div class="body-container position-relative" data-region="body-container">
                     {{> core_message/message_drawer_view_contact_body }}
                     {{> core_message/message_drawer_view_contacts_body }}
@@ -68,17 +183,63 @@
                     {{> core_message/message_drawer_view_group_info_body }}
                     {{> core_message/message_drawer_view_settings_body }}
                 </div>
+
                 <div class="footer-container position-relative" data-region="footer-container">
                     {{> core_message/message_drawer_view_conversation_footer }}
                     {{> core_message/message_drawer_view_overview_footer }}
                 </div>
             </div>
+
         </div>
     </div>
 </div>
+
 {{#js}}
-    require(['jquery', 'core_message/message_drawer'], function($, MessageDrawer) {
+require(['jquery', 'core_message/message_drawer'], function($, MessageDrawer) {
     var root = $('#message-index-{{uniqid}}');
     MessageDrawer.init(root, '{{uniqid}}', true, {{{route}}});
+
+    function isPhone() {
+        return window.matchMedia('(max-width: 767.98px)').matches;
+    }
+
+    /* When a user opens a conversation on mobile, switch to chat view */
+    root.on('click',
+        '[data-action="view-conversation"], ' +
+        '[data-region="view-overview"] [role="button"], ' +
+        'a[href*="conversation"]',
+        function() {
+            if (isPhone()) {
+                root.addClass('show-conversation');
+            }
+        }
+    );
+
+    /* Return to list from various built-in actions */
+    root.on('click',
+        '[data-action="show-overview"], [data-action="show-contacts"], [data-action="show-settings"]',
+        function() {
+            if (isPhone()) {
+                root.removeClass('show-conversation');
+            }
+        }
+    );
+
+    /* Our mobile Back button */
+    root.on('click', '.js-back-to-list', function () {
+        if (isPhone()) {
+            root.removeClass('show-conversation');
+            var listPane = root.find('[data-region="list-pane"]')[0];
+            if (listPane) listPane.scrollTop = 0;
+        }
     });
+
+    /* If a conversation is visible (e.g., deep link), ensure chat view on phone */
+    var observer = new MutationObserver(function() {
+        if (isPhone() && root.find('[data-region="view-conversation"]').is(':visible')) {
+            root.addClass('show-conversation');
+        }
+    });
+    observer.observe(root[0], { childList: true, subtree: true });
+});
 {{/js}}
