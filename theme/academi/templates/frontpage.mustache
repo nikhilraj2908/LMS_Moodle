@@ -1535,6 +1535,17 @@ justify-content:center;
   display:none;
 }
 
+/* keep the toggle away from the OS scrollbar */
+.drawer-toggles .drawer-right-toggle {
+  position: fixed;
+  right: 12px;            /* was effectively 0; move it inside */
+  z-index: 1050;
+}
+@media(max-width:1200px){
+  .drawer-toggles .drawer-right-toggle {
+  right :0;
+}
+}
     </style>
 </head>
 
