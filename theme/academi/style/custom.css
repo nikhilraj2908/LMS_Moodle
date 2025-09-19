@@ -846,7 +846,13 @@ footer#page-footer, #page-footer, .page-footer{
     /* height: calc(100vh - 50px); */
   }
 }
-
+@media (min-width: 992px) {
+    #page.drawers.show-drawer-right {
+        margin-left: 0;
+        margin-right: 315px;
+        padding-right: 0rem !important;
+    }
+}
 .drawer.drawer-right {
 
     height:100vh;   
