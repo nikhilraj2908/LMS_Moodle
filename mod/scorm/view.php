@@ -299,4 +299,5 @@ if (!empty($scorm->popup)) {
     $PAGE->requires->js_init_call('M.mod_scormform.init');
 }
 
+
 echo $OUTPUT->footer();
