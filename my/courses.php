@@ -11,7 +11,9 @@
     /* flex: 1 0 auto; */
 }
 
-
+#backToTop{
+    padding:8px 10px !important;
+}
 .edit-toggle-wrapper{
     margin-top:20px;
 }
