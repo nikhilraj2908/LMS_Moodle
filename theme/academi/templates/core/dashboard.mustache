@@ -1350,16 +1350,13 @@
              font-family: var(--font-primary);
              cursor: pointer;
              transition: all 0.3s ease;
-             box-shadow: 0 5px 15px rgba(60, 108, 255, 0.3);
+         
              width: 100%;
              margin-top: 15px;
              line-height: var(--leading-normal);
          }
 
-        .continue-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(60, 108, 255, 0.4);
-        }
+      
 
         .decoration {
             position: absolute;
@@ -1612,7 +1609,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(60, 108, 255, 0.3);
+        
             width: 100%;
             margin-top: 15px;
             text-align: center;
@@ -2052,12 +2049,20 @@ a.course-link-button {
 }
 
 /* Ensure the main content grows, and the CTA sits at the bottom */
-.top-row .card-content,
-.top-row #course-carousel,
-.top-row .recentcourse-card-inner {
+.top-row .card-content{
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
+}
+.top-row #course-carousel,
+.top-row .recentcourse-card-inner{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+}
+.top-row .recentcourse-card-inner .continue-button{
+      margin-top:auto !important;   /* override inline margin-top */
+
 }
 
 .top-row .continue-button,
@@ -2409,8 +2414,7 @@ a.course-link-button {
                   <div class="stat-label" style="font-size: 13px; color: #7a8ca5;">Last Viewed</div>
                 </div>
               </div>
-              <a href="{{courseurl}}" class="continue-button"
-                style="background: linear-gradient(to right, #3c6cff, #6d95ff); color: white; border: none; border-radius: 30px; padding: 14px 30px; font-size: 18px; font-weight: 600; text-align: center; text-decoration: none; display: block; margin-top: 15px; width: 100%; box-shadow: 0 5px 15px rgba(60,108,255,0.3); transition: all 0.3s ease;">
+              <a href="{{courseurl}}" class="continue-button">
                 Go to Course →
               </a>
             </div>

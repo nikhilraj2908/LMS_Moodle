@@ -945,7 +945,7 @@ footer#page-footer, #page-footer, .page-footer{
 a[data-action="tool_courserating-addrating"] {
   color: #fff !important;           /* make the text white */
   text-decoration: none;            /* optional: remove underline */
-  font-weight: 600;     
+  
   text-shadow: 1px 1px 2px gray;            /* optional */
 }
 
