@@ -641,6 +641,8 @@ body#page-login-forgot_password {
     border: none !important;
   }
   .modal.show .modal-dialog {
+    display: flex;
+    justify-content: center;
     transform: none;
     margin-top: 6% !important;
 }
@@ -746,7 +748,9 @@ body.drawer-open-right .header-main {
 .modal {align-content: center !important;}
 .modal-content{height:auto !important;}
 }
-
+.modal-content{
+    max-width:70%;
+}
 @media (max-width: 575.98px) {
 .modal {align-content: center !important;}
 .modal-content{height:50% !important; }
