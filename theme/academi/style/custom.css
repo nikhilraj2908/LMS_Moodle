@@ -959,3 +959,9 @@ a[data-action="tool_courserating-addrating"]:focus {
     text-shadow: 1px 1px 1px gold !important;
 }
 }
+
+
+
+[data-region=right-hand-drawer].drawer{
+    z-index: 1051;
+}
