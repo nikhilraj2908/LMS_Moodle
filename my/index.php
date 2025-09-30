@@ -53,6 +53,48 @@ require_once(__DIR__ . '/../config.php');
 require_once($CFG->dirroot . '/my/lib.php');
 redirect_if_major_upgrade_required();
 require_login();
+// ================================
+//  STREAK BOX (daily consecutive visits)
+// ================================
+function my_dashboard_get_streak_info(moodle_database $DB, int $userid): array {
+    $since = strtotime('today 00:00:00') - (120 * DAYSECS);
+    $rows = $DB->get_records_sql("
+        SELECT DISTINCT DATE(FROM_UNIXTIME(timecreated)) AS daystr
+          FROM {logstore_standard_log}
+         WHERE userid = :uid AND timecreated >= :since
+         ORDER BY daystr DESC
+    ", ['uid' => $userid, 'since' => $since]);
+
+    $days = [];
+    foreach ($rows as $r) {
+        $days[$r->daystr] = true;
+    }
+
+    // Count consecutive days ending today
+    $streak = 0;
+    $cursor = new DateTimeImmutable('today');
+    while (isset($days[$cursor->format('Y-m-d')])) {
+        $streak++;
+        $cursor = $cursor->sub(new DateInterval('P1D'));
+    }
+
+    // Tiers
+    if ($streak < 10)      { $tier='bronze';   $target=10;  $title='Bronze'; }
+    else if ($streak < 25) { $tier='silver';   $target=25;  $title='Silver'; }
+    else if ($streak < 50) { $tier='gold';     $target=50;  $title='Gold'; }
+    else                   { $tier='platinum'; $target=100; $title='Platinum'; }
+
+    $progress = (int)min(100, round(($streak / $target) * 100));
+
+    return [
+        'current'         => $streak,
+        'target'          => $target,
+        'tier'            => $tier,
+        'tierTitle'       => $title,
+        'progressPct'     => $progress,
+        'remainingToTier' => max(0, $target - $streak),
+    ];
+}
 
 global $DB, $USER, $OUTPUT, $CFG;
 
@@ -431,6 +473,26 @@ if (isloggedin() && !isguestuser()) {
         ];
     }
     $templatecontext['enrolledCourses'] = $enrolledCoursesData;
+    // === STREAK context (added) ===
+$streak = my_dashboard_get_streak_info($DB, $USER->id);
+$templatecontext['streak'] = [
+    'current'         => $streak['current'],
+    'target'          => $streak['target'],
+    'progressPct'     => $streak['progressPct'],
+    'tier'            => $streak['tier'],
+    'tierTitle'       => $streak['tierTitle'],
+    'remainingToTier' => $streak['remainingToTier'],
+    'label'           => $streak['current'] . '/' . $streak['target'] . ' Visit',
+];
+$templatecontext['streakSubtitle'] =
+    ($streak['tier'] === 'bronze')
+        ? 'Complete 10 days streak to earn a bronze badge!'
+        : (($streak['tier'] === 'silver')
+            ? 'Continue for 25 days to earn a silver badge!'
+            : (($streak['tier'] === 'gold')
+                ? 'Stay consistent for 50 days to earn a gold badge!'
+                : 'Push to 100 days to achieve the platinum badge!'));
+
     // c) AJAX search results
     $templatecontext['searchQuery']   = $searchquery;
     $templatecontext['searchResults'] = $formatted ?? [];

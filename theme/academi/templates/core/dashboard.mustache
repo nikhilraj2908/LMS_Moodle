@@ -2233,10 +2233,9 @@ a.course-link-button {
             <div class="lift-inner-circle"
               style="width: 170px; height: 170px; background: #fff; border-radius: 50%; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
 
-              <div id="streak-count"
-                style="font-size: 48px; font-weight: 700; color: #1c3c72; line-height: 1; user-select: none;">
-
-              </div>
+              <div id="streak-count" style="font-size:48px;font-weight:700;color:#1c3c72;line-height:1;user-select:none;">
+  {{streak.current}}
+</div>
 
               <div
                 style="font-size: 16px; font-weight: 400; color: #000; user-select: none; margin-top: 6px; line-height: 1.2;">
@@ -2248,9 +2247,9 @@ a.course-link-button {
 
         </div>
 
-        <div style="text-align: center; margin-top: 20px; font-size: 20px; font-weight: 400;">
-          1/1 Visit ✅ <span style="color: #28a745; font-weight: 700;"></span>
-        </div>
+        <div style="text-align:center; margin-top:20px; font-size:20px; font-weight:400;">
+  {{streak.label}} ✅
+</div>
 
         <p id="quote-text" style="color: #7a8ca5; margin-bottom: 5px; text-align:center; margin-top:5px;">
           Small steps every day lead to big achievements.
@@ -2283,15 +2282,15 @@ a.course-link-button {
         <div
           style="margin: 20px auto 0; width: 100%; height: 12px; background: #eee; border-radius: 10px; overflow: hidden;">
           <div id="streak-progress-bar"
-            style="width: 0%; height: 100%; background: linear-gradient(90deg, #204070, #6d95ff); border-radius: 10px;">
-          </div>
+     style="width: {{streak.progressPct}}%; height:100%; background:linear-gradient(90deg,#204070,#6d95ff); border-radius:10px;">
+</div>
         </div>
 
 
 
-        <div id="streak-goal-text" style="text-align: center; margin-top: 30px; font-size: 15px; color: #1c3c72;">
-          Complete 10 days streak to earn a bronze badge!
-        </div>
+     <div id="streak-goal-text" style="text-align:center; margin-top:30px; font-size:15px; color:#1c3c72;">
+  {{streakSubtitle}}
+</div>
       </div>
       <!-- 2) Continue Learning Card -->
       <div class="card-equal learning-card animated-element slide-in-left delay-1" style="width:25%;">
