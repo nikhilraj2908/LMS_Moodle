@@ -2,7 +2,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_aisummary';
-$plugin->version   = 2025091212;       // bump when you redeploy
+$plugin->version   = 1759227273;       // updated
 $plugin->requires  = 2022041900;       // Moodle 4.0+
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.3';
+$plugin->release   = '1.4';

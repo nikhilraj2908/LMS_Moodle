@@ -13,122 +13,139 @@ use external_value;
 
 class generate_summary extends external_api {
 
+    /**
+     * Define input parameters.
+     */
     public static function execute_parameters() {
         return new external_function_parameters([
-            'title' => new external_value(PARAM_TEXT, 'Course title'),
+            'title'   => new external_value(PARAM_TEXT, 'Topic or course title', VALUE_REQUIRED),
+            'context' => new external_value(PARAM_RAW,  'Short description / hints to disambiguate the title', VALUE_DEFAULT, ''),
         ]);
     }
 
-    public static function execute(string $title) {
+    /**
+     * Main execution logic.
+     */
+    public static function execute($title, $context = '') {
         global $CFG;
 
-        self::validate_parameters(self::execute_parameters(), ['title' => $title]);
-        require_sesskey();
-        require_login();
+        // Validate input
+        $params = self::validate_parameters(self::execute_parameters(), [
+            'title'   => $title,
+            'context' => $context,
+        ]);
 
-        // --- Read config with safe defaults ---
-        $apibase   = trim((string)get_config('local_aisummary', 'apibase'));
-        $apikey    = trim((string)get_config('local_aisummary', 'apikey'));
-        $model     = trim((string)(get_config('local_aisummary', 'model') ?: 'meta-llama/llama-3-8b-instruct:free'));
-        $maxtokens = (int)(get_config('local_aisummary', 'maxtokens') ?? 600);
+        $title   = trim($params['title']);
+        $context = trim($params['context']);
 
-        if ($apibase === '') {
-            $apibase = 'https://openrouter.ai/api/v1/chat/completions';
+        // Require at least some context
+        if (empty($context)) {
+            throw new \moodle_exception('emptytext', 'local_aisummary', '', null, 'Please enter a short description');
         }
 
-        $isopenrouter = (strpos($apibase, 'openrouter.ai') !== false);
-        if ($isopenrouter && $apikey === '') {
-            throw new \moodle_exception('missingconfig', 'local_aisummary', '', null,
-                'Configure API Key in Site administration ▶ Plugins ▶ Local plugins ▶ AI Summary');
+        // Stop early if ambiguous title with too little context
+        if ((preg_match('/^[A-Z0-9]{2,6}$/', $title) || mb_strlen($title) < 3) && mb_strlen($context) < 10) {
+            throw new \moodle_exception('needmorecontext', 'local_aisummary', '', null, 'Add more context to clarify the topic.');
         }
 
-        $headers = ['Content-Type: application/json'];
-        if ($apikey !== '') {
-            $headers[] = 'Authorization: Bearer ' . $apikey;
-        }
-        // IMPORTANT: do NOT send Referer for HTTP sites or when key has no origin restriction.
-        if ($isopenrouter) {
-            $headers[] = 'X-Title: Moodle AI Summary';
+        // Load API settings from Moodle config
+        $apibase   = trim((string) get_config('local_aisummary', 'apibase'));
+        $apikey    = trim((string) get_config('local_aisummary', 'apikey'));
+        $model     = trim((string) get_config('local_aisummary', 'model'));
+        $maxtokens = (int) get_config('local_aisummary', 'maxtokens');
+
+        if ($apibase === '' || $apikey === '' || $model === '') {
+            throw new \moodle_exception('apimissing', 'local_aisummary', '', null, 'API base, key or model is not configured');
         }
 
-        // --- Tight prompt: bullet lines only, no meta questions ---
-        $system = "You are CourseSummaryBot.
-Rules:
-- Produce ONLY bullet lines (one idea per line). No headings/paragraphs.
-- Stay strictly on the course title topic. Do not ask for more info.
-- 15–30 lines total, each ≤ 50 words.
-- Neutral, practical tone. Plain text/Markdown.";
+        // Ensure correct endpoint
+        $fullApiUrl = $apibase;
+        if (substr($apibase, -15) !== '/chat/completions') {
+            $fullApiUrl = rtrim($apibase, '/') . '/chat/completions';
+        }
 
-        $user = "Title: {$title}
-Write the bullet lines now.";
+        // Minimal URL check
+        if (stripos($fullApiUrl, 'https://') !== 0) {
+            throw new \moodle_exception('badresponse', 'local_aisummary', '', null, 'Invalid API base URL (must start with https://)');
+        }
+
+        // Build a strong prompt to ensure actual generation
+        $sys = "You are an assistant that writes a clear, engaging introduction (about 4–5 lines, 150–200 words). "
+             . "The response must be original, factual, and directly related to the given topic. "
+             . "Avoid bullet points, headings, or markdown. If context is insufficient, reply exactly with: INSUFFICIENT_CONTEXT.";
+
+        $usercontent = "Title: {$title}\n"
+                     . "Context: " . ($context !== '' ? $context : '(none)') . "\n\n"
+                     . "Write an engaging introduction of around 150–200 words on this topic.";
 
         $payload = [
-            'model' => $model,
-            'messages' => [
-                ['role' => 'system', 'content' => $system],
-                ['role' => 'user',   'content' => $user],
+            'model'       => $model,
+            'max_tokens'  => $maxtokens ?: 600,
+            'temperature' => 0.4,
+            'messages'    => [
+                ['role' => 'system', 'content' => $sys],
+                ['role' => 'user',   'content' => $usercontent],
             ],
-            'temperature' => 0.2,
-            'max_tokens'  => $maxtokens,
         ];
 
-        $candidates = [$model];
-        if ($isopenrouter) {
-            $candidates = array_unique(array_filter([
-                $model,
-                'meta-llama/llama-3-8b-instruct:free',
-                'google/gemma-2-9b-it:free',
-                'qwen/qwen2.5-7b-instruct:free',
-                'mistralai/mistral-7b-instruct:free',
-            ]));
+        // Prepare cURL
+        require_once($CFG->libdir . '/filelib.php');
+        $curl = new \curl();
+        $curl->setHeader('Authorization: Bearer ' . $apikey);
+        $curl->setHeader('Accept: application/json');
+        $curl->setHeader('Content-Type: application/json');
+        $curl->setHeader('HTTP-Referer: ' . $CFG->wwwroot);
+        $curl->setHeader('X-Title: Moodle AI Summary');
+
+        // Call API
+        $resp = $curl->post($fullApiUrl, json_encode($payload));
+
+        if ($resp === false || $curl->get_errno()) {
+            $error = $curl->get_errno() ? $curl->error : 'Unknown cURL error';
+            throw new \moodle_exception('curlerror', 'local_aisummary', '', null, $error);
         }
 
-        $text = ''; $lastRaw=''; $lastStatus=0;
+        $info = $curl->get_info();
+        $code = (int)($info['http_code'] ?? 0);
 
-        foreach ($candidates as $m) {
-            $payload['model'] = $m;
-
-            $ch = curl_init($apibase);
-            curl_setopt_array($ch, [
-                CURLOPT_POST           => true,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_HTTPHEADER     => $headers,
-                CURLOPT_POSTFIELDS     => json_encode($payload),
-                CURLOPT_TIMEOUT        => 35,
-            ]);
-
-            $raw    = curl_exec($ch);
-            $errno  = curl_errno($ch);
-            $errmsg = curl_error($ch);
-            $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-
-            if ($errno) {
-                throw new \moodle_exception('curlerror', 'local_aisummary', '', null, $errmsg);
+        // Check API status
+        if ($code < 200 || $code >= 300) {
+            $snippet = trim((string)$resp);
+            if (mb_strlen($snippet) > 600) {
+                $snippet = mb_substr($snippet, 0, 600) . '…';
             }
-            if ($status >= 200 && $status < 300) {
-                $json = json_decode($raw, true);
-                $text = $json['choices'][0]['message']['content']
-                     ?? $json['choices'][0]['text']
-                     ?? '';
-                if (trim($text) !== '') { break; }
-            } else {
-                // If not the OpenRouter "No endpoints found" 404, stop and surface it
-                $lastRaw = $raw; $lastStatus = $status;
-                if (!($status == 404 && stripos($raw, 'No endpoints found') !== false)) break;
-            }
+            throw new \moodle_exception(
+                'badresponse',
+                'local_aisummary',
+                '',
+                null,
+                'HTTP ' . $code . ' | URL: ' . $fullApiUrl . ' | Body: ' . $snippet
+            );
         }
 
-        if (trim($text) === '') {
-            if ($lastStatus) {
-                throw new \moodle_exception('badresponse', 'local_aisummary', '', null, 'HTTP '.$lastStatus.' '.$lastRaw);
-            }
-            throw new \moodle_exception('emptytext', 'local_aisummary');
+        // Decode response
+        $data = json_decode($resp, true);
+        $text = '';
+
+        if (isset($data['choices'][0]['message']['content'])) {
+            $text = (string)$data['choices'][0]['message']['content'];
+        } else if (isset($data['choices'][0]['text'])) {
+            $text = (string)$data['choices'][0]['text'];
         }
 
-        return ['summary' => trim($text)];
+        $text = trim($text);
+
+        // Handle insufficient context
+        if ($text === '' || strtoupper($text) === 'INSUFFICIENT_CONTEXT') {
+            throw new \moodle_exception('emptytext', 'local_aisummary', '', null, 'AI could not generate text. Please provide more context.');
+        }
+
+        return ['summary' => $text];
     }
 
+    /**
+     * Define return structure.
+     */
     public static function execute_returns() {
         return new external_single_structure([
             'summary' => new external_value(PARAM_RAW, 'Generated summary'),

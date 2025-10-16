@@ -1,19 +1,16 @@
 <?php
 $string['pluginname'] = 'AI Summary';
-
-$string['apibase'] = 'API base URL';
-$string['apibase_desc'] = 'Default: https://openrouter.ai/api/v1/chat/completions (OpenAI-compatible chat completions). You may change to another compatible endpoint.';
-
+$string['apibase'] = 'API endpoint';
+$string['apibase_desc'] = 'Chat completions endpoint (e.g., OpenRouter).';
 $string['apikey'] = 'API key';
-$string['apikey_desc'] = 'Paste your provider key (OpenRouter or other).';
-
-$string['model'] = 'Model';
-$string['model_desc'] = 'Example (OpenRouter free): meta-llama/llama-3-8b-instruct:free';
-
+$string['apikey_desc'] = 'Secret key for your AI provider.';
+$string['model'] = 'Model ID';
+$string['model_desc'] = 'e.g., openrouter/anthropic/claude-3.5-sonnet';
 $string['maxtokens'] = 'Max tokens';
-$string['maxtokens_desc'] = 'Upper bound for response tokens. 600 is usually enough for 15–30 bullet lines.';
+$string['maxtokens_desc'] = 'Upper bound for the response length.';
 
-$string['missingconfig'] = 'AI Summary plugin is not configured.';
-$string['badresponse'] = 'The AI service returned an error.';
-$string['emptytext'] = 'No text received from the AI.';
+$string['needmorecontext'] = 'Please add a short description to disambiguate this title before generating.';
+$string['apimissing'] = 'AI API settings are missing. Please configure the plugin.';
 $string['curlerror'] = 'Network error when contacting the AI service.';
+$string['badresponse'] = 'AI service returned an error.';
+$string['emptytext'] = 'AI returned no usable text. Try again with more context.';
