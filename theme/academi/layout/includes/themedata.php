@@ -64,6 +64,5 @@ $templatecontext = [
     'showsitename' => $showsitename,
     'showlogo' => $showlogo,
     "smalllogourl" => $smalllogourl,   ///////////added for small logo
-
 ];
 $templatecontext += footer();

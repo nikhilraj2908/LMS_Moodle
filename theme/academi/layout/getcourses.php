@@ -97,6 +97,7 @@ case 'closing':
         ORDER BY c.enddate ASC
         LIMIT 10
     ";
+
     $params = [
         'userid' => $userid,
         'now' => time(),

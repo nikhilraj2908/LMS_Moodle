@@ -1,8 +1,8 @@
+document.addEventListener("DOMContentLoaded", function () {
+  console.log("OpenRouter Integration Ready ✅");
+
 <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
 
-        document.addEventListener("DOMContentLoaded", function () {
-
-  console.log("OpenRouter Integration Ready ✅");
 
   const interval = setInterval(() => {
     const titleInput = document.querySelector("#id_fullname");

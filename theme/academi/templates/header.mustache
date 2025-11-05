@@ -36,6 +36,9 @@
     background: linear-gradient(to bottom, #ffffff 0%, rgb(204 242 255) 100%);
 }
 
+.dropdown-toggle{
+    padding:0px;
+}
 
 #search-results-container {
     position: absolute;
@@ -113,11 +116,19 @@
 }
 .header-icons {
     display: flex;
-    align-items: center;
-  
+    align-items: center;	
 }
 .header-icons > div{
-    margin-left:10px;
+margin-left:10px;
+}
+
+.edit-toggle-wrapper{
+    margin-left:10px !important;
+}
+
+
+.edit-toggle-wrapper.admin-mode {
+  margin-left: 0px !important;
 }
 
 img.userpicture
@@ -125,23 +136,10 @@ img.userpicture
   margin-right: 0rem; 
 }
 
-
-
-.edit-toggle-wrapper{
-    margin-left:10px !important;
-    
-}
-
-
-.edit-toggle-wrapper.admin-mode {
-  margin-left: 0px !important;
- 
-}
 .navbar-nav > div{
     padding-left:0rem !important;
     padding-right:0rem !important;
 }
-
 .header-icons .dropdown-toggle::after {
     display: none;
 }
@@ -230,14 +228,7 @@ img.userpicture
      .header-main .search-input-wrapper {
   display:none;
   }
-
 }
-.dropdown-toggle{
-    padding:0px;
-}
-
-
-
 
 </style>
 
@@ -252,7 +243,7 @@ img.userpicture
                 {{/ logourl }}
                     ">
                 {{#showlogo}}
-                    {{# logourl }}
+                 {{# logourl }}
   <span class="logo d-flex align-items-center">
     {{!-- Desktop / md and up --}}
     <img class="d-none d-md-block" src="{{logourl}}" alt="{{sitename}}" style="max-height:44px; height:auto;"/>
@@ -279,7 +270,7 @@ img.userpicture
                 </div>
 
 {{#primarymoremenu}}
-  <div class="primary-navigation d-flex align-items-center ">
+  <div class="primary-navigation d-flex align-items-center">
 
     {{> core/moremenu}}
 
@@ -322,3 +313,4 @@ img.userpicture
     </div>
 {{/themestyleheader}}
 <script src="{{{ config.wwwroot }}}/theme/academi/javascript/search.js?v=1.0"></script>
+ 

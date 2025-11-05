@@ -263,11 +263,8 @@ $string['topRight'] = 'TopRight';
 $string['url'] = 'URL';
 $string['urldesc'] = 'Enter the URL to set the link for the title of this site feature {$a->block}';
 $string['viewallcourses'] = 'View all courses';
-
-
 $string['loginguest'] = 'Login as Guest';
 $string['guestlogin'] = 'Guest Login';
-
 
 $string['smalllogo'] = 'Mobile logo';
 $string['smalllogodesc'] = 'Upload a compact logo used on phones and small screens. Recommended height ~36–40px, square or short-wide.';

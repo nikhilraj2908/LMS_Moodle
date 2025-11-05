@@ -1056,7 +1056,7 @@
         }
     }
     .slick-arrow {
-        max-width:40px;
+	max-width:40px;
         text-indent: -999em;
         border-radius: 5px;
         position: absolute;
@@ -1098,7 +1098,11 @@
             .available-content .available-img:hover:after {
                 width: 80%;
                 height: 220%;
- ft: 0;
+                top: -180px;
+            }
+        }
+        .slick-arrow.slick-prev {
+            left: 0;
         }
     }
 }

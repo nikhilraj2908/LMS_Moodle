@@ -27,6 +27,3 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/behat/lib.php');
 require_once(dirname(__FILE__) .'/includes/layoutdata.php');
 echo $OUTPUT->render_from_template('theme_academi/columns2', $templatecontext);
-
-
-/* added the js snippet into that location administration → Appearance → Additional HTML → “Before BODY is closed”  */

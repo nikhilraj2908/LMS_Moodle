@@ -237,7 +237,7 @@ if (isloggedin() && !isguestuser()) {
         if ($last_course) {
             $last_upload_time = $last_course->timecreated;
             $current_time = time();
-            $one_week = 7 * 24 * 60 * 60;
+            $one_week =7 * 24 * 60 * 60;
     
             if (($current_time - $last_upload_time) >= $one_week) {
                 $showpopup = true;

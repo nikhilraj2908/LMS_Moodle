@@ -72,12 +72,13 @@
              text-rendering: optimizeLegibility;
          }
 
-  
+    
 @media (max-width: 767.98px) {
     .drawer-toggles .drawer-right-toggle, .drawer-toggles .drawer-left-toggle {
         top: 10vh;
     }
-      #theme_boost-drawers-blocks.drawer-right {
+
+    #theme_boost-drawers-blocks.drawer-right {
     top: 0 !important;
     margin-top: 0 !important;
     padding-top: 0 !important;
@@ -631,7 +632,6 @@
         .bottom-row {
              align-items: stretch;   
             gap: 20px;
-            
         }
 
         
@@ -714,7 +714,9 @@
                 margin-right: 0 !important;
             }
         }
-        @media(min-width:1050px)and (max-width:1450px){
+        
+
+  @media(min-width:1050px)and (max-width:1450px){
             .progress-container {
                 position: relative;
                 width: 100% !important;
@@ -722,7 +724,9 @@
                 margin: 30px auto 30px !important;
             }
         }
-        
+
+
+
         /* Mobile (up to 767px) */
         @media (max-width: 767px) {
             .container {
@@ -1350,13 +1354,11 @@
              font-family: var(--font-primary);
              cursor: pointer;
              transition: all 0.3s ease;
-         
+             
              width: 100%;
              margin-top: 15px;
              line-height: var(--leading-normal);
          }
-
-      
 
         .decoration {
             position: absolute;
@@ -1609,7 +1611,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-        
             width: 100%;
             margin-top: 15px;
             text-align: center;
@@ -1980,7 +1981,8 @@ html {
             }
         }
 
-        /* ===== BUTTON RESPONSIVENESS (Continue & Go to Course) ===== */
+
+     /* ===== BUTTON RESPONSIVENESS (Continue & Go to Course) ===== */
 .continue-button,
 a.course-link-button {
   /* layout */
@@ -2054,6 +2056,7 @@ a.course-link-button {
   display: flex;
   flex-direction: column;
 }
+
 .top-row #course-carousel,
 .top-row .recentcourse-card-inner{
   display:flex;
@@ -2064,6 +2067,7 @@ a.course-link-button {
       margin-top:auto !important;   /* override inline margin-top */
 
 }
+
 
 .top-row .continue-button,
 .top-row a.continue-button,
@@ -2158,10 +2162,11 @@ a.course-link-button {
   flex-direction: column;
 }
 
-
 .edit-toggle-wrapper{
   display:none;
 }
+
+
     </style>
 </head>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -2233,9 +2238,10 @@ a.course-link-button {
             <div class="lift-inner-circle"
               style="width: 170px; height: 170px; background: #fff; border-radius: 50%; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
 
-              <div id="streak-count" style="font-size:48px;font-weight:700;color:#1c3c72;line-height:1;user-select:none;">
-  {{streak.current}}
-</div>
+              <div id="streak-count"
+                style="font-size: 48px; font-weight: 700; color: #1c3c72; line-height: 1; user-select: none;">
+
+              </div>
 
               <div
                 style="font-size: 16px; font-weight: 400; color: #000; user-select: none; margin-top: 6px; line-height: 1.2;">
@@ -2247,9 +2253,9 @@ a.course-link-button {
 
         </div>
 
-        <div style="text-align:center; margin-top:20px; font-size:20px; font-weight:400;">
-  {{streak.label}} ✅
-</div>
+        <div style="text-align: center; margin-top: 20px; font-size: 20px; font-weight: 400;">
+          1/1 Visit ✅ <span style="color: #28a745; font-weight: 700;"></span>
+        </div>
 
         <p id="quote-text" style="color: #7a8ca5; margin-bottom: 5px; text-align:center; margin-top:5px;">
           Small steps every day lead to big achievements.
@@ -2258,19 +2264,19 @@ a.course-link-button {
         <!-- All Badges Preview -->
         <div id="badge-preview" style="display: flex; justify-content: center; gap: 20px; margin-top: 30px;">
           <div class="badge-wrapper" id="badge-preview-bronze">
-            <img src="/moodle/theme/academi/pix/bronze-badge.png" alt="Bronze" style="width: 50px; " />
+            <img src="/theme/academi/pix/bronze-badge.png" alt="Bronze" style="width: 50px; " />
             <div style="font-size: 12px; text-align: center; color: #cc7a00;">Bronze</div>
           </div>
           <div class="badge-wrapper" id="badge-preview-silver">
-            <img src="/moodle/theme/academi/pix/silver-badge.png" alt="Silver" style="width: 50px; " />
+            <img src="/theme/academi/pix/silver-badge.png" alt="Silver" style="width: 50px; " />
             <div style="font-size: 12px; text-align: center; color: #b0b0b0;">Silver</div>
           </div>
           <div class="badge-wrapper" id="badge-preview-gold">
-            <img src="/moodle/theme/academi/pix/gold-badge.png" alt="Gold" style="width: 50px; " />
+            <img src="/theme/academi/pix/gold-badge.png" alt="Gold" style="width: 50px; " />
             <div style="font-size: 12px; text-align: center; color: #FFD700;">Gold</div>
           </div>
           <div class="badge-wrapper" id="badge-preview-platinum">
-            <img src="/moodle/theme/academi/pix/platinum-badge.png" alt="Platinum" style="width: 50px; " />
+            <img src="/theme/academi/pix/platinum-badge.png" alt="Platinum" style="width: 50px; " />
             <div style="font-size: 12px; text-align: center; color: #00BFFF;">Platinum</div>
           </div>
         </div>
@@ -2282,15 +2288,15 @@ a.course-link-button {
         <div
           style="margin: 20px auto 0; width: 100%; height: 12px; background: #eee; border-radius: 10px; overflow: hidden;">
           <div id="streak-progress-bar"
-     style="width: {{streak.progressPct}}%; height:100%; background:linear-gradient(90deg,#204070,#6d95ff); border-radius:10px;">
-</div>
+            style="width: 0%; height: 100%; background: linear-gradient(90deg, #204070, #6d95ff); border-radius: 10px;">
+          </div>
         </div>
 
 
 
-     <div id="streak-goal-text" style="text-align:center; margin-top:30px; font-size:15px; color:#1c3c72;">
-  {{streakSubtitle}}
-</div>
+        <div id="streak-goal-text" style="text-align: center; margin-top: 30px; font-size: 15px; color: #1c3c72;">
+          Complete 10 days streak to earn a bronze badge!
+        </div>
       </div>
       <!-- 2) Continue Learning Card -->
       <div class="card-equal learning-card animated-element slide-in-left delay-1" style="width:25%;">
@@ -2928,7 +2934,7 @@ const badgeThresholds = {
     platinum: 80
 };
 
-fetch('/moodle/theme/academi/streak.php', {
+fetch('/theme/academi/streak.php', {
     method: 'POST',
     credentials: 'same-origin'
 })

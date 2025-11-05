@@ -50,9 +50,6 @@ $setting->set_updatedcallback('theme_reset_all_caches');
 $temp->add($setting);
 
 
-
-
-
 // Small (mobile) logo when it is responsive
 $setting = new admin_setting_configstoredfile(
     'theme_academi/smalllogo',
@@ -62,6 +59,7 @@ $setting = new admin_setting_configstoredfile(
 );
 $setting->set_updatedcallback('theme_reset_all_caches');
 $temp->add($setting); // $page here is an admin_settingpage (OK).
+
 
 
 // Favicon upload option.
