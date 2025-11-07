@@ -1,0 +1,316 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_apas/header.
+
+    Page header template.
+
+    Example context (json):
+    {
+        "themestyleheader": 'true',
+        "output": {
+            "page_heading_menu": "<li>..</li>"
+        },
+        "sitename": "Moodle"
+    }
+}}
+<style>
+.header-main {
+    position: sticky;
+    top: 0;
+    z-index: 1099;
+    background: linear-gradient(to bottom, #ffffff 0%, rgb(204 242 255) 100%);
+}
+
+.dropdown-toggle{
+    padding:0px;
+}
+
+#search-results-container {
+    position: absolute;
+    top: 100%; /* just below the input */
+    left: 0;
+    right: 0;
+    background-color: #204070;
+    color: white;
+    z-index: 999;
+    border-radius: 0 0 5px 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    display: none; /* shown dynamically */
+}
+
+.search-result-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-result-item:hover {
+    background-color: #3c6894;
+}
+.search-results {
+    position: absolute;
+    top: 100%;  /* below the input box */
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 9999;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.search-input-wrapper {
+    position: relative;
+    width: 20%;
+    
+}
+
+.search-input-wrapper input {
+    padding-right: 40px; /* leave space for icon */
+    padding-left: 20px;
+    height: 42px;
+    border-radius: 999px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
+    background-color: #fff;
+    font-size: 14px;
+}
+
+.search-input-wrapper .search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #0a375f;
+    font-size: 16px;
+    pointer-events: none;
+}
+.header-icons {
+    display: flex;
+    align-items: center;	
+}
+.header-icons > div{
+margin-left:10px;
+}
+
+.edit-toggle-wrapper{
+    margin-left:10px !important;
+}
+
+
+.edit-toggle-wrapper.admin-mode {
+  margin-left: 0px !important;
+}
+
+img.userpicture
+ {
+  margin-right: 0rem; 
+}
+
+.navbar-nav > div{
+    padding-left:0rem !important;
+    padding-right:0rem !important;
+}
+.header-icons .dropdown-toggle::after {
+    display: none;
+}
+
+.header-icons .icon {
+    font-size: 20px;
+    position: relative;
+}
+
+.header-icons .icon .badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: red;
+    color: white;
+    font-size: 10px;
+    border-radius: 50%;
+    padding: 2px 5px;
+}
+    
+
+.primary-navigation .nav-link {
+    position: relative;
+    color: #000;
+    font-weight: normal;
+    padding: 0 10px;
+    transition: color 0.3s ease;
+}
+
+.primary-navigation .nav-link.active {
+    color: #204070;
+    font-weight: bold;
+}
+
+/* make sure the link is positioned relatively so ::after lines up */
+.primary-navigation .nav-link {
+  position: relative;
+  background: transparent !important;
+}
+
+/* your existing underline setup */
+.primary-navigation .nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 2px;           /* adjust to sit just below the text */
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #204070;
+  transition: width 0.3s ease-in-out;
+}
+
+/* expand the underline on hover/focus */
+.primary-navigation .nav-link:hover::after,
+.primary-navigation .nav-link:focus::after {
+  width: 100%;
+}
+
+/* keep the underline in place when that item is “active” */
+.primary-navigation .nav-item.active .nav-link::after {
+  width: 100%;
+}
+
+
+.primary-navigation .nav-link.active::after {
+    width: 100%;
+}
+.moremenu .nav-link.active:focus, .moremenu .nav-link.active:hover {
+
+    border-bottom-color: #204070;
+}
+.header-main .navbar.navbar-light .primary-navigation .navigation .nav-link:hover {
+
+}
+/* show next to More only on small screens */
+.mobile-inline {
+  display: block;
+}
+@media (min-width: 768px) {
+  .mobile-inline {
+    display: none;
+  }
+  
+}
+@media (max-width:767px){
+     .header-main .search-input-wrapper {
+  display:none;
+  }
+}
+
+</style>
+
+
+{{#themestyleheader}}
+    <div class="header-main">
+        <div class="container-fluid">
+            <nav class="navbar navbar-light bg-faded navbar-expand">
+                <a href="{{{ config.wwwroot }}}/?redirect=0" class="d-flex h-100 navbar-brand {{# logourl }}has-logo{{/ logourl }}
+                {{^ logourl }}
+                    hidden-sm-down
+                {{/ logourl }}
+                    ">
+                {{#showlogo}}
+                 {{# logourl }}
+  <span class="logo d-flex align-items-center">
+    {{!-- Desktop / md and up --}}
+    <img class="d-none d-md-block" src="{{logourl}}" alt="{{sitename}}" style="max-height:44px; height:auto;"/>
+
+    {{!-- Mobile / under md: use small logo if provided, else fall back --}}
+    {{#smalllogourl}}
+      <img class="d-md-none" src="{{smalllogourl}}" alt="{{sitename}}" style="max-height:36px; height:auto;"/>
+    {{/smalllogourl}}
+    {{^smalllogourl}}
+      <img class="d-md-none" src="{{logourl}}" alt="{{sitename}}" style="max-height:36px; height:auto;"/>
+    {{/smalllogourl}}
+  </span>
+{{/ logourl }}
+                    {{^ logourl }}
+                        <span class="site-name hidden-sm-down">{{{ sitename }}}</span>
+                    {{/ logourl }}
+                {{/showlogo}}
+                   
+                </a>
+                  <div class="search-input-wrapper">
+                    <input type="text" id="course-search-input" class="form-control rounded-pill" placeholder="Search for latest courses...">
+                    <i class="fa fa-search search-icon"></i>
+                    <div id="search-results-container" class="search-results"></div>
+                </div>
+
+{{#primarymoremenu}}
+  <div class="primary-navigation d-flex align-items-center">
+
+    {{> core/moremenu}}
+
+    {{^isloginpage}}
+      {{#usermenu}}
+        <div class="usermenu-container mobile-inline ms-2" data-region="usermenu">
+          {{> core/user_menu}}
+        </div>
+      {{/usermenu}}
+    {{/isloginpage}}
+
+  </div>
+{{/primarymoremenu}}
+
+                <ul class="navbar-nav d-none d-md-flex my-1 px-1">
+                    <!-- page_heading_menu -->
+                    {{{ output.page_heading_menu }}}
+                    <div class="d-flex align-items-center ms-auto px-2" >
+    {{{ output.search_box }}}
+
+    <div class="header-icons d-flex align-items-center gap-1">
+        {{{ output.navbar_plugin_output }}}
+
+        <div class="usermenu-container" data-region="usermenu">
+            {{^isloginpage}}
+                {{#usermenu}}
+                    {{> core/user_menu }}
+                {{/usermenu}}
+            {{/isloginpage}}
+        </div>
+                 <div class="edit-toggle-wrapper">
+    {{{ output.edit_switch }}}
+</div>
+    </div>
+</div>
+                </ul>
+
+            </nav>
+        </div>
+    </div>
+{{/themestyleheader}}
+<script src="{{{ config.wwwroot }}}/theme/apas/javascript/search.js?v=1.0"></script>
+ 

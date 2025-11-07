@@ -1,0 +1,2171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {{> theme_boost/head }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+    /* Carousel Styles (keep your existing carousel styles) */
+/* Never allow sideways scrolling */
+
+
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+    :root{
+  --content-gutter: clamp(12px, 2vw, 24px);
+  --card-gap: clamp(12px, 2vw, 20px);
+}
+    #heroCarousel {
+        position: relative;
+        height: 68vh;
+        overflow: hidden;
+             border-bottom-right-radius: 60px;
+    border-bottom-left-radius: 60px;
+    box-shadow: 3px 5px 3vh 8px rgb(180, 191, 207);
+        
+    } 
+    
+.main-container{
+       
+        background: linear-gradient(#ffffff,  #f0f6ff);
+        
+}
+    .carousel-inner, 
+    .carousel-item {
+        height: 100%;
+        width: 100%;
+       
+    }
+
+    .carousel-item {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: relative;
+       
+    }
+
+    .carousel-overlay-box {
+    background-color: transparent;
+    padding: 30px;
+    border: 2px solid #204070;
+    border-radius: 15px;
+    position: absolute;
+    top: 20%;
+    left: 3%;
+    transform: translateY(-50%);
+    max-width: 50%; 
+    
+    z-index: 2;
+}
+
+
+/* 2XL screens and above (1536px+) - original styling */
+
+
+/* XL screens (1280px to 1535px) */
+@media (min-width: 1280px) and (max-width: 1555px) {
+    .carousel-overlay-box {
+    background-color: #fff;
+    padding: 20px;
+    border: 2px solid #204070;
+    border-radius: 15px;
+    position: absolute;
+    top: 8% !important;
+    left: 4%;
+    transform: translateY(-50%);
+    max-width: 35%; 
+    
+    z-index: 2;
+      
+    }
+}
+
+/* LG screens (1024px to 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .carousel-overlay-box {
+   background-color: #fff;
+    padding: 20px;
+    border: 2px solid #204070;
+    border-radius: 12px;
+    position: absolute;
+    top: 7%;
+    left: 5%;
+    transform: translateY(-50%);
+    max-width: 60%; 
+    width: 45%;
+    z-index: 2;
+        
+    }
+}
+
+/* MD screens (768px to 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .carousel-overlay-box {
+       
+        top:37%;
+        width: 80%;
+      
+        border-radius: 10px;
+        border-width: 1.5px;
+    }
+}
+
+@media (max-width: 767px) {
+  /* show only the right side of the poster on phones */
+  #heroCarousel .carousel-item{
+    background-position: right center;   /* crop to the right */
+    background-size: cover;
+    background-position:  center;   /* crop to the right */
+    
+  }
+
+  /* keep the white bordered card visible on top of the hero */
+  .carousel-overlay-box{
+    position: absolute;                  /* sit on top of the image */
+    left: 6%;
+    right: 6%;
+    top: 8%;                            /* tweak if needed (55–65%) */
+    transform: translateY(-50%);
+    width: auto;
+    max-width: none;
+
+    background: rgba(255,255,255,.92);   /* bring the box back */
+    border: 1.5px solid #204070;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    z-index: 5;
+  }
+
+  /* phone sizing for text inside the card */
+  .carousel-overlay-box h2{ font-size: clamp(1.1rem, 2vw + 0.5rem, 2.2rem); line-height: 1.15; }
+  
+  .carousel-overlay-box p {
+  font-size: clamp(0.85rem, 0.8vw + 0.6rem, 1.1rem);
+  line-height: 1.4;
+}
+
+
+  /* don’t pull the course buttons up over the hero on phones */
+  .carousel-course-btn{
+    margin-left: 0;
+    margin-top: 12px;        /* was -48% */
+    gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .carousel-control-prev-icon{
+    display:none;
+  }
+  .carousel-control-next-icon{
+    display:none;
+  }
+
+
+   .hero {
+  background: url('/theme/apas/pix/newsletterbanner.png');
+    background-size: cover;
+    background-position: center;
+    animation: none !important;   /* stop movement/animation */
+    height: 60vh;                 /* adjust height if needed */
+  }
+  
+
+  #backToTop {
+    height: auto;
+    border: 1px solid #fff;
+    padding: 0 10px;
+    position: fixed;
+    right: 1rem;
+    bottom: 3rem;
+    z-index: 1;
+  }
+}
+
+
+
+
+
+
+
+
+    /* Course Cards Overlay */
+  .course-cards-overlay {
+    position: relative;
+    margin-top: -130px; /* Default for 2xl and above */
+    z-index: 10;
+    padding: 0 20px;
+}
+
+/* 2XL screens and above (1536px+) */
+@media (min-width: 1536px) {
+    .course-cards-overlay {
+        margin-top: -130px;
+        padding: 0 20px;
+    }
+}
+
+/* XL screens (1280px - 1535px) */
+@media (min-width: 1280px) and (max-width: 1535px) {
+    .course-cards-overlay {
+        margin-top: -100px;
+        padding: 0 18px;
+    }
+}
+
+/* LG screens (1024px - 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .course-cards-overlay {
+        margin-top: -90px;
+        padding: 0 15px;
+    }
+}
+
+/* MD screens (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .course-cards-overlay {
+        margin-top: -60px;
+        padding: 0 12px;
+    }
+}
+
+/* SM screens (below 768px) */
+@media (max-width: 767px) {
+    .course-cards-overlay {
+        margin-top: -40px;
+        padding: 0 10px;
+    }
+}
+
+@media (min-width: 992px) {
+    .container-fluid, .container-sm, .container-md, .container-lg, .container-xl {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+}
+
+
+
+
+
+    .course-cards-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 20px;
+        max-width: 100%;
+     margin: 0 auto;
+    
+    }
+
+    .course-category {
+        flex: 1;
+        min-width: 250px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        padding: 20px;
+    }
+
+    .course-category h3 {
+        color: #003366;
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .course-category-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .course-category-list li {
+        margin-bottom: 10px;
+    }
+
+    .course-category-list a {
+        color: #555;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s;
+    }
+
+    .course-category-list a:hover {
+        color: #003366;
+        transform: translateX(5px);
+    }
+
+    .course-category-list a::before {
+        content: "→";
+        margin-right: 8px;
+        color: #003366;
+        opacity: 0;
+        transition: all 0.2s;
+    }
+
+    .course-category-list a:hover::before {
+        opacity: 1;
+    }
+
+    /* Buttons from Figma */
+    .btn-figma {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    font-size: 16px; /* Base font size */
+}
+
+/* 2XL screens and above (1536px+) - original styling */
+@media (min-width: 1536px) {
+    .btn-figma {
+        padding: 10px 20px;
+        font-size: 16px;
+        margin-right: 10px;
+        margin-bottom: 1px;
+    }
+}
+
+/* XL screens (1280px - 1535px) */
+@media (min-width: 1280px) and (max-width: 1535px) {
+    .btn-figma {
+        padding: 4px 8px;
+        font-size: 12px;
+        margin-right: 7px;
+        margin-bottom: 9px;
+    }
+}
+
+/* LG screens (1024px - 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .btn-figma {
+        padding: 8px 16px;
+        font-size: 14px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+}
+
+/* MD screens (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .btn-figma {
+        padding: 7px 14px;
+        font-size: 13px;
+        margin-right: 7px;
+        margin-bottom: 7px;
+    }
+}
+
+/* SM screens (below 768px) */
+@media (max-width: 767px) {
+    .btn-figma {
+        padding: 6px 12px;
+        font-size: 12px;
+        margin-right: 6px;
+        margin-bottom: 6px;
+        display: block;      /* Stack buttons vertically on small screens */
+        width: 100%;         /* Full width */
+        box-sizing: border-box;
+    }
+}
+
+    .btn-primary-figma {
+        background-color: #003366;
+        color: white;
+        border: 2px solid #003366;
+    }
+
+    .btn-primary-figma:hover {
+        background-color: #002244;
+        color: white;
+    }
+
+    .btn-outline-figma {
+        background-color: transparent;
+        color: #003366;
+        border: 2px solid #003366;
+    }
+
+    .btn-outline-figma:hover {
+        background-color: #003366;
+        color: white;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .course-cards-overlay {
+            margin-top: -50px;
+        }
+        
+        .course-category {
+            min-width: 100%;
+        }
+        
+        .carousel-overlay-box {
+            width: 90%;
+            max-width: 90%;
+            left: 5%;
+        }
+    }
+    /* Hide admin buttons by default */
+.btn-admin {
+    display: none !important;
+}
+
+/* Show admin buttons only if user has site admin menu */
+body.has-admin-menu .btn-admin {
+    display: inline-block !important;
+}
+
+/* Hide user buttons if admin menu exists */
+body.has-admin-menu .btn-user {
+    display: none !important;
+}
+
+/* Show user buttons by default */
+.btn-user {
+    display: inline-block !important;
+}
+.custom-course-grid{
+    margin:20px 40px;
+}
+.carousel-course-btn {
+    display: flex;
+    margin-left:3%;
+    gap: 16px;
+    margin-bottom:20px;
+   
+}
+
+/* 2XL screens and above (1536px+) - original */
+@media (min-width: 1536px) {
+    .carousel-course-btn {
+        margin-left: 3%;
+        gap: 16px;
+        margin-bottom: 0px;
+        flex-wrap: nowrap;
+    }
+}
+
+/* XL screens (1280px - 1535px) */
+@media (min-width: 1280px) and (max-width: 1535px) {
+    .carousel-course-btn {
+        margin-left: 2.5%;
+        gap: 14px;
+        margin-bottom: -1px;
+        flex-wrap: nowrap;
+    }
+}
+
+/* LG screens (1024px - 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .carousel-course-btn {
+        margin-left: 2%;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap; /* Wrap to next line if needed */
+    }
+}
+
+/* MD screens (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .carousel-course-btn {
+        margin-left: 1.5%;
+        gap: 10px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+    }
+}
+
+/* SM screens (below 768px) */
+@media (max-width: 767px) {
+  .announcement-title{
+    text-align:center;
+  }
+  .announcement-subtext{
+    text-align:center;
+  }
+    .carousel-course-btn {
+        margin-left: 1%;
+        gap: 8px;
+        margin-bottom: 12px;
+        flex-direction: column; /* Stack buttons vertically */
+        margin-top: -48%; /* Remove left margin for full width */
+        align-items: stretch;
+    }
+}
+
+
+
+
+.carousel-course-btn button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    background: white;
+    color: black;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.carousel-course-btn button:hover {
+    background: #e0e0e0;
+}
+
+.carousel-course-btn button.active {
+    background: #204070;
+    color: #fff;
+    font-weight: bold;
+}
+/* Fix drawer starting from the top */
+
+
+/* Usually you don't need this at all. If you keep it, don't hard-code 0 */
+#theme_boost-drawers-blocks.drawer-right { top: var(--fixed-navbar-height, 56px); }
+
+.show-drawer-right{
+  margin-right:300px !important;
+}
+
+
+.section-top-performers {
+    background-image: url('/theme/apas/pix/topperformers-bg.png');
+
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+      position: relative;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
+
+}
+
+.performer-container-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    position: relative;
+}
+
+.performers-carousel {
+    display: flex;
+    gap: 9rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 50px  120px;
+    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    width: 90%;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.performers-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1536px) { /* <= 2xl */
+    .performers-carousel {
+        gap: 6rem;
+        padding: 60px 80px;
+        width: 95%;
+    }
+}
+
+@media (max-width: 1280px) { /* <= xl */
+    .performers-carousel {
+        gap: 5rem;
+        padding: 50px 60px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 1024px) { /* <= lg */
+    .performers-carousel {
+        gap: 3rem;
+        padding: 40px 40px;
+    }
+}
+
+@media (max-width: 768px) { /* <= md */
+    .performers-carousel {
+        gap: 2rem;
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 640px) { /* <= sm */
+    .performers-carousel {
+        gap: 1rem;
+        padding: 20px 10px;
+    }
+}
+
+
+.performer-card {
+
+  background: #d3f4ff;  /* light blue */
+  border-radius: 20px;
+  border: none; /* remove main border */
+  flex: 0 0 28%;
+  position: relative;
+  padding: 40px 30px 30px 80px;
+  box-sizing: border-box;
+  box-shadow:
+    inset 0 4px 6px rgba(0, 0, 0, 0.15), /* inner shadow */
+    2px 2px 8px rgba(0, 0, 0, 0.1); /* subtle outer shadow */
+  min-width: 320px;
+}
+/* Make the rail snap and each card center on the rail */
+.performers-carousel{
+  scroll-snap-type: x mandatory;
+}
+.performer-card{
+  scroll-snap-align: center;
+  
+}
+@media (max-width: 640px){
+  .performer-container-wrapper{ overflow: hidden; } /* hide edge bleed */
+  .performers-carousel{
+    gap: 0;                 /* remove gap that causes the peek */
+    padding: 16px 0;        /* small vertical padding only */
+    scroll-padding: 0 16px; /* makes snapping feel centered */
+  }
+  .performer-card{
+    flex: 0 0 100% !important;   /* full viewport width */
+    min-width: 100% !important;
+    margin:16px;              /* optional side breathing room */
+    border-radius: 12px;
+  }
+}
+
+/* Very small phones: keep it strict one-per-view */
+@media (max-width: 480px){
+ 
+}
+/* Large screens (lg and xl) */
+@media (max-width: 1535px) {
+  .performer-card {
+    flex: 0 0 20%;
+    padding: 10px 10px 10px 10px;
+    min-width: 280px;
+  }
+}
+
+/* Medium screens (tablets) */
+@media (max-width: 1023px) {
+  .performer-card {
+    flex: 0 0 60%;
+    padding: 25px 20px 20px 40px;
+    min-width: 250px;
+  }
+}
+
+/* Small screens (mobile landscape) */
+@media (max-width: 639px) {
+  .performer-card {
+    flex: 0 0 80%;
+    padding: 20px 15px 15px 30px;
+    min-width: auto;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Extra small screens (mobile portrait) */
+@media (max-width: 479px) {
+  .performer-card {
+    flex: 0 0 95%;
+    padding: 15px 10px 10px 20px;
+    border-radius: 15px;
+  }
+}
+
+
+
+/* Add inner border using pseudo-element */
+.performer-card::before {
+    content: "";
+    position: absolute;
+    top: 15px;             /* align with top */
+    left: -16px;        /* shift 10px left outside */
+    right: 16px;       /* keep right edge inside */
+    bottom: -16px;      /* shift 10px down outside */
+    border: 1.75px solid #204070;  /* semi-transparent blue border */
+    border-radius: 20px;  /* same radius as card */
+    pointer-events: none;
+    box-sizing: border-box;
+    z-index: 0;       /* behind main card */
+}
+
+.footer-content-popover{
+  display:none;
+}
+
+
+@media (max-width: 480px) {
+  
+
+   .performers-carousel{ padding: 12px 0; }
+  .performer-card{
+    flex-basis: 100% !important;
+    min-width: 100% !important;
+    margin: 0px 30px 30px 30px;              /* optional side breathing room */
+
+  }
+  .performer-pic {
+   
+    left: 10px !important;
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .performer-content {
+    padding-left: 75px !important; /* to avoid overlap with image */
+  }
+
+  .quote-mark.single-quote {
+    font-size: 40px !important;
+    top: -20px !important;
+    right: 10px !important;
+  }
+
+  .view-profile-link {
+    font-size: 0.8rem !important;
+    padding: 5px 12px !important;
+  }
+      
+  .performer-name {
+    font-size: 1.1rem !important;
+  }
+
+  .testimonial-text {
+    font-size: 0.85rem !important;
+  }
+
+  .points {
+    font-size: 0.75rem !important;
+  }
+
+  .carousel-nav {
+    width: 35px !important;
+    height: 35px !important;
+    font-size: 1.5rem !important;
+  }
+}
+
+
+.quote-mark.single-quote {
+    position: absolute;
+    top: -100px;
+    right: 20px;
+    font-size: 100px; /* adjust size as needed */
+    color: #204070; /* subtle color */
+    font-family: 'Arial', sans-serif;
+    font-weight: 700;
+    pointer-events: none; /* so it doesn't block clicks */
+    user-select: none;
+  transform: scaleX(-1) scaleY(-1);
+}
+.carousel-nav {
+  width: 36px;                  /* smaller circle */
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #204070;    /* subtle border */
+  background: #ffffffcc;        /* semi-transparent white */
+  color: #204070;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  z-index: 5;                   /* stay above cards */
+}
+
+.carousel-nav i {
+  font-size: 1rem;              /* smaller arrow icon */
+  pointer-events: none;
+}
+
+.carousel-nav:hover {
+  background: #204070;
+  color: #fff;
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Hide arrows on small screens (use swipe) */
+@media (max-width: 640px) {
+  .carousel-nav {
+    visibility: hidden;
+  }
+}
+
+
+
+.top-performer-heading{
+  /* min   fluid (based on viewport)   max */
+  font-size: clamp(1.2rem, 2.2vw + 0.4rem, 2rem);
+  line-height: 1.15;
+  margin-top: clamp(12px, 2vw, 30px);
+}
+/* Rest of your existing performer card styles remain the same */
+
+/* Stylish quotation marks */
+.quote-mark {
+    font-size: 80px;
+    color: #204070;
+    font-family: serif;
+    position: absolute;
+}
+
+.left-quote {
+    
+   
+}
+
+.right-quote {
+    bottom: 25px; /* lift it up */
+    right: 20px;
+}
+
+/* Profile Image Overlap */
+.performer-pic {
+  position: absolute;
+  top: 100px;    /* position relative to the card */
+  left: -80px;   /* outside the card */
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  background: white;
+}
+
+/* Large screens (lg and xl) */
+@media (max-width: 1535px) {
+  .performer-pic {
+    top: 90px;
+    left: -65px;
+    width: 90px;
+    height: 90px;
+  }
+}
+
+/* Medium screens (tablets) */
+@media (max-width: 1023px) {
+  .performer-pic {
+    top: 75px;
+    left: -50px;
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* Small screens (mobile landscape) */
+@media (max-width: 639px) {
+  .performer-pic {
+    top: 60px;
+    left: -40px;
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* Extra small screens (mobile portrait) */
+@media (max-width: 479px) {
+  .performer-pic {
+   
+    left: -30px;
+   
+  }
+}
+
+
+/* Image inside the profile */
+.performer-pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Textual content inside card */
+.performer-content {
+    padding-left: 60px; /* to account for image overlap */
+}
+
+/* Name styling */
+.performer-name {
+  font-size: 2rem;  /* Default font size for large screens */
+  font-weight: 700;
+  color: #204070;
+  margin-top: 10px;
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (max-width: 1535px) {
+  .performer-name {
+    font-size: 1.2rem;  /* Slightly smaller font size */
+    margin-top: 8px;
+  }
+}
+
+/* Small devices (phones landscape, 1024px and down) */
+@media (max-width: 1023px) {
+  .performer-name {
+    font-size: 1.6rem;  /* Smaller font size */
+    margin-top: 6px;
+  }
+}
+
+/* Extra small devices (phones portrait, 768px and down) */
+@media (max-width: 767px) {
+  .performer-name {
+    font-size: 1.4rem;  /* Even smaller font size */
+    margin-top: 5px;
+  }
+}
+
+/* Very small devices (small phones, 480px and down) */
+@media (max-width: 479px) {
+  .performer-name {
+    font-size: 1.2rem;  /* Smaller font size */
+    margin-top: 4px;
+  }
+}
+
+/* Testimonial text */
+.testimonial-text {
+  font-style: italic;
+  margin: 12px 0;
+  color: #444;
+  font-size: 1.25rem;  /* Default font size for large screens */
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (max-width: 1535px) {
+  .testimonial-text {
+    font-size: 1rem;  /* Slightly smaller font size */
+    margin: 8px 0;  /* Reduced margin */
+  }
+}
+
+/* Small devices (phones landscape, 1024px and down) */
+@media (max-width: 1023px) {
+  .testimonial-text {
+    font-size: 1rem;  /* Smaller font size */
+    margin: 8px 0;  /* Smaller margin */
+  }
+}
+
+/* Extra small devices (phones portrait, 768px and down) */
+@media (max-width: 767px) {
+  .testimonial-text {
+    font-size: 0.95rem;  /* Even smaller font size */
+    margin: 6px 0;  /* Reduced margin */
+  }
+}
+
+/* Very small devices (small phones, 480px and down) */
+@media (max-width: 479px) {
+  .testimonial-text {
+    font-size: 0.85rem;  /* Smallest font size */
+    margin: 4px 0;  /* Smallest margin */
+  }
+}
+
+/* Rating Stars */
+.points {
+  margin-top: 10px;
+  font-size: 18px;  /* Default font size */
+  color: gold;
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (max-width: 1535px) {
+  .points {
+    font-size: 16px;  /* Slightly smaller font size */
+    margin-top: 0px;  /* Adjusted margin */
+  }
+}
+
+/* Small devices (phones landscape, 1024px and down) */
+@media (max-width: 1023px) {
+  .points {
+    font-size: 14px;  /* Smaller font size */
+    margin-top: 6px;  /* Adjusted margin */
+  }
+}
+
+/* Extra small devices (phones portrait, 768px and down) */
+@media (max-width: 767px) {
+  .points {
+    font-size: 12px;  /* Even smaller font size */
+    margin-top: 5px;  /* Reduced margin */
+  }
+}
+
+/* Very small devices (small phones, 480px and down) */
+@media (max-width: 479px) {
+  .points {
+    font-size: 11px;  /* Smallest font size */
+    margin-top: 4px;  /* Smallest margin */
+  }
+}
+
+
+/* View profile link as button */
+.view-profile-link {
+    display: inline-block;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #204070;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1.5px solid #204070;
+    border-radius: 8px;
+    padding: 6px 14px;
+    transition: all 0.3s ease;
+}
+
+.view-profile-link:hover {
+    background: #204070;
+    color: white;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(32,64,112,0.3);
+}
+
+.block_news_items,
+.block_calendar_month {
+    max-height: 400px !important;
+    overflow-y: auto;
+}
+
+.block_news_items .card-body,
+.block_calendar_month .card-body {
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.block_news_items::-webkit-scrollbar,
+.block_calendar_month::-webkit-scrollbar {
+    width: 6px;
+}
+.block_news_items::-webkit-scrollbar-thumb,
+.block_calendar_month::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.newlink{
+display:none;    
+}
+.news-footer{
+  display:none;
+}
+.announcement-card{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1rem;
+
+  /* spacing & size */
+  padding: 20px;                    /* single source of truth */
+  min-height: 120px;                /* consistent height */
+  width: auto;                      /* let grid control width */
+
+  /* visuals */
+  border-left: 5px solid #204070;
+  border-radius: 15px 15px 45px 45px;  /* keep your rounded bottom corners */
+  background: linear-gradient(to right, #ffffff 0%, rgb(204 242 255) 100%);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  transition: transform .18s ease, box-shadow .18s ease;
+  margin: 0 !important;             /* grid creates spacing; kill outer margins */
+}
+
+.announcement-card:hover{
+  cursor: pointer;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.14);
+}
+.announcement-icon{
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  background: url(https://cdn-icons-png.flaticon.com/512/1827/1827392.png) no-repeat center / contain;
+  position: relative;
+  margin: 0 0 0 6px;                 /* small left inset, no bottom margin */
+}
+
+.announcement-icon::after{
+  content: "";
+  position: absolute;
+  top: -5px; right: -5px;
+  width: 12px; height: 12px;
+  background: red; border-radius: 50%;
+  border: 2px solid #fff;
+}
+
+/* Text area grows */
+.announcement-content{ flex: 1; min-width: 0; }
+
+
+/* Typography */
+.announcement-title{
+
+  font-size: clamp(1rem, 1.2vw, 1.25rem);
+  color: #0e2a55;
+  text-decoration: none;
+  line-height: 1.2;
+  margin-left: 6px;
+  display: inline-block;
+} 
+
+
+
+.announcement-meta{
+  font-size: .9rem;
+  color: #667085;
+  margin: 6px 0 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Tighten on small screens */
+@media (max-width: 575.98px){
+  .announcement-card{ padding: 16px; min-height: 110px; }
+  .announcement-icon{ width: 34px; height: 34px; }
+  .announcement-meta{ font-size: .85rem; }
+}
+
+
+.unlist, .unlist li, .inline-list, .inline-list li, .block .list, .block .list li, .section li.movehere, .tabtree li {
+    margin-bottom:20px;
+  
+}
+/* Wrapper for the two blocks */
+#block-region-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: space-around;
+    margin:20px
+}
+
+/* Left block (calendar) */
+.block_calendar_month {
+    flex: 1 1 48%;
+    max-width: 600px;
+}
+
+/* Right block (announcements) */
+.block_news_items {
+    width: 50% !important;
+    margin-left: auto !important; /* Push it to the right */
+   
+    padding: 20px;
+}
+#region-main .maincalendar .calendarwrapper td>div {
+    height: 2em;
+    overflow: hidden;
+}
+.block_news_items, .block_calendar_month {
+    max-height: 500px !important;
+    overflow-y: auto;
+}
+
+
+
+
+
+
+
+
+
+/* Animation safety */
+@media (prefers-reduced-motion: reduce){
+  .animated-element{
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+/* For Laptop and Desktop (larger screens) */
+@media (min-width: 768px) {
+  .newsletter-img {
+    height: 30vh;
+    max-width: 100%;
+  }
+
+}
+
+
+
+
+/* Default button style for subscription */
+.subscription-toggle-btn {
+  padding: 12px 20px;
+  border-radius: 30px;
+  font-size: 16px;
+  background-color: #003366;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.subscription-toggle-btn:hover {
+  background-color: #002244;
+}
+
+
+
+
+
+/* ===== ANIMATION CLASSES ===== */
+    /* Initial hidden state */
+    .animated-element {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+
+    /* Slide in from left */
+    .slide-in-left {
+        transform: translateX(-100px);
+    }
+
+    /* Slide in from right */
+    .slide-in-right {
+        transform: translateX(100px);
+    }
+
+    /* Slide in from bottom */
+    .slide-in-bottom {
+        transform: translateY(100px);
+    }
+
+    /* Final visible state */
+    .animate-visible {
+        opacity: 1;
+        transform: translate(0, 0) !important;
+    }
+
+    /* ===== ANIMATION DELAYS ===== */
+    .delay-1 { transition-delay: 0.01s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+    .delay-5 { transition-delay: 0.5s; }
+    .delay-6 { transition-delay: 0.6s; }
+
+/* Add this to your CSS */
+html {
+    scroll-behavior: smooth;
+}
+
+.animated-element {
+    will-change: transform, opacity; /* Optimize for animation */
+}
+
+
+
+.progress-container {
+  background-color: #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 8px;
+  margin: 8px 0;
+  width:64%
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #4caf50; /* green */
+  transition: width 0.4s ease-in-out;
+}
+
+.progress-label {
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 6px;
+}
+.progress-bar[data-progress^="0"] { background-color: #e74c3c; }     /* red */
+.progress-bar[data-progress^="5"] { background-color: #f1c40f; }     /* yellow */
+.progress-bar[data-progress^="9"] { background-color: #2ecc71; }     /* green */
+
+
+
+.course-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background-color: #ff4d4f; /* bright red */
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 2;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.custom-course-card-image {
+  position: relative;
+}
+
+
+.expiring-timer {
+  font-size: 0.8rem;
+  color: #d9534f;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.countdown-text{
+  position:absolute;
+  top: 10px;
+  left:10px;
+  padding:5px;
+}
+
+
+.announcement-icon-wrapper {
+  flex-shrink: 0;
+}
+
+
+.announcement-text-content h3 {
+  font-size: 2rem;
+  color: #003366;
+
+}
+
+
+
+.btn:not(:disabled):not(.disabled)
+
+ {
+    border-color: #204070;
+}
+
+
+
+.btn-dark {
+  background-color: #003366;
+  border: none;
+}
+
+.btn-dark:hover {
+  background-color: #002244;
+}
+
+.btn-outline-dark {
+  color: #003366;
+  border: 2px solid #003366;
+}
+
+.btn-outline-dark:hover {
+  background-color: #003366;
+  color: white;
+}
+
+
+
+/* Grid layout for the two columns */
+.newsletter-wrapper{
+  display: grid;
+  grid-template-columns: 1fr;            /* mobile: stack */
+  gap: var(--card-gap);
+  margin: var(--content-gutter);
+  align-items: stretch;
+}
+
+/* >= md: 5/7 split */
+@media (min-width: 1200px){
+  .newsletter-wrapper{
+    grid-template-columns: 5fr 7fr;
+  }
+}
+/* Left box styles (kept from your code) */
+
+.announcement-box{
+  display:flex;
+  background-color: rgba(255, 255, 255, 0.80);
+  position: relative;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.1);
+  overflow: hidden;
+  height: 100%;            /* stretch to match right column */
+}
+
+.announcement-icon-img{
+  max-width: clamp(160px, 22vw, 300px);
+  height: auto;
+}
+
+/* Right panel – remove fixed width, let it fill the grid column */
+.newsletter-posts{
+  width: 100%;
+  background-color: rgba(255,255,255,.75);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.1);
+  max-height: 46vh;       /* scroll if long */
+  overflow: auto;
+}
+.newsletter-posts .unlist{
+  display: grid;
+  grid-template-columns: 1fr;                 /* mobile: single column */
+  gap: 14px;                                   /* card gap */
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.newsletter-left {
+  background-image: url('/theme/apas/pix/newsletterbanner.png');
+  background-size: cover;
+  background-position: center;
+  inset: 0;
+  z-index: 0;
+  border-radius: 16px;
+}
+
+
+@media (min-width: 992px){
+  .newsletter-posts .unlist{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+/* Tweak heading sizing */
+.newsletter-box h2,
+.announcement-title{
+  color: #003366;
+  font-size: clamp(1.25rem, 2rem);
+  margin: 0 0 .25rem;
+}
+
+.announcement-subtext{
+  color: #666;
+  font-size: clamp(.9rem, 1.6vw, 1rem);
+}
+
+/* Mobile refinements */
+@media (max-width: 767.98px){
+  .newsletter-wrapper{ margin: 0 var(--content-gutter); }
+  .newsletter-posts{ padding: 15px; max-height: none; }
+  .announcement-icon-img{ max-width: 180px; }
+
+      .drawer-toggles .drawer-right-toggle, .drawer-toggles .drawer-left-toggle {
+         top: 10vh; 
+    }
+    /* Make the CTA card and the course block visible immediately */
+  .carousel-overlay-box.animated-element,
+  .course-cards-overlay.animated-element {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Keep a gentle motion for other bottom-in elements if you still use it */
+  .slide-in-bottom { transform: translateY(16px); }
+}
+
+
+@media(max-width:550px){
+    .announcement-box{
+      display:block;    
+    }
+    .announcement-icon-wrapper {
+display:flex;
+justify-content:center;
+}
+}
+/* Keep your motion-safety rule */
+@media (prefers-reduced-motion: reduce){
+  .animated-element{
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+.announcement-btns{
+  display:flex;
+  gap:20px;
+}
+
+@media(max-width:1790px){
+  .announcement-btns{
+  display:block;
+  gap:20px;
+
+}
+  .announcement-btns a{
+    width:100%;
+    margin-top:10px;
+  }
+}
+
+.popup-content{
+
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 25em;
+      margin: auto;
+      position: relative;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.edit-toggle-wrapper{
+  display:none;
+}
+
+
+/* keep the toggle away from the OS scrollbar */
+.drawer-toggles .drawer-right-toggle {
+  position: fixed;
+  right: 12px;            /* was effectively 0; move it inside */
+  z-index: 1050;
+}
+@media(max-width:1200px){
+  .drawer-toggles .drawer-right-toggle {
+  right :0;
+}
+}
+    </style>
+</head>
+
+
+
+<body {{{ bodyattributes }}}>
+
+    {{> core/local/toast/wrapper}}
+    <div id="page-wrapper" class="d-print-block">
+        {{{ output.standard_top_of_body_html }}}
+        
+        {{> theme_apas/header }}
+
+        <!-- Carousel Section -->
+       <div class="main-container ">
+
+                 <div id="heroCarousel" class="carousel slide" data-ride="carousel" data-interval="3000">
+            <div class="carousel-inner">
+                {{#banners}}
+                <div class="carousel-item {{#is_active}}active{{/is_active}}" style="background-image: url('{{image_url}}');">
+
+                </div>
+                {{/banners}}
+            </div>
+
+            <div class="carousel-overlay-box animated-element slide-in-left delay-1">
+    <h2>Transform Your <br>  <span style="color: #003366; font-weight: 750; font-size: 1.3em;">Learning Journey</span> <br> With <span style="color: #003366; font-weight: 700;">ALOGICDATA</span></h2>
+    <p class="font-weight-bold">Bringing Education to Your Fingertips</p>
+    <div>
+        <!-- Admin buttons -->
+            <a href="{{config.wwwroot}}/course/edit.php" class="btn-figma btn-primary-figma btn-admin">Create Course</a>
+            <a href="{{config.wwwroot}}/course/management.php" class="btn-figma btn-outline-figma btn-admin">Manage Courses</a>
+            <a href="{{config.wwwroot}}/report/modulecompletion/index.php?" class="btn-figma btn-outline-figma btn-admin">Reports</a>
+
+        
+        <!-- User buttons -->
+        <a href="{{config.wwwroot}}/my/courses.php" class="btn-figma btn-primary-figma btn-user">Explore All Courses</a> 
+        <a href="{{config.wwwroot}}/calendar/view.php?view=month" class="btn-figma btn-outline-figma btn-user">My Calendar</a>
+    </div>
+</div>
+
+</div>
+            
+            
+        </div>
+
+        <!-- Course Cards Overlay -->
+   <!-- Course Cards Section -->
+<div class="course-cards-overlay animated-element slide-in-bottom delay-2">
+    <div class="carousel-course-btn">
+        <button class="active" data-type="new">New</button>
+        <button data-type="continue">Continue Learning</button>
+        <button data-type="closing">Expiring Soon</button> 
+    </div>
+    <div class="course-cards-container">
+        <div class="custom-course-grid" id="courseGrid">
+            <!-- Courses will be loaded here dynamically -->
+        </div>
+    </div>
+</div>
+
+                <div class="section-top-performers animated-element slide-in-right delay-3">
+    <div class="top-performer d-flex justify-content-center">
+                            <span  class="top-performer-heading fs-4">
+                                Our Top <span style="color:#204070;">Performers</span> <span style="color: gold;">⭐</span>
+                            </span>
+                    </div>
+
+    <div class="performer-container-wrapper">
+        <button class="carousel-nav prev-slide" aria-label="Previous">
+    <i class="fa-solid fa-chevron-left"></i>
+  </button>
+        
+        <div class="performers-carousel">
+            {{#topperformers}}
+            <div class="performer-card">
+                            <div class="quote-mark single-quote">“</div>
+                            <div class="performer-pic">
+                            {{{picture}}}
+                            </div>
+                            <div class="performer-content">
+                            <h4 class="performer-name">{{fullname}}</h4>
+                            <p class="testimonial-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. <!-- You can replace with actual testimonials --></p>
+                              <div class="points mb-1 text-dark  ">
+                                Total Points: <strong>{{points}}</strong>
+                            </div>
+                            <div class="points">
+                                ★★★★
+                            </div>
+                            <a href="{{profileurl}}" class="view-profile-link">View Profile</a>
+                            </div>
+                     
+                        </div>
+            {{/topperformers}}
+        </div>
+        
+        <button class="carousel-nav next-slide" aria-label="Next">
+    <i class="fa-solid fa-chevron-right"></i>
+  </button>
+    </div>
+    </div>
+    <div class="container my-5">
+  <div class="newsletter-wrapper align-items-start">
+    <!-- Left -->
+    <div class="newsletter-left animated-element slide-in-left delay-1 h-100">
+      <div class="announcement-box  align-items-center p-4 shadow rounded-4">
+        <div class="announcement-icon-wrapper me-4">
+          <img src="{{config.wwwroot}}/theme/apas/pix/Newsletter.png" alt="Newsletter Icon" class="announcement-icon-img">
+        </div>
+        <div class="announcement-text-content">
+          <h3 class="announcement-title mb-1">Important Announcements</h3>
+          <p class="announcement-subtext mb-3">Stay Updated! with the latest newsletters and announcements</p>
+          <div class="announcement-btns">
+            {{#isadmin}}
+            <a href="{{config.wwwroot}}/mod/forum/post.php?forum={{forumid}}" class="btn btn-dark rounded-pill px-4 py-2">
+              <span class="fa fa-plus me-2"></span><span>Add New</span>
+            </a>
+            {{/isadmin}}
+            <a href="{{config.wwwroot}}/mod/forum/view.php?f={{forumid}}" class="btn btn-outline-dark rounded-pill px-4 py-2">
+              All Announcements
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right -->
+    <div class="newsletter-right animated-element slide-in-right delay-1">
+      <div class="newsletter-posts">
+        <h3 class="p-2 text-primary">Announcement Board</h3>
+        {{{newsitems_html}}}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+      <div id="page" data-region="mainpage" data-usertour="scroller" class="drawers {{#courseindexopen}}show-drawer-left{{/courseindexopen}} {{#blockdraweropen}}show-drawer-right{{/blockdraweropen}} drag-container {{jumbotronclass}}">
+            {{#courseindex}}
+  {{< theme_boost/drawer }}
+    {{$id}}theme_boost-drawers-courseindex{{/id}}
+    {{$drawerclasses}}drawer drawer-left {{#courseindexopen}}show{{/courseindexopen}}{{/drawerclasses}}
+    {{$drawercontent}} {{{courseindex}}} {{/drawercontent}}
+    {{$drawerpreferencename}}drawer-open-index{{/drawerpreferencename}}
+    {{$drawerstate}}show-drawer-left{{/drawerstate}}
+    {{$tooltipplacement}}right{{/tooltipplacement}}
+    {{$closebuttontext}}{{#str}}closecourseindex, core{{/str}}{{/closebuttontext}}
+  {{/ theme_boost/drawer}}
+{{/courseindex}}
+
+{{#hasblocks}}
+  {{< theme_boost/drawer }}
+    {{$id}}theme_boost-drawers-blocks{{/id}}
+    {{$drawerclasses}}drawer drawer-right {{#blockdraweropen}}show{{/blockdraweropen}}{{/drawerclasses}}
+    {{$drawercontent}}
+      <section class="d-print-none" aria-label="{{#str}}blocks{{/str}}">
+        {{{ addblockbutton }}}
+        {{{ sidepreblocks }}}
+      </section>
+    {{/drawercontent}}
+    {{$drawerpreferencename}}drawer-open-block{{/drawerpreferencename}}
+    {{$forceopen}}{{#forceblockdraweropen}}1{{/forceblockdraweropen}}{{/forceopen}}
+    {{$drawerstate}}show-drawer-right{{/drawerstate}}
+    {{$tooltipplacement}}left{{/tooltipplacement}}
+    {{$drawercloseonresize}}1{{/drawercloseonresize}}
+    {{$closebuttontext}}{{#str}}closeblockdrawer, core{{/str}}{{/closebuttontext}}
+  {{/ theme_boost/drawer}}
+{{/hasblocks}}
+
+
+
+            <div id="topofscroll" class="main-inner">
+                <div class="drawer-toggles d-flex">
+                    {{#courseindex}}
+                        <div class="drawer-toggler drawer-left-toggle open-nav d-print-none">
+                            <button
+                                class="btn icon-no-margin"
+                                data-toggler="drawers"
+                                data-action="toggle"
+                                data-target="theme_boost-drawers-courseindex"
+                                data-toggle="tooltip"
+                                data-placement="right"
+                                title="{{#str}}opendrawerindex, core{{/str}}"
+                            >
+                                <span class="sr-only">{{#str}}opendrawerindex, core{{/str}}</span>
+                                {{#pix}} t/index_drawer, moodle {{/pix}}
+                            </button>
+                        </div>
+                    {{/courseindex}}
+                    {{#hasblocks}}
+                        <div class="drawer-toggler drawer-right-toggle ml-auto d-print-none">
+                            <button
+                                class="btn icon-no-margin"
+                                data-toggler="drawers"
+                                data-action="toggle"
+                                data-target="theme_boost-drawers-blocks"
+                                data-toggle="tooltip"
+                                data-placement="right"
+                                title="{{#str}}opendrawerblocks, core{{/str}}"
+                            >
+                                <span class="sr-only">{{#str}}opendrawerblocks, core{{/str}}</span>
+                                <span class="dir-rtl-hide">{{#pix}}t/blocks_drawer, core{{/pix}}</span>
+                                <span class="dir-ltr-hide">{{#pix}}t/blocks_drawer_rtl, core{{/pix}}</span>
+                            </button>
+                        </div>
+                    {{/hasblocks}}
+                </div>
+                {{{ output.full_header }}}
+                {{#secondarymoremenu}}
+                    <div class="secondary-navigation d-print-none">
+                        {{> core/moremenu}}
+                    </div>
+                {{/secondarymoremenu}}
+
+                {{#isloggedin}}
+                 
+                    
+
+                    
+                {{/isloggedin}}
+
+                <div id="page-content" class="pb-3 d-print-block">
+                    <div id="region-main-box">
+                        {{#hasregionmainsettingsmenu}}
+                        <div id="region-main-settings-menu" class="d-print-none">
+                            <div>{{{ regionmainsettingsmenu }}}</div>
+                        </div>
+                        {{/hasregionmainsettingsmenu}}
+                        <section id="region-main" aria-label="{{#str}}content{{/str}}">
+                            {{#hasregionmainsettingsmenu}}
+                                <div class="region_main_settings_menu_proxy"></div>
+                            {{/hasregionmainsettingsmenu}}
+                            {{{ output.course_content_header }}}
+                            {{#headercontent}}
+                                {{> core/activity_header }}
+                            {{/headercontent}}
+                            {{#overflow}}
+                                <div class="container tertiary-navigation">
+                                    <div class="navitem">
+                                        {{> core/url_select}}
+                                    </div>
+                                </div>
+                            {{/overflow}}
+                            {{{ output.main_content }}}
+                            {{{ output.activity_navigation }}}
+                            {{{ output.course_content_footer }}}
+                        </section>
+                    </div>
+                </div>
+            </div>
+            {{> theme_apas/footer }}
+        </div>
+        {{{ output.standard_after_main_region_html }}}
+    </div>
+{{#showpopup}}
+<div id="customPopup" class="popup-overlay" style="display: none;">
+  <div class="popup-content">
+    <button class="btn-close" onclick="closePopup()" style="
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+    ">&times;</button>
+    <img src="{{alert_gif}}" alt="Alert" style="max-width: 100%; margin-bottom: 20px;" />
+    <h3>Important Notice</h3>
+    <p>{{popupmessage}}</p>
+    <button onclick="redirectToCreateCourse()" style="
+        background: #003366;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        margin-top: 10px;
+        cursor: pointer;
+    ">Create Course</button>
+  </div>
+</div>
+{{/showpopup}}
+
+     {{! <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script> }}
+    <script>
+  {{#js}}
+  require(['jquery', 'core/moremenu', 'theme_boost/drawer'], function($, MoreMenu, Drawer) {
+    // Hero carousel
+    var $carousel = $('#heroCarousel');
+    if ($carousel.length && $carousel.find('.carousel-item').length > 1) {
+      $carousel.carousel({
+        interval: 3000,
+        ride: 'carousel',
+        pause: false,
+        wrap: true,
+        touch: true
+      });
+    }
+
+    // Init Moremenu
+    MoreMenu.init();
+
+    // Init Drawers
+    Drawer.init();
+  });
+  {{/js}}
+
+
+const MOODLE_WWWROOT = '{{config.wwwroot}}';
+function startCountdownTimers() {
+  const timers = document.querySelectorAll('.expiring-timer');
+
+  timers.forEach(timer => {
+    const enddate = parseInt(timer.dataset.enddate);
+    const countdownEl = timer.querySelector('.countdown-value');
+
+    function updateTimer() {
+      const now = Date.now();
+      const distance = enddate - now;
+
+      if (distance <= 0) {
+        countdownEl.innerText = 'Expired';
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      countdownEl.innerText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    updateTimer();
+    setInterval(updateTimer, 1000); // update every second
+  });
+}
+
+    document.addEventListener('DOMContentLoaded', function() {
+   const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-visible');
+                        // Unobserve after animation to prevent re-triggering
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1, // Trigger when 10% visible
+                rootMargin: '0px 0px -100px 0px' // Trigger a bit early
+            });
+
+            // Observe all animated elements
+            document.querySelectorAll('.animated-element').forEach(el => {
+                observer.observe(el);
+            });
+
+    // Function to render courses
+function renderCourses(courses, type) {
+  const courseGrid = document.getElementById('courseGrid');
+  courseGrid.innerHTML = '';
+
+  const limitedCourses = courses.slice(0, 4);
+  limitedCourses.forEach(course => {
+    const courseCard = document.createElement('div');
+    courseCard.className = 'custom-course-card';
+    courseCard.style.cursor = 'pointer';
+
+    courseCard.innerHTML = `
+      <div class="custom-course-card-image">
+        ${type === 'new' ? '<div class="course-badge">NEW</div>' : ''}
+        <img src="${course.course_image_url}" alt="${course.course_name}">
+      </div>
+      <div class="custom-course-content">
+        <h3 class="custom-course-title">${course.course_name}</h3>
+
+        ${type === 'closing' && course.enddate ? `
+        <div class="expiring-timer" data-enddate="${course.enddate * 1000}">
+          <span class="countdown-text text-light bg-danger"> <span class="countdown-value">Loading...</span></span>
+        </div>
+      ` : ''}
+
+        <div class="d-flex justify-content-between">
+          <div class="progress-container">
+            <div class="progress-bar" style="width: ${course.progress || 0}%;"></div>
+          </div>
+          <div class="progress-label">${course.progress || 0}% complete</div>
+        </div>
+
+      <div class="d-flex justify-content-between align-items-center">
+          <a href="${course.course_url}" class="course-card-link"><span>Explore Course</span></a>
+          ${type === 'closing' && course.enddate ? `
+          <small>Ends On: ${new Date(course.enddate * 1000).toLocaleDateString()}</small>
+        </div>
+      </div>
+      ` : ''}
+      </div>
+    `;
+
+    courseCard.addEventListener('click', () => {
+      window.location.href = course.course_url;
+    });
+
+    courseGrid.appendChild(courseCard);
+  });
+
+  if (type === 'closing') {
+    startCountdownTimers(); // ✅ This is needed only once
+  }
+}
+
+
+
+    // Set active button    
+    function setActiveButton(activeBtn) {
+        document.querySelectorAll('.carousel-course-btn button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        activeBtn.classList.add('active');
+    }
+
+    // Fetch courses dynamically
+    async function fetchCourses(type) {
+        const courseGrid = document.getElementById('courseGrid');
+        courseGrid.innerHTML = '<div class="text-center py-4">Loading courses...</div>';
+        
+        try {
+            const response = await fetch(`${MOODLE_WWWROOT}/theme/apas/layout/getcourses.php?type=${type}`, {
+                credentials: 'include'
+            });    
+            
+            if (!response.ok) throw new Error('Network response was not ok');
+            
+            const data = await response.json();
+            renderCourses(data,type);
+        } catch (error) {
+            console.error('Error fetching courses:', error);
+            courseGrid.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <h4>Error loading courses</h4>
+                    <p>${error.message}</p>
+                </div>
+            `;
+        }
+    }
+
+    // Handle button clicks
+    function handleButtonClick(button) {
+        setActiveButton(button);
+        const type = button.getAttribute('data-type');
+        fetchCourses(type);
+    }
+
+    // Initial load
+    const initialButton = document.querySelector('.carousel-course-btn button[data-type="new"]');
+    if (initialButton) {
+        handleButtonClick(initialButton);
+    }
+
+    // Set event listeners
+    document.querySelectorAll('.carousel-course-btn button').forEach(button => {
+        button.addEventListener('click', () => {
+            handleButtonClick(button);
+        });
+    });
+});
+   document.addEventListener('DOMContentLoaded', function() {
+  // Handle forum subscription toggles
+  document.querySelectorAll('.subscription-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const form = this.closest('form');
+      const cmid = form.dataset.cmid;
+      const action = this.dataset.action;
+      const formData = new FormData(form);
+      
+      // Show loading state
+      this.disabled = true;
+      this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+      
+      // Send AJAX request
+      fetch(M.cfg.wwwroot + '/mod/forum/subscribe.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.text())
+      .then(data => {
+        // Toggle button state
+        const newAction = action === 'subscribe' ? 'unsubscribe' : 'subscribe';
+        this.dataset.action = newAction;
+        this.innerHTML = newAction === 'subscribe' ? 
+          '{{#str}}subscribe, mod_forum{{/str}}' : 
+          '{{#str}}unsubscribe, mod_forum{{/str}}';
+          
+        // Update UI classes if needed
+        if(newAction === 'subscribe') {
+          this.classList.remove('btn-danger');
+          this.classList.add('btn-primary');
+        } else {
+          this.classList.remove('btn-primary');
+          this.classList.add('btn-danger');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Show error message
+        require(['core/notification'], function(Notification) {
+          Notification.addNotification({
+            message: 'Failed to update subscription',
+            type: 'error'
+          });
+        });
+      })
+      .finally(() => {
+        this.disabled = false;
+      });
+    });
+  });
+});
+
+
+    document.querySelectorAll('[data-toggler="drawers"]').forEach(button => {
+    button.addEventListener('click', function () {
+        const targetId = this.getAttribute('data-target');
+        const drawer = document.getElementById(targetId);
+     
+    });
+});
+
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('[data-toggler="drawers"]').forEach(button => {
+        button.addEventListener('click', function () {
+            const targetId = this.getAttribute('data-target');
+            const drawer = document.getElementById(targetId);
+           
+        });
+    });
+});
+
+   document.addEventListener("DOMContentLoaded", function() {
+    // Check if admin menu exists
+    const isAdmin = document.querySelector('[data-key="siteadminnode"]') !== null;
+    
+    if (isAdmin) {
+        document.body.classList.add('has-admin-menu');
+        console.log("Admin user detected");
+    } else {
+        console.log("Regular user detected");
+    }
+});
+    function closePopup() {
+    let popup = document.getElementById("customPopup");
+    popup.style.animation = "fadeOut 0.5s ease-out forwards";
+    setTimeout(() => {
+        popup.style.display = "none";
+    }, 500);
+}
+
+
+    function redirectToCreateCourse() {
+        window.location.href = window.location.origin + "/course/edit.php";
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var showPopup = {{showpopup}};
+        if (showPopup) {
+            let popup = document.getElementById("customPopup");
+            popup.style.display = "flex";
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        function createGaugeChart(canvasId, textId, value) {
+            let canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            let progressValue = parseFloat(canvas.getAttribute('data-progress')) || 0;
+            let ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'Remaining'],
+                    datasets: [{
+                        data: [progressValue, 100 - progressValue],
+                        backgroundColor: ['green', 'lightgray']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+            document.getElementById(textId).innerText = progressValue.toFixed(2) + "%";
+        }
+        createGaugeChart('learningPathChart', 'learningPathText');
+        createGaugeChart('curriculumChart', 'curriculumText');
+    });
+
+   
+ 
+    document.querySelectorAll('.carousel-course-btn button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.carousel-course-btn button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
+document.addEventListener('DOMContentLoaded', function() {
+  const carousel = document.querySelector('.performers-carousel');
+  document.querySelector('.next-slide').addEventListener('click', function() {
+    carousel.scrollBy({ left: carousel.offsetWidth, behavior: 'smooth' });
+  });
+  document.querySelector('.prev-slide').addEventListener('click', function() {
+    carousel.scrollBy({ left: -carousel.offsetWidth, behavior: 'smooth' });
+  });
+});
+
+    </script>
+</body>
+</html>

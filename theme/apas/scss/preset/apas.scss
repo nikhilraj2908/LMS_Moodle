@@ -1,0 +1,8 @@
+@import "colors";
+$primary:   #204070;
+$secondary: #3b3c41;
+$primary_30: rgba($primary, .3);
+$primary_70: rgba($primary, .7);
+$secondary_30: rgba($secondary, .3);
+$secondary_70: rgba($secondary, .7);
+@import "includes";
