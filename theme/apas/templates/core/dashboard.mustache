@@ -2166,7 +2166,10 @@ a.course-link-button {
   display:none;
 }
 
-
+.dashboard-user-dp .userinitials{
+  height:50px;
+  width:50px;
+}
     </style>
 </head>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -2175,7 +2178,9 @@ a.course-link-button {
     <div class="bg-light">
   <div class="dashboard-header justify-content-between">
     <div class="d-flex align-items-center">
+       <div class="dashboard-user-dp">
       {{{userpicture}}}
+      </div>
       <span class="ms-2">Hey! {{username}}</span>
     </div>
   </div>
@@ -2264,19 +2269,19 @@ a.course-link-button {
         <!-- All Badges Preview -->
         <div id="badge-preview" style="display: flex; justify-content: center; gap: 20px; margin-top: 30px;">
           <div class="badge-wrapper" id="badge-preview-bronze">
-            <img src="/theme/apas/pix/bronze-badge.png" alt="Bronze" style="width: 50px; " />
+            <img src="/moodle/theme/apas/pix/bronze-badge.png" alt="Bronze" style="width: 50px; " />
             <div style="font-size: 12px; text-align: center; color: #cc7a00;">Bronze</div>
           </div>
           <div class="badge-wrapper" id="badge-preview-silver">
-            <img src="/theme/apas/pix/silver-badge.png" alt="Silver" style="width: 50px; " />
+            <img src="/moodle/theme/apas/pix/silver-badge.png" alt="Silver" style="width: 50px; " />
             <div style="font-size: 12px; text-align: center; color: #b0b0b0;">Silver</div>
           </div>
           <div class="badge-wrapper" id="badge-preview-gold">
-            <img src="/theme/apas/pix/gold-badge.png" alt="Gold" style="width: 50px; " />
+            <img src="/moodle/theme/apas/pix/gold-badge.png" alt="Gold" style="width: 50px; " />
             <div style="font-size: 12px; text-align: center; color: #FFD700;">Gold</div>
           </div>
           <div class="badge-wrapper" id="badge-preview-platinum">
-            <img src="/theme/apas/pix/platinum-badge.png" alt="Platinum" style="width: 50px; " />
+            <img src="/moodle/theme/apas/pix/platinum-badge.png" alt="Platinum" style="width: 50px; " />
             <div style="font-size: 12px; text-align: center; color: #00BFFF;">Platinum</div>
           </div>
         </div>
@@ -2455,17 +2460,17 @@ a.course-link-button {
         </div>
         <div class="progress-stats" style="display: flex; justify-content: space-around; margin-top: 10px;">
           <div class="stat-item">
-            <div class="stat-value" id="modulesValue">{{totalModules}}</div>
+            <div class="stat-value" id="modulesValue">{{totalCourses}}</div>
             <div class="stat-label">Total</div>
-          </div>
-          <div class="stat-item">
+            </div>
+            <div class="stat-item">
             <div class="stat-value" id="completedValue">{{completedCourses}}</div>
             <div class="stat-label">Completed</div>
-          </div>
-          <div class="stat-item">
+            </div>
+            <div class="stat-item">
             <div class="stat-value" id="remainingValue">{{remainingCourses}}</div>
             <div class="stat-label">Remaining</div>
-          </div>
+            </div>
         </div>
         <div class="progress-bar"
           style="height: 10px; background: #f0f3f8; border-radius: 5px; margin: 25px 0 15px; overflow: hidden;">
@@ -2934,7 +2939,7 @@ const badgeThresholds = {
     platinum: 80
 };
 
-fetch('/theme/apas/streak.php', {
+fetch('/moodle/theme/apas/streak.php', {
     method: 'POST',
     credentials: 'same-origin'
 })

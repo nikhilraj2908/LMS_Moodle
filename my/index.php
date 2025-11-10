@@ -874,51 +874,78 @@ if ($recentCourse) {
     // h) points broken down by course
     // ... your original SQL + loop ...
 
+$sql = "
+    WITH UserID AS (
+        SELECT id AS userid FROM mdl_user WHERE id = ?
+    ),
+    TotalCourses AS (
+        SELECT COUNT(DISTINCT c.id) AS total_assigned_courses
+          FROM mdl_course c
+          JOIN mdl_enrol e ON c.id = e.courseid
+          JOIN mdl_user_enrolments ue ON e.id = ue.enrolid
+         WHERE ue.userid = (SELECT userid FROM UserID)
+           AND c.visible = 1
+    ),
+    CompletedCourses AS (
+        SELECT COUNT(*) AS total_completed_courses
+        FROM (
+            SELECT c.id
+            FROM mdl_course c
+            JOIN mdl_enrol e ON c.id = e.courseid
+            JOIN mdl_user_enrolments ue ON e.id = ue.enrolid
+            WHERE ue.userid = (SELECT userid FROM UserID)
+            AND c.visible = 1
+            AND (
+                -- Method 1: Course has completion record
+                EXISTS (
+                    SELECT 1 FROM mdl_course_completions cc 
+                    WHERE cc.course = c.id 
+                    AND cc.userid = ue.userid 
+                    AND cc.timecompleted IS NOT NULL
+                )
+                OR
+                -- Method 2: All required activities are completed
+                NOT EXISTS (
+                    SELECT 1 FROM mdl_course_modules cm
+                    WHERE cm.course = c.id
+                    AND cm.completion > 0
+                    AND cm.visible = 1
+                    AND NOT EXISTS (
+                        SELECT 1 FROM mdl_course_modules_completion cmc
+                        WHERE cmc.coursemoduleid = cm.id
+                        AND cmc.userid = ue.userid
+                        AND cmc.completionstate = 1
+                    )
+                )
+            )
+        ) AS completed
+    )
+    SELECT 
+        (SELECT total_assigned_courses FROM TotalCourses) AS total_courses_assigned,
+        (SELECT total_completed_courses FROM CompletedCourses) AS total_courses_completed,
+        ((SELECT total_assigned_courses FROM TotalCourses)
+         - (SELECT total_completed_courses FROM CompletedCourses)) AS total_courses_overdue
+";
 
-   $sql = "
-        WITH UserID AS (
-            SELECT id AS userid FROM mdl_user WHERE id = ?
-        ),
-        TotalCourses AS (
-            SELECT COUNT(c.id) AS total_assigned_courses
-              FROM mdl_course c
-              JOIN mdl_enrol e            ON c.id = e.courseid
-              JOIN mdl_user_enrolments ue ON e.id = ue.enrolid
-             WHERE ue.userid = (SELECT userid FROM UserID)
-        ),
-        CompletedCourses AS (
-            SELECT COUNT(DISTINCT cm.course) AS total_completed_courses
-              FROM mdl_course_modules_completion cmc
-              JOIN mdl_course_modules cm ON cmc.coursemoduleid = cm.id
-             WHERE cmc.userid = (SELECT userid FROM UserID)
-               AND cmc.completionstate = 1
-        ),
-        TotalPoints AS (
-            SELECT COALESCE(SUM(g.finalgrade), 0) AS total_points_earned
-              FROM mdl_grade_grades g
-             WHERE g.userid = (SELECT userid FROM UserID)
-        ),
-        MaxPoints AS (
-            SELECT COALESCE(SUM(g.rawgrademax), 0) AS max_total_points
-              FROM mdl_grade_grades g
-             WHERE g.userid = (SELECT userid FROM UserID)
-        )
-        SELECT 
-            (SELECT total_assigned_courses  FROM TotalCourses)         AS total_courses_assigned,
-            (SELECT total_completed_courses FROM CompletedCourses)      AS total_courses_completed,
-            ((SELECT total_assigned_courses FROM TotalCourses)
-             - (SELECT total_completed_courses FROM CompletedCourses))  AS total_courses_overdue,
-            (SELECT total_points_earned FROM TotalPoints)               AS total_points_earned,
-            (SELECT max_total_points    FROM MaxPoints)                 AS total_possible_points
-    ";
-    $userData = $DB->get_record_sql($sql, [$USER->id]);
+$userData = $DB->get_record_sql($sql, [$USER->id]);
 
-    $totalCourses        = $userData->total_courses_assigned     ?? 0;
-    $completedCourses    = $userData->total_courses_completed    ?? 0;
-    $totalOverdue        = $userData->total_courses_overdue      ?? 0;
-    $totalPoints         = $userData->total_points_earned        ?? 0;
-    $totalPossiblePoints = $userData->total_possible_points      ?? 0;
+// For points, keep your existing separate query
+$points_sql = "
+    SELECT 
+        COALESCE(SUM(g.finalgrade), 0) AS total_points_earned,
+        COALESCE(SUM(gi.grademax), 0) AS max_total_points
+    FROM mdl_grade_grades g
+    JOIN mdl_grade_items gi ON gi.id = g.itemid
+    WHERE g.userid = ? 
+    AND g.finalgrade IS NOT NULL
+";
+$pointsData = $DB->get_record_sql($points_sql, [$USER->id]);
 
+$totalCourses        = $userData->total_courses_assigned     ?? 0;
+$completedCourses    = $userData->total_courses_completed    ?? 0;
+$totalOverdue        = $userData->total_courses_overdue      ?? 0;
+$totalPoints         = $pointsData->total_points_earned      ?? 0;
+$totalPossiblePoints = $pointsData->max_total_points         ?? 0;
     $formattedTotalPoints         = rtrim(rtrim(number_format($totalPoints, 2, '.', ''), '0'), '.');
     $formattedTotalPossiblePoints = rtrim(rtrim(number_format($totalPossiblePoints, 2, '.', ''), '0'), '.');
 
@@ -940,58 +967,52 @@ if ($recentCourse) {
     // ------------------------------------------
     // h) Points broken down by course (bar chart)
     // ------------------------------------------
-    $sql = "
-        WITH UserID AS (
-            SELECT id AS userid FROM mdl_user WHERE id = ?
-        ),
-        CompletedCourses AS (
-            SELECT
-                c.id               AS course_id,
-                c.fullname         AS course_name,
-                SUM(g.finalgrade)  AS earned_points,
-                SUM(g.rawgrademax) AS total_points_assigned
-              FROM mdl_course c
-              JOIN mdl_enrol e            ON c.id = e.courseid
-              JOIN mdl_user_enrolments ue ON e.id = ue.enrolid
-              JOIN mdl_grade_items gi     ON c.id = gi.courseid
-              JOIN mdl_grade_grades g     ON gi.id = g.itemid
-                                     AND g.userid = ue.userid
-             WHERE ue.userid = (SELECT userid FROM UserID)
-             GROUP BY c.id, c.fullname
-        )
-        SELECT
-            course_id,
-            course_name,
-            earned_points,
-            total_points_assigned,
-            ROUND(
-              (earned_points / NULLIF(total_points_assigned, 0)) * 100,
-              0
-            ) AS percentage_points_earned
-          FROM CompletedCourses
-         ORDER BY earned_points DESC
-    ";
-    $userCourses = $DB->get_records_sql($sql, [$USER->id]);
+   $sql = "
+    SELECT
+        c.id                       AS course_id,
+        c.fullname                 AS course_name,
+        COALESCE(SUM(g.finalgrade), 0)     AS earned_points,
+        COALESCE(SUM(gi.grademax), 0)      AS total_points_assigned,
+        ROUND(
+          COALESCE(SUM(g.finalgrade), 0) * 100.0 / NULLIF(SUM(gi.grademax), 0),
+          0
+        ) AS percentage_points_earned
+    FROM {course} c
+    JOIN {grade_items} gi ON gi.courseid = c.id
+                         AND gi.itemtype = 'course'       -- only the course total
+    LEFT JOIN {grade_grades} g ON g.itemid = gi.id
+                              AND g.userid = :userid
+    WHERE c.visible = 1
+      AND EXISTS (                               -- just make sure the user is enrolled somehow
+            SELECT 1
+            FROM {enrol} e
+            JOIN {user_enrolments} ue ON ue.enrolid = e.id
+           WHERE e.courseid = c.id
+             AND ue.userid  = :userid2
+      )
+    GROUP BY c.id, c.fullname
+    ORDER BY earned_points DESC
+";
+$userCourses = $DB->get_records_sql($sql, ['userid' => $USER->id, 'userid2' => $USER->id]);
 
-    $courses_data = [];
-    foreach ($userCourses as $course) {
-        $earned_points = (int)($course->earned_points ?? 0);
-        $total_points  = (int)($course->total_points_assigned ?? 1);
-        $percentage    = (int)round(($earned_points / $total_points) * 100, 0);
-        $bar_color     = $percentage >= 70
-            ? "#204070"
-            : ($percentage >= 40 ? "#3C6894" : "#808080");
+$courses_data = [];
+foreach ($userCourses as $course) {
+    $earned_points = (int)$course->earned_points;
+    $total_points  = (int)max($course->total_points_assigned, 1);
+    $percentage    = (int)$course->percentage_points_earned;
+    $bar_color     = $percentage >= 70 ? "#204070" : ($percentage >= 40 ? "#3C6894" : "#808080");
 
-        $courses_data[] = [
-            'course_name'   => $course->course_name,
-            'earned_points' => $earned_points,
-            'total_points'  => $total_points,
-            'percentage'    => $percentage,
-            'bar_color'     => $bar_color,
-            'points_display'=> "$earned_points/$total_points"
-        ];
-    }
-    $templatecontext['courses'] = $courses_data;
+    $courses_data[] = [
+        'course_name'    => $course->course_name,
+        'earned_points'  => $earned_points,
+        'total_points'   => $total_points,
+        'percentage'     => $percentage,
+        'bar_color'      => $bar_color,
+        'points_display' => "$earned_points/$total_points"
+    ];
+}
+$templatecontext['courses'] = $courses_data;
+
 }
 
 // ======================================
