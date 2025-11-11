@@ -874,95 +874,133 @@ if ($recentCourse) {
     // h) points broken down by course
     // ... your original SQL + loop ...
 
+// ===============================
+// Learning Path + Points (DROP-IN)
+// ===============================
+$now = time();
+
+/*
+ * Learning Path:
+ * - total_courses_assigned: distinct, visible courses the user is actively enrolled in
+ * - total_courses_completed: course_completions OR all required, visible activities (in sections >= 1) done
+ *   (matches Moodle tiles logic by excluding section 0)
+ */
 $sql = "
-    WITH UserID AS (
-        SELECT id AS userid FROM mdl_user WHERE id = ?
-    ),
-    TotalCourses AS (
-        SELECT COUNT(DISTINCT c.id) AS total_assigned_courses
-          FROM mdl_course c
-          JOIN mdl_enrol e ON c.id = e.courseid
-          JOIN mdl_user_enrolments ue ON e.id = ue.enrolid
-         WHERE ue.userid = (SELECT userid FROM UserID)
-           AND c.visible = 1
-    ),
-    CompletedCourses AS (
-        SELECT COUNT(*) AS total_completed_courses
-        FROM (
-            SELECT c.id
-            FROM mdl_course c
-            JOIN mdl_enrol e ON c.id = e.courseid
-            JOIN mdl_user_enrolments ue ON e.id = ue.enrolid
-            WHERE ue.userid = (SELECT userid FROM UserID)
-            AND c.visible = 1
-            AND (
-                -- Method 1: Course has completion record
-                EXISTS (
-                    SELECT 1 FROM mdl_course_completions cc 
-                    WHERE cc.course = c.id 
-                    AND cc.userid = ue.userid 
-                    AND cc.timecompleted IS NOT NULL
-                )
-                OR
-                -- Method 2: All required activities are completed
-                NOT EXISTS (
-                    SELECT 1 FROM mdl_course_modules cm
-                    WHERE cm.course = c.id
-                    AND cm.completion > 0
-                    AND cm.visible = 1
-                    AND NOT EXISTS (
-                        SELECT 1 FROM mdl_course_modules_completion cmc
-                        WHERE cmc.coursemoduleid = cm.id
-                        AND cmc.userid = ue.userid
-                        AND cmc.completionstate = 1
-                    )
-                )
+WITH UserID AS (
+  SELECT id AS userid FROM {user} WHERE id = :userid
+),
+MyCourses AS (
+  SELECT DISTINCT c.id
+  FROM {course} c
+  JOIN {enrol} e            ON e.courseid = c.id AND e.status = 0
+  JOIN {user_enrolments} ue ON ue.enrolid  = e.id AND ue.status = 0
+  WHERE ue.userid = (SELECT userid FROM UserID)
+    AND (ue.timeend = 0 OR ue.timeend IS NULL OR ue.timeend > :now)
+    AND c.visible = 1
+),
+CompletedCourses AS (
+  SELECT COUNT(*) AS total_completed_courses
+  FROM (
+    SELECT DISTINCT c.id
+    FROM {course} c
+    JOIN {enrol} e            ON e.courseid = c.id AND e.status = 0
+    JOIN {user_enrolments} ue ON ue.enrolid  = e.id AND ue.status = 0
+    WHERE ue.userid = (SELECT userid FROM UserID)
+      AND (ue.timeend = 0 OR ue.timeend IS NULL OR ue.timeend > :now2)
+      AND c.visible = 1
+      AND (
+        /* Method 1: official course completion record */
+        EXISTS (
+          SELECT 1
+          FROM {course_completions} cc
+          WHERE cc.course = c.id
+            AND cc.userid = ue.userid
+            AND cc.timecompleted IS NOT NULL
+        )
+        OR
+        /* Method 2: all required, visible activities in real sections (>=1) completed */
+        NOT EXISTS (
+          SELECT 1
+          FROM {course_modules} cm
+          JOIN {course_sections} cs ON cs.id = cm.section
+          WHERE cm.course     = c.id
+            AND cm.completion > 0
+            AND cm.visible    = 1
+            AND cs.section   >= 1           -- match tile logic (ignore section 0)
+            AND NOT EXISTS (
+              SELECT 1
+              FROM {course_modules_completion} cmc
+              WHERE cmc.coursemoduleid = cm.id
+                AND cmc.userid         = ue.userid
+                AND cmc.completionstate = 1
             )
-        ) AS completed
-    )
-    SELECT 
-        (SELECT total_assigned_courses FROM TotalCourses) AS total_courses_assigned,
-        (SELECT total_completed_courses FROM CompletedCourses) AS total_courses_completed,
-        ((SELECT total_assigned_courses FROM TotalCourses)
-         - (SELECT total_completed_courses FROM CompletedCourses)) AS total_courses_overdue
+        )
+      )
+  ) x
+),
+Totals AS (
+  SELECT COUNT(*) AS total_assigned_courses FROM MyCourses
+)
+SELECT
+  (SELECT total_assigned_courses FROM Totals)           AS total_courses_assigned,
+  (SELECT total_completed_courses FROM CompletedCourses) AS total_courses_completed,
+  (SELECT total_assigned_courses FROM Totals)
+    - (SELECT total_completed_courses FROM CompletedCourses) AS total_courses_overdue
 ";
 
-$userData = $DB->get_record_sql($sql, [$USER->id]);
+$userData = $DB->get_record_sql($sql, [
+    'userid' => $USER->id,
+    'now'    => $now,
+    'now2'   => $now
+]);
 
-// For points, keep your existing separate query
+/*
+ * Points (FIXED):
+ * Only use the course total grade item (itemtype='course').
+ * Summing all items + the course total doubles numbers.
+ */
 $points_sql = "
-    SELECT 
-        COALESCE(SUM(g.finalgrade), 0) AS total_points_earned,
-        COALESCE(SUM(gi.grademax), 0) AS max_total_points
-    FROM mdl_grade_grades g
-    JOIN mdl_grade_items gi ON gi.id = g.itemid
-    WHERE g.userid = ? 
+  SELECT
+    COALESCE(SUM(g.finalgrade), 0) AS total_points_earned,
+    COALESCE(SUM(gi.grademax),  0) AS max_total_points
+  FROM {grade_items} gi
+  JOIN {grade_grades} g ON g.itemid = gi.id
+  WHERE gi.itemtype = 'course'      -- <<< only the course total
+    AND g.userid  = :userid
     AND g.finalgrade IS NOT NULL
 ";
-$pointsData = $DB->get_record_sql($points_sql, [$USER->id]);
+$pointsData = $DB->get_record_sql($points_sql, ['userid' => $USER->id]);
 
-$totalCourses        = $userData->total_courses_assigned     ?? 0;
-$completedCourses    = $userData->total_courses_completed    ?? 0;
-$totalOverdue        = $userData->total_courses_overdue      ?? 0;
-$totalPoints         = $pointsData->total_points_earned      ?? 0;
-$totalPossiblePoints = $pointsData->max_total_points         ?? 0;
-    $formattedTotalPoints         = rtrim(rtrim(number_format($totalPoints, 2, '.', ''), '0'), '.');
-    $formattedTotalPossiblePoints = rtrim(rtrim(number_format($totalPossiblePoints, 2, '.', ''), '0'), '.');
+// ---------- Compute + push to template ----------
+$totalCourses        = (int)($userData->total_courses_assigned  ?? 0);
+$completedCourses    = (int)($userData->total_courses_completed ?? 0);
+$totalOverdue        = (int)($userData->total_courses_overdue   ?? 0);
 
-    $learningPathPercentage = ($totalCourses > 0)
-        ? round(($completedCourses / $totalCourses) * 100, 2)
-        : 0;
-    $overduePercentage = ($totalCourses > 0)
-        ? round(($totalOverdue / $totalCourses) * 100, 2)
-        : 0;
+$totalPointsRaw         = (float)($pointsData->total_points_earned ?? 0);
+$totalPossiblePointsRaw = (float)($pointsData->max_total_points    ?? 0);
 
-    $templatecontext['completedCourses']       = $completedCourses;
-    $templatecontext['totalCourses']           = $totalCourses;
-    $templatecontext['totalOverdue']           = $totalOverdue;
-    $templatecontext['totalPoints']            = $formattedTotalPoints;
-    $templatecontext['totalPossiblePoints']    = $formattedTotalPossiblePoints;
-    $templatecontext['learningPathPercentage'] = $learningPathPercentage;
-    $templatecontext['overduePercentage']      = $overduePercentage;
+/* nice formatting without trailing .00 */
+$formattedTotalPoints         = rtrim(rtrim(number_format($totalPointsRaw, 2, '.', ''), '0'), '.');
+$formattedTotalPossiblePoints = rtrim(rtrim(number_format($totalPossiblePointsRaw, 2, '.', ''), '0'), '.');
+
+$learningPathPercentage = $totalCourses > 0
+  ? round(($completedCourses / $totalCourses) * 100, 2)
+  : 0;
+
+$overduePercentage = $totalCourses > 0
+  ? round(($totalOverdue / $totalCourses) * 100, 2)
+  : 0;
+
+$templatecontext['totalCourses']           = $totalCourses;
+$templatecontext['completedCourses']       = $completedCourses;
+$templatecontext['remainingCourses']       = max($totalCourses - $completedCourses, 0);
+$templatecontext['totalOverdue']           = $totalOverdue;
+
+$templatecontext['learningPathPercentage'] = $learningPathPercentage;
+$templatecontext['overduePercentage']      = $overduePercentage;
+
+$templatecontext['totalPoints']            = $formattedTotalPoints;
+$templatecontext['totalPossiblePoints']    = $formattedTotalPossiblePoints;
 
     // ------------------------------------------
     // h) Points broken down by course (bar chart)

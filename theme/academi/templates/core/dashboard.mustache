@@ -2258,8 +2258,9 @@ a.course-link-button {
 
         </div>
 
-        <div style="text-align: center; margin-top: 20px; font-size: 20px; font-weight: 400;">
-          1/1 Visit ✅ <span style="color: #28a745; font-weight: 700;"></span>
+        <!-- AFTER -->
+        <div style="text-align:center; margin-top:20px; font-size:20px; font-weight:400;">
+            <span id="streak-label">0/10 Visits</span> ✅
         </div>
 
         <p id="quote-text" style="color: #7a8ca5; margin-bottom: 5px; text-align:center; margin-top:5px;">
@@ -2929,8 +2930,6 @@ setTimeout(() => requestAnimationFrame(animateProgress), 300);
         });
 
 
-
-
 // Update earned badge preview visibility (opacity)
 const badgeThresholds = {
     bronze: 10,
@@ -2941,63 +2940,55 @@ const badgeThresholds = {
 
 fetch('/moodle/theme/academi/streak.php', {
     method: 'POST',
-    credentials: 'same-origin'
-})
-.then(response => response.json())
-.then(data => {
-    const streakCount = data.streakCount || 0;
+    credentials: 'same-origin' 
+})     
+    .then(r => r.json())
+    .then(data => {
+      const streakCount = data.streakCount || 0;
+      const target      = data.target || 10;
+      const progressPct = ('progressPct' in data) ? data.progressPct : Math.min((streakCount / target) * 100, 100);
 
-    // Update circle count
-    document.getElementById('streak-count').textContent = streakCount;
+      // 1) big number
+      const countEl = document.getElementById('streak-count');
+      if (countEl) countEl.textContent = streakCount;
 
-    // Update progress bar
-    const progressBar = document.getElementById('streak-progress-bar');
-    const progressPercent = Math.min((streakCount / 10) * 100, 100);
-    if (progressBar) {
-        progressBar.style.width = `${progressPercent}%`;
-    }
+      // 2)  X/Y Visits label
+      const labelEl = document.getElementById('streak-label');
+      if (labelEl) labelEl.textContent = data.label || `${streakCount}/${target} Visits`;
 
-    // 🌟 Moved here: control opacity + animation of badges
-    const badgeThresholds = {
-        bronze: 10,
-        silver: 30,
-        gold: 50,
-        platinum: 80
-    };
+      // 3) progress bar
+      const bar = document.getElementById('streak-progress-bar');
+      if (bar) bar.style.width = progressPct + '%';
 
-    Object.entries(badgeThresholds).forEach(([badge, threshold]) => {
+      // 4) badge previews (opacity)
+      Object.entries(badgeThresholds).forEach(([badge, threshold]) => {
         const previewEl = document.querySelector(`#badge-preview-${badge} img`);
-        if (previewEl) {
-            if (streakCount >= threshold) {
-                previewEl.style.opacity = '1';
-                previewEl.classList.add('earned-badge');
-            } else {
-                previewEl.style.opacity = '0.2';
-                previewEl.classList.remove('earned-badge');
-            }
+        if (!previewEl) return;
+        if (streakCount >= threshold) {
+          previewEl.style.opacity = '1';
+          previewEl.classList.add('earned-badge');
+        } else {
+          previewEl.style.opacity = '0.2';
+          previewEl.classList.remove('earned-badge');
         }
-    });
+      });
 
-    // Show main badge (if any)
-    const badges = ['bronze', 'silver', 'gold', 'platinum'];
-    badges.forEach(b => {
+      // 5) show the main earned badge
+      ['bronze','silver','gold','platinum'].forEach(b => {
         const el = document.getElementById(`${b}-badge`);
         if (el) el.style.display = 'none';
-    });
-
-    if (streakCount >= 80) {
+      });
+      if (streakCount >= 100) {
         document.getElementById('platinum-badge')?.classList.add('badge-show');
-    } else if (streakCount >= 50) {
+      } else if (streakCount >= 50) {
         document.getElementById('gold-badge')?.classList.add('badge-show');
-    } else if (streakCount >= 30) {
+      } else if (streakCount >= 25) {
         document.getElementById('silver-badge')?.classList.add('badge-show');
-    } else if (streakCount >= 10) {
+      } else if (streakCount >= 10) {
         document.getElementById('bronze-badge')?.classList.add('badge-show');
-    }
-})
-.catch(console.error);
-
-
+      }
+    })
+    .catch(console.error);
 
 
 
@@ -3052,23 +3043,21 @@ fetch('/moodle/theme/academi/streak.php', {
         });
 
 
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const streakGoals = [
-                "Complete 10 days streak to earn a bronze badge!",
-                "Continue for 25 days to earn a silver badge!",
-                "Continue for 40 days to earn a gold badge!",
-                "Continue for 100 days to earn a Platinum badge!"
-            ];
-
-            let streakIndex = 0;
-            const streakGoalElement = document.getElementById('streak-goal-text');
-
-            setInterval(() => {
-                streakIndex = (streakIndex + 1) % streakGoals.length;
-                streakGoalElement.textContent = streakGoals[streakIndex];
-            }, 10000); // Change every 5 seconds
-        });
+document.addEventListener('DOMContentLoaded', () => {
+  const streakGoals = [
+    "Complete 10 days streak to earn a bronze badge!",
+    "Continue for 25 days to earn a silver badge!",
+    "Stay consistent for 50 days to earn a gold badge!",
+    "Push to 100 days to achieve the platinum badge!"
+  ];
+  let i = 0;
+  const el = document.getElementById('streak-goal-text');
+  if (!el) return;
+  setInterval(() => {
+    i = (i + 1) % streakGoals.length;
+    el.textContent = streakGoals[i];
+  }, 10000);
+});
 
  document.addEventListener('DOMContentLoaded', function() {
     
