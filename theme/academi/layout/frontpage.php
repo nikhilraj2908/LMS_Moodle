@@ -28,20 +28,23 @@ global $DB, $USER, $OUTPUT;
 
 // ── 1. Fetch the top 5 users by points ─────────────────────────────────────
 $top5 = $DB->get_records_sql("
-    SELECT 
-        g.userid,
-        u.firstname,
-        u.lastname,
-        u.picture,
-        u.imagealt,
-        u.email,
-        COALESCE(SUM(g.finalgrade), 0) AS total_points
-    FROM {grade_grades} g
-    JOIN {user} u ON u.id = g.userid
-    WHERE u.deleted = 0
-    GROUP BY g.userid, u.firstname, u.lastname, u.picture, u.imagealt, u.email
-    ORDER BY total_points DESC
-    LIMIT 5
+   SELECT 
+    g.userid,
+    u.firstname,
+    u.lastname,
+    u.picture,
+    u.imagealt,
+    u.email,
+    COALESCE(SUM(g.finalgrade), 0) AS total_points
+FROM {grade_grades} g
+JOIN {user} u ON u.id = g.userid
+JOIN {grade_items} gi ON gi.id = g.itemid
+WHERE u.deleted = 0
+  AND gi.itemtype = 'course'  -- Only count course total grades
+GROUP BY g.userid, u.firstname, u.lastname, u.picture, u.imagealt, u.email
+ORDER BY total_points DESC
+LIMIT 5
+
 ");
 
 // ── 2. Massage them into Mustache context ─────────────────────────────────

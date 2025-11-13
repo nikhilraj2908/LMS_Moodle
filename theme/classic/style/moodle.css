@@ -34609,8 +34609,8 @@ div#dock {
   height: 64px;
 }
 .userinitials.size-100 {
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
   font-size: 1.875rem;
 }
 

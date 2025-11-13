@@ -1007,38 +1007,57 @@ $templatecontext['totalPossiblePoints']    = $formattedTotalPossiblePoints;
     // ------------------------------------------
    $sql = "
     SELECT
-        c.id                       AS course_id,
-        c.fullname                 AS course_name,
-        COALESCE(SUM(g.finalgrade), 0)     AS earned_points,
-        COALESCE(SUM(gi.grademax), 0)      AS total_points_assigned,
-        ROUND(
-          COALESCE(SUM(g.finalgrade), 0) * 100.0 / NULLIF(SUM(gi.grademax), 0),
-          0
-        ) AS percentage_points_earned
+        c.id        AS course_id,
+        c.fullname  AS course_name,
+
+        -- points actually earned for this course (course total grade item only)
+        COALESCE(SUM(g.finalgrade), 0) AS earned_points,
+
+        -- maximum points possible for this course (course total grademax only)
+        COALESCE(SUM(gi.grademax), 0)  AS total_points_assigned,
+
+        -- percentage for the bar (0–100), safe against divide-by-zero
+        CASE
+            WHEN SUM(gi.grademax) > 0
+                THEN ROUND(SUM(g.finalgrade) * 100.0 / SUM(gi.grademax))
+            ELSE 0
+        END AS percentage_points_earned
+
     FROM {course} c
-    JOIN {grade_items} gi ON gi.courseid = c.id
-                         AND gi.itemtype = 'course'       -- only the course total
-    LEFT JOIN {grade_grades} g ON g.itemid = gi.id
-                              AND g.userid = :userid
+    JOIN {grade_items} gi
+         ON gi.courseid = c.id
+        AND gi.itemtype = 'course'           -- ✅ only the course total grade item
+
+    LEFT JOIN {grade_grades} g
+           ON g.itemid    = gi.id
+          AND g.userid    = :userid
+          AND g.finalgrade IS NOT NULL       -- ignore null grades
+
     WHERE c.visible = 1
-      AND EXISTS (                               -- just make sure the user is enrolled somehow
+      AND EXISTS (                            -- make sure user is enrolled
             SELECT 1
             FROM {enrol} e
             JOIN {user_enrolments} ue ON ue.enrolid = e.id
            WHERE e.courseid = c.id
              AND ue.userid  = :userid2
       )
+
     GROUP BY c.id, c.fullname
     ORDER BY earned_points DESC
 ";
-$userCourses = $DB->get_records_sql($sql, ['userid' => $USER->id, 'userid2' => $USER->id]);
+
+$userCourses = $DB->get_records_sql($sql, [
+    'userid'  => $USER->id,
+    'userid2' => $USER->id
+]);
 
 $courses_data = [];
 foreach ($userCourses as $course) {
     $earned_points = (int)$course->earned_points;
-    $total_points  = (int)max($course->total_points_assigned, 1);
+    $total_points  = (int)max($course->total_points_assigned, 1); // avoid /0
     $percentage    = (int)$course->percentage_points_earned;
-    $bar_color     = $percentage >= 70 ? "#204070" : ($percentage >= 40 ? "#3C6894" : "#808080");
+    $bar_color     = $percentage >= 70 ? "#204070"
+                  : ($percentage >= 40 ? "#3C6894" : "#808080");
 
     $courses_data[] = [
         'course_name'    => $course->course_name,
@@ -1049,7 +1068,9 @@ foreach ($userCourses as $course) {
         'points_display' => "$earned_points/$total_points"
     ];
 }
+
 $templatecontext['courses'] = $courses_data;
+
 
 }
 
@@ -1151,6 +1172,7 @@ if ($userCategoryId > 0) {
 }
 
 /* user summaries (one row per user; restricted by selected category if any) */
+/* user summaries (one row per user; restricted by selected category if any) */
 $usersql = "
     SELECT 
         u.id,
@@ -1160,31 +1182,79 @@ $usersql = "
         COUNT(DISTINCT CASE WHEN cp.progress_percent = 100 THEN c.id END) AS completed_courses,
         COUNT(DISTINCT CASE WHEN cp.progress_percent > 0 AND cp.progress_percent < 100 THEN c.id END) AS inprogress_courses,
         COUNT(DISTINCT CASE WHEN cp.progress_percent IS NULL OR cp.progress_percent = 0 THEN c.id END) AS notstarted_courses,
-        ROUND(SUM(COALESCE(g.finalgrade, 0)), 0) AS total_points_earned,
-        ROUND(SUM(COALESCE(gi.grademax, 0)), 0) AS max_total_points
+
+        -- total points (only where the user actually has a grade)
+        ROUND(
+            SUM(
+                CASE
+                    WHEN g.finalgrade IS NOT NULL
+                        THEN COALESCE(g.finalgrade, 0)
+                    ELSE 0
+                END
+            ), 0
+        ) AS total_points_earned,
+
+        -- max possible points for those same courses
+        ROUND(
+            SUM(
+                CASE
+                    WHEN g.finalgrade IS NOT NULL
+                        THEN COALESCE(gi.grademax, 0)
+                    ELSE 0
+                END
+            ), 0
+        ) AS max_total_points
+
     FROM {user} u
     LEFT JOIN {user_enrolments} ue ON u.id = ue.userid
     LEFT JOIN {enrol} e            ON ue.enrolid = e.id
     LEFT JOIN {course} c           ON c.id = e.courseid
+
+    /* per-course progress % per user, using ALL trackable modules in the course */
     LEFT JOIN (
-        SELECT 
-            cmc.userid, 
+        SELECT
+            cmc.userid,
             cm.course,
-            (COUNT(CASE WHEN cmc.completionstate = 1 THEN 1 END) * 100.0 / COUNT(*)) AS progress_percent
-        FROM {course_modules_completion} cmc
-        JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
-        GROUP BY cmc.userid, cm.course
+            ROUND(
+                SUM(
+                    CASE
+                        WHEN cmc.completionstate = 1 THEN 1
+                        ELSE 0
+                    END
+                ) * 100.0
+                /
+                NULLIF((
+                    /* total trackable, visible modules in this course (sections >= 1) */
+                    SELECT COUNT(*)
+                    FROM {course_modules} cm2
+                    JOIN {course_sections} cs2 ON cs2.id = cm2.section
+                    WHERE cm2.course     = cm.course
+                      AND cm2.completion > 0
+                      AND cm2.visible    = 1
+                      AND cs2.section   >= 1
+                ), 0)
+            , 0) AS progress_percent
+        FROM {course_modules} cm
+        JOIN {course_sections} cs ON cs.id = cm.section
+        LEFT JOIN {course_modules_completion} cmc
+               ON cmc.coursemoduleid = cm.id
+        WHERE cm.completion > 0        -- only trackable activities
+          AND cm.visible    = 1        -- only visible
+          AND cs.section    >= 1       -- ignore section 0
+        GROUP BY cm.course, cmc.userid
     ) cp ON cp.userid = u.id AND cp.course = c.id
+
     LEFT JOIN {grade_items} gi ON gi.courseid = c.id AND gi.itemtype = 'course'
     LEFT JOIN {grade_grades} g ON g.itemid   = gi.id AND g.userid = u.id
+
     WHERE u.deleted = 0 AND u.suspended = 0
     $categoryWhere
     GROUP BY u.id, u.firstname, u.lastname, u.email
     ORDER BY u.firstname ASC, u.lastname ASC
     LIMIT 500
 ";
-$userSummaries = $DB->get_records_sql($usersql, $userparams);
 
+$userSummaries = $DB->get_records_sql($usersql, $userparams);
 $templatecontext['userSummaries'] = array_values($userSummaries);
 
 /* keep user filter on the User export button */
@@ -1192,6 +1262,7 @@ $templatecontext['summaryExportUrl'] = (new moodle_url('/my/export.php', [
     'type'   => 'summary',
     'usercat'=> $userCategoryId ?: null,
 ]))->out(false);
+
 
 /**** ===== COURSE-WISE REPORT (ADMIN) ===== ****/
 $download = optional_param('download', '', PARAM_ALPHA);
@@ -1264,8 +1335,10 @@ switch ($sortby) {
 
 /*
  * MAIN SQL
- * - Per-user progress = (# completed trackable, visible modules in non-0 sections) / (total trackable, visible modules) * 100
+ * - Per-user progress = (# completed trackable, visible modules in non-0 sections)
+/  (total trackable, visible modules) * 100
  * - Aggregate enrolled/completed/inprogress/notstarted and avgprogress per course
+ * - "Completed" is based on course_completions.timecompleted (true Moodle course completion)
  */
 $sql = "
     SELECT
@@ -1273,23 +1346,39 @@ $sql = "
         c.fullname,
         cat.name AS categoryname,
 
+        -- total enrolled (active) users
         COUNT(DISTINCT ue.userid) AS enrolled,
 
-        COUNT(DISTINCT CASE WHEN COALESCE(up.progress_pct, 0) >= 99.9 THEN ue.userid END) AS completed,
+        -- users who have an official course completion
+        COUNT(DISTINCT CASE
+            WHEN cc.timecompleted IS NOT NULL AND cc.timecompleted > 0
+            THEN ue.userid
+        END) AS completed,
 
-        COUNT(DISTINCT CASE WHEN COALESCE(up.progress_pct, 0) > 0
-                             AND COALESCE(up.progress_pct, 0) < 99.9 THEN ue.userid END) AS inprogress,
+        -- enrolled, NOT completed, but with some progress > 0
+        COUNT(DISTINCT CASE
+            WHEN (cc.timecompleted IS NULL OR cc.timecompleted = 0)
+             AND COALESCE(up.progress_pct, 0) > 0
+            THEN ue.userid
+        END) AS inprogress,
 
-        COUNT(DISTINCT CASE WHEN COALESCE(up.progress_pct, 0) <= 0.0 THEN ue.userid END) AS notstarted,
+        -- enrolled, NOT completed, and 0% progress
+        COUNT(DISTINCT CASE
+            WHEN (cc.timecompleted IS NULL OR cc.timecompleted = 0)
+             AND COALESCE(up.progress_pct, 0) <= 0
+            THEN ue.userid
+        END) AS notstarted,
 
+        -- average progress % across enrolled users
         ROUND(AVG(COALESCE(up.progress_pct, 0))) AS avgprogress,
 
+        -- count of trackable modules in the course (visible, completion enabled, real sections)
         (
             SELECT COUNT(1)
               FROM {course_modules} cm
               JOIN {course_sections} cs ON cs.id = cm.section
-             WHERE cm.course = c.id
-               AND cm.visible = 1
+             WHERE cm.course   = c.id
+               AND cm.visible  = 1
                AND cm.completion > 0
                AND cs.section >= 1
         ) AS totalmodules
@@ -1313,19 +1402,26 @@ $sql = "
             , 0) AS progress_pct
         FROM {course_modules} cm
         JOIN {course_sections} cs ON cs.id = cm.section
-        LEFT JOIN {course_modules_completion} cmc ON cmc.coursemoduleid = cm.id
+        LEFT JOIN {course_modules_completion} cmc
+               ON cmc.coursemoduleid = cm.id
         WHERE cm.completion > 0
-          AND cm.visible = 1
-          AND cs.section >= 1
+          AND cm.visible   = 1
+          AND cs.section  >= 1
         GROUP BY cm.course, cmc.userid
     ) up
       ON up.courseid = c.id
      AND up.userid   = ue.userid
 
+    /* Official course completion records */
+    LEFT JOIN {course_completions} cc
+           ON cc.course = c.id
+          AND cc.userid = ue.userid
+
     $whereclause
     GROUP BY c.id, c.fullname, cat.name
     ORDER BY $orderby
 ";
+
 
 $courserows = $DB->get_records_sql($sql, $params);
 
