@@ -19,75 +19,87 @@ $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
 
 // Get user course details
 $sql = "
-    WITH course_progress AS (
-        SELECT 
-            cmc.userid, 
-            cm.course,
-            
-            (COUNT(CASE WHEN cmc.completionstate = 1 THEN 1 END) * 100.0 / COUNT(*)) AS progress_percent
-        FROM {course_modules_completion} cmc
-        JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
-        WHERE cmc.completionstate IN (0,1)
-        GROUP BY cmc.userid, cm.course
-    ),
-    completion_count AS (
-        SELECT 
-            cmc.userid, 
-            cm.course,
-            COUNT(CASE WHEN cmc.completionstate = 1 THEN 1 END) AS completed_modules,
-            COUNT(*) AS total_modules
-        FROM {course_modules_completion} cmc
-        JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
-        GROUP BY cmc.userid, cm.course
-    ),
-    course_summary AS (
-    SELECT 
-        u.id AS userid,
+    SELECT
         c.id AS courseid,
         c.fullname AS coursename,
-        ccg.name AS categoryname,
-        ROUND(COALESCE(cp.progress_percent, 0), 0) AS progress_percent,
-        CASE 
-            WHEN cc.completed_modules = cc.total_modules THEN 'Completed'
-            WHEN cc.completed_modules > 0 THEN 'In Progress'
+        cat.name   AS categoryname,
+
+        /* ---- Progress % (same logic as course_report.php) ---- */
+        ROUND((
+            SELECT
+                SUM(CASE WHEN cmc.completionstate = 1 THEN 1 ELSE 0 END) * 100.0
+                / NULLIF(COUNT(*), 0)
+            FROM {course_modules} cm
+            JOIN {course_sections} cs ON cs.id = cm.section
+       LEFT JOIN {course_modules_completion} cmc
+              ON cmc.coursemoduleid = cm.id
+             AND cmc.userid         = u.id
+            WHERE cm.course     = c.id
+              AND cm.visible    = 1
+              AND cm.completion > 0
+              AND cs.section   >= 1
+        ), 0) AS progress_percent,
+
+        /* ---- Completion label (exactly like course_report.php) ---- */
+        CASE
+            -- Completed if Moodle course_completions has a record
+            WHEN cc.timecompleted IS NOT NULL THEN 'Completed'
+
+            -- Or if user has finished 100% of required modules
+            WHEN (
+                SELECT ROUND(
+                    SUM(CASE WHEN cmc2.completionstate = 1 THEN 1 ELSE 0 END) * 100.0
+                    / NULLIF(COUNT(*), 0), 0
+                )
+                  FROM {course_modules} cm2
+                  JOIN {course_sections} cs2 ON cs2.id = cm2.section
+             LEFT JOIN {course_modules_completion} cmc2
+                    ON cmc2.coursemoduleid = cm2.id
+                   AND cmc2.userid         = u.id
+                 WHERE cm2.course     = c.id
+                   AND cm2.visible    = 1
+                   AND cm2.completion > 0
+                   AND cs2.section   >= 1
+            ) >= 100 THEN 'Completed'
+
+            -- If some modules done but < 100% → In Progress
+            WHEN (
+                SELECT
+                    SUM(CASE WHEN cmc3.completionstate = 1 THEN 1 ELSE 0 END)
+                  FROM {course_modules} cm3
+                  JOIN {course_sections} cs3 ON cs3.id = cm3.section
+             LEFT JOIN {course_modules_completion} cmc3
+                    ON cmc3.coursemoduleid = cm3.id
+                   AND cmc3.userid         = u.id
+                 WHERE cm3.course     = c.id
+                   AND cm3.visible    = 1
+                   AND cm3.completion > 0
+                   AND cs3.section   >= 1
+            ) > 0 THEN 'In Progress'
+
+            -- Otherwise → Not Started
             ELSE 'Not Started'
         END AS completion_status,
-        ROUND(COALESCE(g.finalgrade, 0), 0) AS points_earned,
-        ROUND(COALESCE(gi.grademax, 0), 0) AS max_points
-    FROM {user} u
-    JOIN {user_enrolments} ue ON u.id = ue.userid
-    JOIN {enrol} e ON ue.enrolid = e.id
-    JOIN {course} c ON c.id = e.courseid
-    JOIN {course_categories} ccg ON c.category = ccg.id  -- moved here ✅
-    LEFT JOIN course_progress cp ON cp.userid = u.id AND cp.course = c.id
-    LEFT JOIN completion_count cc ON cc.userid = u.id AND cc.course = c.id
-    LEFT JOIN {grade_items} gi ON gi.courseid = c.id AND gi.itemtype = 'course'
-    LEFT JOIN {grade_grades} g ON g.itemid = gi.id AND g.userid = u.id
-    WHERE u.id = :userid
-),
-    totals AS (
-        SELECT 
-            COUNT(*) AS total_courses,
-            COUNT(CASE WHEN progress_percent = 100 THEN 1 END) AS completed_courses,
-            SUM(points_earned) AS total_earned_points,
-            SUM(max_points) AS total_possible_points
-        FROM course_summary
-    )
-  SELECT
-    cs.courseid, 
-    cs.coursename,
-    cs.categoryname,  -- ✅ Add this
-    cs.completion_status,
-    cs.progress_percent,
-    cs.points_earned,
-    cs.max_points,
-    t.total_courses,
-    t.completed_courses,
-    t.total_earned_points,
-    t.total_possible_points
-FROM course_summary cs, totals t
-";
 
+        /* ---- Points (same as other reports) ---- */
+        ROUND(COALESCE(g.finalgrade, 0), 0) AS points_earned,
+        ROUND(COALESCE(gi.grademax,   0), 0) AS max_points
+
+    FROM {user} u
+    JOIN {user_enrolments} ue ON ue.userid = u.id
+    JOIN {enrol} e            ON e.id     = ue.enrolid
+    JOIN {course} c           ON c.id     = e.courseid
+    JOIN {course_categories} cat ON cat.id = c.category
+   LEFT JOIN {course_completions} cc
+          ON cc.course = c.id AND cc.userid = u.id
+   LEFT JOIN {grade_items} gi
+          ON gi.courseid = c.id AND gi.itemtype = 'course'
+   LEFT JOIN {grade_grades} g
+          ON g.itemid    = gi.id AND g.userid = u.id
+
+   WHERE u.id = :userid
+   ORDER BY c.fullname ASC
+";
 
 
 $userpicture = new user_picture($user);
