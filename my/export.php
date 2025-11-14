@@ -205,41 +205,48 @@ if ($mode === 'summary') {
     $params   = [];
     $catwhere = cat_filter_sql('cc', $coursecat, $params);
 
-    // This matches your Course Report Summary logic.
+    // EXACTLY matches the Course Report Summary logic on the dashboard
     $sql = "
         SELECT
             c.id,
             c.fullname AS coursename,
             cc.name    AS categoryname,
 
+            -- total enrolled (active) users
             COUNT(DISTINCT ue.userid) AS enrolled,
 
+            -- users with ~100% progress
             COUNT(DISTINCT CASE
                 WHEN COALESCE(up.progress_pct, 0) >= 99.9
                 THEN ue.userid
             END) AS completed,
 
+            -- enrolled, not completed, but >0% progress
             COUNT(DISTINCT CASE
                 WHEN COALESCE(up.progress_pct, 0) > 0
                  AND COALESCE(up.progress_pct, 0) < 99.9
                 THEN ue.userid
             END) AS inprogress,
 
+            -- enrolled, 0% or NULL progress
             COUNT(DISTINCT CASE
-                WHEN COALESCE(up.progress_pct, 0) <= 0.0
+                WHEN up.progress_pct IS NULL
+                  OR COALESCE(up.progress_pct, 0) <= 0.0
                 THEN ue.userid
             END) AS notstarted,
 
+            -- average progress % across enrolled users
             ROUND(AVG(COALESCE(up.progress_pct, 0))) AS avgprogress,
 
+            -- count of trackable modules in the course
             (
                 SELECT COUNT(1)
                   FROM {course_modules} cm
                   JOIN {course_sections} cs ON cs.id = cm.section
-                 WHERE cm.course = c.id
-                   AND cm.visible = 1
+                 WHERE cm.course    = c.id
+                   AND cm.visible   = 1
                    AND cm.completion > 0
-                   AND cs.section >= 1
+                   AND cs.section  >= 1
             ) AS totalmodules
 
         FROM {course} c
@@ -250,23 +257,37 @@ if ($mode === 'summary') {
         LEFT JOIN {user_enrolments} ue
                ON ue.enrolid = e.id AND ue.status = 0
 
-        /* Per-user progress % (only trackable & visible modules in real sections) */
+        /* Per-user progress % (same denominator as course_report.php) */
         LEFT JOIN (
             SELECT
-                cm.course AS courseid,
                 cmc.userid,
+                cm.course AS courseid,
                 ROUND(
                     SUM(
-                        CASE WHEN cmc.completionstate = 1 THEN 1 ELSE 0 END
-                    ) * 100.0 / NULLIF(COUNT(*), 0)
+                        CASE
+                            WHEN cmc.completionstate = 1 THEN 1
+                            ELSE 0
+                        END
+                    ) * 100.0
+                    /
+                    NULLIF((
+                        -- total trackable, visible modules in this course
+                        SELECT COUNT(*)
+                        FROM {course_modules} cm2
+                        JOIN {course_sections} cs2 ON cs2.id = cm2.section
+                        WHERE cm2.course     = cm.course
+                          AND cm2.completion > 0
+                          AND cm2.visible    = 1
+                          AND cs2.section   >= 1
+                    ), 0)
                 , 0) AS progress_pct
             FROM {course_modules} cm
             JOIN {course_sections} cs ON cs.id = cm.section
             LEFT JOIN {course_modules_completion} cmc
                    ON cmc.coursemoduleid = cm.id
             WHERE cm.completion > 0
-              AND cm.visible = 1
-              AND cs.section >= 1
+              AND cm.visible    = 1
+              AND cs.section    >= 1
             GROUP BY cm.course, cmc.userid
         ) up
           ON up.courseid = c.id

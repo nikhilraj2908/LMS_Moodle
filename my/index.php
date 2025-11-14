@@ -1349,23 +1349,23 @@ $sql = "
         -- total enrolled (active) users
         COUNT(DISTINCT ue.userid) AS enrolled,
 
-        -- users who have an official course completion
+        -- users with 100% progress
         COUNT(DISTINCT CASE
-            WHEN cc.timecompleted IS NOT NULL AND cc.timecompleted > 0
+            WHEN COALESCE(up.progress_pct, 0) >= 99.9
             THEN ue.userid
         END) AS completed,
 
-        -- enrolled, NOT completed, but with some progress > 0
+        -- enrolled, not completed, but >0% progress
         COUNT(DISTINCT CASE
-            WHEN (cc.timecompleted IS NULL OR cc.timecompleted = 0)
-             AND COALESCE(up.progress_pct, 0) > 0
+            WHEN COALESCE(up.progress_pct, 0) > 0
+             AND COALESCE(up.progress_pct, 0) < 99.9
             THEN ue.userid
         END) AS inprogress,
 
-        -- enrolled, NOT completed, and 0% progress
+        -- enrolled, 0% progress or NULL
         COUNT(DISTINCT CASE
-            WHEN (cc.timecompleted IS NULL OR cc.timecompleted = 0)
-             AND COALESCE(up.progress_pct, 0) <= 0
+            WHEN up.progress_pct IS NULL
+              OR COALESCE(up.progress_pct, 0) <= 0
             THEN ue.userid
         END) AS notstarted,
 
@@ -1377,10 +1377,10 @@ $sql = "
             SELECT COUNT(1)
               FROM {course_modules} cm
               JOIN {course_sections} cs ON cs.id = cm.section
-             WHERE cm.course   = c.id
-               AND cm.visible  = 1
+             WHERE cm.course    = c.id
+               AND cm.visible   = 1
                AND cm.completion > 0
-               AND cs.section >= 1
+               AND cs.section  >= 1
         ) AS totalmodules
 
     FROM {course} c
@@ -1391,41 +1391,50 @@ $sql = "
     LEFT JOIN {user_enrolments} ue
            ON ue.enrolid = e.id AND ue.status = 0
 
-    /* Per-user progress % (only trackable & visible modules in real sections) */
+    /* Per-user progress % (only trackable & visible modules in real sections)
+       Denominator = ALL trackable modules in the course, just like course_report.php */
     LEFT JOIN (
         SELECT
-            cm.course AS courseid,
             cmc.userid,
+            cm.course AS courseid,
             ROUND(
-                SUM(CASE WHEN cmc.completionstate = 1 THEN 1 ELSE 0 END) * 100.0
-                / NULLIF(COUNT(*), 0)
+                SUM(
+                    CASE
+                        WHEN cmc.completionstate = 1 THEN 1
+                        ELSE 0
+                    END
+                ) * 100.0
+                /
+                NULLIF((
+                    /* total trackable, visible modules in this course (sections >= 1) */
+                    SELECT COUNT(*)
+                    FROM {course_modules} cm2
+                    JOIN {course_sections} cs2 ON cs2.id = cm2.section
+                    WHERE cm2.course     = cm.course
+                      AND cm2.completion > 0
+                      AND cm2.visible    = 1
+                      AND cs2.section   >= 1
+                ), 0)
             , 0) AS progress_pct
         FROM {course_modules} cm
         JOIN {course_sections} cs ON cs.id = cm.section
         LEFT JOIN {course_modules_completion} cmc
                ON cmc.coursemoduleid = cm.id
         WHERE cm.completion > 0
-          AND cm.visible   = 1
-          AND cs.section  >= 1
+          AND cm.visible    = 1
+          AND cs.section    >= 1
         GROUP BY cm.course, cmc.userid
     ) up
       ON up.courseid = c.id
      AND up.userid   = ue.userid
-
-    /* Official course completion records */
-    LEFT JOIN {course_completions} cc
-           ON cc.course = c.id
-          AND cc.userid = ue.userid
 
     $whereclause
     GROUP BY c.id, c.fullname, cat.name
     ORDER BY $orderby
 ";
 
-
 $courserows = $DB->get_records_sql($sql, $params);
 
-/* Build template rows */
 $courseSummaries = [];
 foreach ($courserows as $r) {
     $courseSummaries[] = [
@@ -1442,6 +1451,7 @@ foreach ($courserows as $r) {
     ];
 }
 $templatecontext['courseSummaries'] = array_values($courseSummaries);
+
 
 /* Keep current filters on the Course export link */
 $templatecontext['courseSummaryExportUrl'] = (new moodle_url('/my/index.php', [
