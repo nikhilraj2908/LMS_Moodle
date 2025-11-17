@@ -994,3 +994,16 @@ a[data-action="tool_courserating-addrating"]:focus {
 [data-region=right-hand-drawer].drawer{
     z-index: 1051;
 }
+
+.gradeparent {
+    width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+}
+
+/* Table must NOT force page to expand */
+.gradereport-grader-table {
+    width: max-content !important;
+    table-layout: auto;
+    white-space: nowrap;
+}
