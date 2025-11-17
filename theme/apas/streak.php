@@ -1,45 +1,44 @@
 <?php
-// File: theme/apas/streak.php
-// Tracks a “streak” that increments once per calendar day (or resets if you skip a day)
-// Uses mdl_user_preferences so no schema changes are required.
-
 require_once(__DIR__ . '/../../config.php');
 require_login();
 
 global $USER;
 
-// current timestamp
-$now = time();
+$now     = time();
+$lastTs  = get_user_preferences('streak_last_ts', 0);
+$count   = get_user_preferences('streak_count', 0);
 
-// 1) Load previous values (defaults to 0)
-$lastTs = get_user_preferences('streak_last_ts', 0);
-$count  = get_user_preferences('streak_count',   0);
+$today   = date('Y-m-d', $now);
+$lastDay = $lastTs ? date('Y-m-d', $lastTs) : null;
 
-// 2) Derive “day” buckets
-$today    = date('Y-m-d', $now);
-$lastDay  = $lastTs ? date('Y-m-d', $lastTs) : null;
-
-if ($lastDay === $today) {
-    // still the same calendar day → do nothing
-}
-else {
-    // first hit on a new day
+if ($lastDay !== $today) {
+    // new calendar day
     if ($lastTs && ($now - $lastTs <= 86400)) {
-        // previous visit was yesterday → continue streak
         $count++;
     } else {
-        // gap > 1 day → reset streak
         $count = 1;
     }
-    // save updated prefs
     set_user_preference('streak_last_ts', $now);
     set_user_preference('streak_count',   $count);
 }
 
-// 3) Return JSON (your front-end remains unchanged)
-header('Content-Type: application/json');
+// ----- tier logic: 10 / 25 / 50 / 100 -----
+if     ($count < 10)  { $tier='bronze';   $target=10;  $tierTitle='Bronze'; }
+elseif ($count < 25)  { $tier='silver';   $target=25;  $tierTitle='Silver'; }
+elseif ($count < 50)  { $tier='gold';     $target=50;  $tierTitle='Gold'; }
+else                  { $tier='platinum'; $target=100; $tierTitle='Platinum'; }
+
+$progressPct = min(100, (int)round(($count / $target) * 100));
+$visitWord   = ($count === 1) ? 'Visit' : 'Visits';
+
+header('Content-Type: application/json; charset=utf-8');
 echo json_encode([
-    'streakCount' => $count,
-    'visitDone'   => true
+    'streakCount'  => (int)$count,
+    'tier'         => $tier,
+    'tierTitle'    => $tierTitle,
+    'target'       => (int)$target,
+    'progressPct'  => $progressPct,
+    'label'        => "{$count}/{$target} {$visitWord}",
+    'visitDone'    => true,
 ]);
 exit;

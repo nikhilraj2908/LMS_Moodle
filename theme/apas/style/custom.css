@@ -893,7 +893,7 @@ footer#page-footer, #page-footer, .page-footer{
     margin-bottom: 0px !important;
 
 }
-/* ----- Enrolment options page theming (works for Boost/apas) ----- */
+/* ----- Enrolment options page theming (works for Boost/Academi) ----- */
 .path-enrol {
   /* reduce huge top whitespace and unify title */
   #region-main { padding-top: 1rem; }
@@ -993,4 +993,17 @@ a[data-action="tool_courserating-addrating"]:focus {
 
 [data-region=right-hand-drawer].drawer{
     z-index: 1051;
+}
+
+.gradeparent {
+    width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+}
+
+/* Table must NOT force page to expand */
+.gradereport-grader-table {
+    width: max-content !important;
+    table-layout: auto;
+    white-space: nowrap;
 }

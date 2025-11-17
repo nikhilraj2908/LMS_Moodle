@@ -165,7 +165,7 @@ html, body {
 
 
    .hero {
-  background: url('/theme/apas/pix/newsletterbanner.png');
+  background: url('/theme/academi/pix/newsletterbanner.png');
     background-size: cover;
     background-position: center;
     animation: none !important;   /* stop movement/animation */
@@ -540,7 +540,7 @@ body.has-admin-menu .btn-user {
 
 
 .section-top-performers {
-    background-image: url('/theme/apas/pix/topperformers-bg.png');
+    background-image: url('/theme/academi/pix/topperformers-bg.png');
 
     background-repeat: no-repeat;
     background-position: center center;
@@ -1425,6 +1425,7 @@ html {
   box-shadow: 0 6px 20px rgba(0,0,0,.1);
   max-height: 46vh;       /* scroll if long */
   overflow: auto;
+  min-height:40vh;
 }
 .newsletter-posts .unlist{
   display: grid;
@@ -1435,7 +1436,7 @@ html {
   list-style: none;
 }
 .newsletter-left {
-  background-image: url('/theme/apas/pix/newsletterbanner.png');
+  background-image: url('/theme/academi/pix/newsletterbanner.png');
   background-size: cover;
   background-position: center;
   inset: 0;
@@ -1546,6 +1547,12 @@ justify-content:center;
   right :0;
 }
 }
+
+.userinitials.size-100 {
+  width: 100%;
+  height: 100%;
+  font-size: 1.875rem;
+}
     </style>
 </head>
 
@@ -1557,7 +1564,7 @@ justify-content:center;
     <div id="page-wrapper" class="d-print-block">
         {{{ output.standard_top_of_body_html }}}
         
-        {{> theme_apas/header }}
+        {{> theme_academi/header }}
 
         <!-- Carousel Section -->
        <div class="main-container ">
@@ -1653,7 +1660,7 @@ justify-content:center;
     <div class="newsletter-left animated-element slide-in-left delay-1 h-100">
       <div class="announcement-box  align-items-center p-4 shadow rounded-4">
         <div class="announcement-icon-wrapper me-4">
-          <img src="{{config.wwwroot}}/theme/apas/pix/Newsletter.png" alt="Newsletter Icon" class="announcement-icon-img">
+          <img src="{{config.wwwroot}}/theme/academi/pix/Newsletter.png" alt="Newsletter Icon" class="announcement-icon-img">
         </div>
         <div class="announcement-text-content">
           <h3 class="announcement-title mb-1">Important Announcements</h3>
@@ -1797,7 +1804,7 @@ justify-content:center;
                     </div>
                 </div>
             </div>
-            {{> theme_apas/footer }}
+            {{> theme_academi/footer }}
         </div>
         {{{ output.standard_after_main_region_html }}}
     </div>
@@ -1973,7 +1980,7 @@ function renderCourses(courses, type) {
         courseGrid.innerHTML = '<div class="text-center py-4">Loading courses...</div>';
         
         try {
-            const response = await fetch(`${MOODLE_WWWROOT}/theme/apas/layout/getcourses.php?type=${type}`, {
+            const response = await fetch(`${MOODLE_WWWROOT}/theme/academi/layout/getcourses.php?type=${type}`, {
                 credentials: 'include'
             });    
             
