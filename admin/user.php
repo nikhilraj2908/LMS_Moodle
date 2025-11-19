@@ -188,6 +188,10 @@
     }
     echo html_writer::start_div('', ['data-region' => 'report-user-list-wrapper']);
 
+    
+// 🔹 NEW: responsive wrapper only for the table
+echo html_writer::start_div('table-responsive');  // Bootstrap class
+
     $bulkactions = new user_bulk_action_form(new moodle_url('/admin/user/user_bulk.php'),
         ['excludeactions' => ['displayonpage', 'download'], 'passuserids' => true, 'hidesubmit' => true],
         'post', '',
