@@ -234,13 +234,22 @@ if ($completionstate->completionstate == COMPLETION_COMPLETE) {
 }
 
 // fallback to Moodle gradebook for score if needed
-$gradeitem = grade_get_grades($course->id, 'mod', 'scorm', $scorm->id, $USER->id);
-if ($gradeitem && !empty($gradeitem->items[0]->grades)) {
-    $usergrade = reset($gradeitem->items[0]->grades);
-    if (isset($usergrade->grade)) {
-        $score = round($usergrade->grade, 2);
+if (!empty($trackdata->score_raw)) {
+    // use SCORM score only
+    $score = $trackdata->score_raw;
+} else {
+    // only fallback if user has actual SCORM attempts
+    if ($attempt > 0) {
+        $gradeitem = grade_get_grades($course->id, 'mod', 'scorm', $scorm->id, $USER->id);
+        if ($gradeitem && !empty($gradeitem->items[0]->grades)) {
+            $usergrade = reset($gradeitem->items[0]->grades);
+            if (isset($usergrade->grade)) {
+                $score = round($usergrade->grade, 2);
+            }
+        }
     }
 }
+
 
 $timesql = "SELECT SUM(duration) as totaltime, MAX(counter) as attemptcount
             FROM {scorm_session_time}

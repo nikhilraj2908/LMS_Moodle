@@ -601,14 +601,14 @@ body.has-admin-menu .btn-user {
 @media (max-width: 768px) { /* <= md */
     .performers-carousel {
         gap: 2rem;
-        padding: 30px 20px;
+       /* padding: 30px 20px;*/
     }
 }
 
 @media (max-width: 640px) { /* <= sm */
     .performers-carousel {
         gap: 1rem;
-        padding: 20px 10px;
+        /* padding: 20px 10px; */
     }
 }
 
@@ -637,10 +637,10 @@ body.has-admin-menu .btn-user {
   
 }
 @media (max-width: 640px){
-  .performer-container-wrapper{ overflow: hidden; } /* hide edge bleed */
+  .performer-container-wrapper{ overflow: hidden; gap:0; } /* hide edge bleed */
   .performers-carousel{
     gap: 0;                 /* remove gap that causes the peek */
-    padding: 16px 0;        /* small vertical padding only */
+   /* padding: 16px 0;         small vertical padding only */
     scroll-padding: 0 16px; /* makes snapping feel centered */
   }
   .performer-card{
@@ -718,7 +718,7 @@ body.has-admin-menu .btn-user {
 @media (max-width: 480px) {
   
 
-   .performers-carousel{ padding: 12px 0; }
+/*   .performers-carousel{ padding: 12px 0; }*/
   .performer-card{
     flex-basis: 100% !important;
     min-width: 100% !important;
@@ -733,7 +733,7 @@ body.has-admin-menu .btn-user {
   }
 
   .performer-content {
-    padding-left: 75px !important; /* to avoid overlap with image */
+  /*  padding-left: 75px !important;  to avoid overlap with image */
   }
 
   .quote-mark.single-quote {
@@ -889,9 +889,9 @@ body.has-admin-menu .btn-user {
 @media (max-width: 479px) {
   .performer-pic {
    
-    left: -30px;
+    left: -40px !important;
    
-  }
+  } 
 }
 
 
