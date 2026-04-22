@@ -234,20 +234,19 @@ if ($completionstate->completionstate == COMPLETION_COMPLETE) {
 }
 
 // fallback to Moodle gradebook for score if needed
-if (!empty($trackdata->score_raw)) {
-    // use SCORM score only
-    $score = $trackdata->score_raw;
-} else {
-    // only fallback if user has actual SCORM attempts
-    if ($attempt > 0) {
-        $gradeitem = grade_get_grades($course->id, 'mod', 'scorm', $scorm->id, $USER->id);
-        if ($gradeitem && !empty($gradeitem->items[0]->grades)) {
-            $usergrade = reset($gradeitem->items[0]->grades);
-            if (isset($usergrade->grade)) {
-                $score = round($usergrade->grade, 2);
-            }
-        }
+// Always use Moodle gradebook grade first for displayed score.
+// This respects SCORM grading settings like Highest grade / Average / First / Last.
+$score = '0';
+
+$gradeitem = grade_get_grades($course->id, 'mod', 'scorm', $scorm->id, $USER->id);
+if ($gradeitem && !empty($gradeitem->items[0]->grades)) {
+    $usergrade = reset($gradeitem->items[0]->grades);
+    if (isset($usergrade->grade) && $usergrade->grade !== null) {
+        $score = round($usergrade->grade, 2);
     }
+} else if (!empty($trackdata->score_raw)) {
+    // Only fallback to raw SCORM tracking if gradebook has nothing.
+    $score = round($trackdata->score_raw, 2);
 }
 
 
@@ -276,7 +275,7 @@ echo '  </div>';
 
 echo '  <div class="col-md-3">';
 echo '    <div class="card p-3 text-center">';
-echo '      <h5>All Attempts</h5>';
+echo '      <h5>All Sessions</h5>';
 echo '      <span class="fw-bold text-primary">' . htmlspecialchars($attemptcount) . '</span>';
 echo '    </div>';
 echo '  </div>';
