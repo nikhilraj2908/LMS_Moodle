@@ -6,7 +6,7 @@ require_once(__DIR__ . '/../config.php');
 require_login();
 
 require_once($CFG->libdir . '/csvlib.class.php');  // csv_export_writer
-require_once($CFG->libdir . '/filelib.php'); 
+require_once($CFG->libdir . '/filelib.php');
 $courseid = required_param('id', PARAM_INT);
 $download = optional_param('download', '', PARAM_ALPHA);
 
@@ -50,11 +50,11 @@ foreach ($cle->get_course_overviewfiles() as $f) {
         $courseimageurl = file_encode_url(
             $CFG->wwwroot . '/pluginfile.php',
             '/' . $f->get_contextid() .
-            '/' . $f->get_component() .
-            '/' . $f->get_filearea() .
-            '/' . $f->get_itemid() .
-            $f->get_filepath() .
-            $f->get_filename(),
+                '/' . $f->get_component() .
+                '/' . $f->get_filearea() .
+                '/' . $f->get_itemid() .
+                $f->get_filepath() .
+                $f->get_filename(),
             false
         );
         break;
@@ -80,76 +80,125 @@ $sql = "
         u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename,
         u.email, u.lastaccess,
 
-        -- progress %
         ROUND((
             SELECT SUM(CASE WHEN cmc.completionstate = 1 THEN 1 ELSE 0 END) * 100.0
                    / NULLIF(COUNT(*), 0)
               FROM {course_modules} cm
-              JOIN {course_sections} cs ON cs.id = cm.section
+              JOIN {course_sections} cs
+                ON cs.id = cm.section
          LEFT JOIN {course_modules_completion} cmc
-                ON cmc.coursemoduleid = cm.id AND cmc.userid = u.id
-             WHERE cm.course    = :cid_a
-               AND cm.visible   = 1
-               AND cm.completion> 0
-               AND cs.section  >= 1
+                ON cmc.coursemoduleid = cm.id
+               AND cmc.userid = u.id
+             WHERE cm.course = :courseid_progress
+               AND cm.visible = 1
+               AND cm.completion > 0
+               AND cs.section >= 1
         ), 0) AS progress_percent,
 
-        -- completion label (prefer Moodle's course_completions; fallback to module progress)
-CASE
-    -- Completed if course_completions has a record
-    WHEN cc.timecompleted IS NOT NULL THEN 'Completed'
+        (
+            SELECT COUNT(1)
+              FROM {scorm} s
+              JOIN {course_modules} cmsc
+                ON cmsc.instance = s.id
+              JOIN {modules} msc
+                ON msc.id = cmsc.module
+               AND msc.name = 'scorm'
+              JOIN {course_sections} cssc
+                ON cssc.id = cmsc.section
+              JOIN {scorm_attempt} sa
+                ON sa.scormid = s.id
+               AND sa.userid = u.id
+             WHERE s.course = :courseid_scormstarted
+               AND cmsc.visible = 1
+               AND cssc.section >= 1
+        ) AS hasscormattempt,
 
-    -- OR if user has finished 100% of required modules
-    WHEN (
-        SELECT ROUND(
-            SUM(CASE WHEN cmc2.completionstate = 1 THEN 1 ELSE 0 END) * 100.0
-            / NULLIF(COUNT(*), 0), 0
-        )
-          FROM {course_modules} cm2
-          JOIN {course_sections} cs2 ON cs2.id = cm2.section
-     LEFT JOIN {course_modules_completion} cmc2
-            ON cmc2.coursemoduleid = cm2.id AND cmc2.userid = u.id
-         WHERE cm2.course    = :cid_b1
-           AND cm2.visible   = 1
-           AND cm2.completion> 0
-           AND cs2.section  >= 1
-    ) >= 100 THEN 'Completed'
+        CASE
+            WHEN cc.timecompleted IS NOT NULL THEN 'Completed'
 
-    -- If some modules done but <100% → In Progress
-    WHEN (
-        SELECT SUM(CASE WHEN cmc2.completionstate = 1 THEN 1 ELSE 0 END)
-          FROM {course_modules} cm2
-          JOIN {course_sections} cs2 ON cs2.id = cm2.section
-     LEFT JOIN {course_modules_completion} cmc2
-            ON cmc2.coursemoduleid = cm2.id AND cmc2.userid = u.id
-         WHERE cm2.course    = :cid_b2
-           AND cm2.visible   = 1
-           AND cm2.completion> 0
-           AND cs2.section  >= 1
-    ) > 0 THEN 'In Progress'
+            WHEN (
+                SELECT ROUND(
+                    SUM(CASE WHEN cmc2.completionstate = 1 THEN 1 ELSE 0 END) * 100.0
+                    / NULLIF(COUNT(*), 0), 0
+                )
+                  FROM {course_modules} cm2
+                  JOIN {course_sections} cs2
+                    ON cs2.id = cm2.section
+             LEFT JOIN {course_modules_completion} cmc2
+                    ON cmc2.coursemoduleid = cm2.id
+                   AND cmc2.userid = u.id
+                 WHERE cm2.course = :courseid_completed
+                   AND cm2.visible = 1
+                   AND cm2.completion > 0
+                   AND cs2.section >= 1
+            ) >= 100 THEN 'Completed'
 
-    -- Otherwise → Not Started
-    ELSE 'Not Started'
-END AS completion_status,
+            WHEN (
+                SELECT SUM(CASE WHEN cmc3.completionstate = 1 THEN 1 ELSE 0 END)
+                  FROM {course_modules} cm3
+                  JOIN {course_sections} cs3
+                    ON cs3.id = cm3.section
+             LEFT JOIN {course_modules_completion} cmc3
+                    ON cmc3.coursemoduleid = cm3.id
+                   AND cmc3.userid = u.id
+                 WHERE cm3.course = :courseid_inprogress
+                   AND cm3.visible = 1
+                   AND cm3.completion > 0
+                   AND cs3.section >= 1
+            ) > 0 THEN 'In Progress'
 
+            WHEN (
+                SELECT COUNT(1)
+                  FROM {scorm} s2
+                  JOIN {course_modules} cmsc2
+                    ON cmsc2.instance = s2.id
+                  JOIN {modules} msc2
+                    ON msc2.id = cmsc2.module
+                   AND msc2.name = 'scorm'
+                  JOIN {course_sections} cssc2
+                    ON cssc2.id = cmsc2.section
+                  JOIN {scorm_attempt} sa2
+                    ON sa2.scormid = s2.id
+                   AND sa2.userid = u.id
+                 WHERE s2.course = :courseid_startedstatus
+                   AND cmsc2.visible = 1
+                   AND cssc2.section >= 1
+            ) > 0 THEN 'In Progress'
+
+            ELSE 'Not Started'
+        END AS completion_status,
 
         ROUND(COALESCE(gg.finalgrade, 0), 0) AS points_earned,
-        ROUND(COALESCE(gi.grademax, 0), 0)   AS max_points
+        ROUND(COALESCE(gi.grademax, 0), 0) AS max_points
 
       FROM {enrol} e
-      JOIN {user_enrolments} ue ON ue.enrolid = e.id AND ue.status = 0
-      JOIN {user} u             ON u.id = ue.userid AND u.deleted = 0 AND u.suspended = 0
- LEFT JOIN {course_completions} cc ON cc.course = e.courseid AND cc.userid = u.id
- LEFT JOIN {grade_items} gi        ON gi.courseid = e.courseid AND gi.itemtype = 'course'
- LEFT JOIN {grade_grades} gg       ON gg.itemid = gi.id AND gg.userid = u.id
-     WHERE e.courseid = :cid_c
+      JOIN {user_enrolments} ue
+        ON ue.enrolid = e.id
+       AND ue.status = 0
+      JOIN {user} u
+        ON u.id = ue.userid
+       AND u.deleted = 0
+       AND u.suspended = 0
+ LEFT JOIN {course_completions} cc
+        ON cc.course = e.courseid
+       AND cc.userid = u.id
+ LEFT JOIN {grade_items} gi
+        ON gi.courseid = e.courseid
+       AND gi.itemtype = 'course'
+ LEFT JOIN {grade_grades} gg
+        ON gg.itemid = gi.id
+       AND gg.userid = u.id
+     WHERE e.courseid = :courseid_main
   ORDER BY u.lastname, u.firstname
 ";
+
 $params = [
-    'cid_a'  => $courseid,
-    'cid_b1' => $courseid,
-    'cid_b2' => $courseid,
-    'cid_c'  => $courseid
+    'courseid_progress'      => $courseid,
+    'courseid_scormstarted'  => $courseid,
+    'courseid_completed'     => $courseid,
+    'courseid_inprogress'    => $courseid,
+    'courseid_startedstatus' => $courseid,
+    'courseid_main'          => $courseid,
 ];
 
 $userrows = array_values($DB->get_records_sql($sql, $params));
@@ -167,7 +216,7 @@ foreach ($userrows as $r) {
         'email'            => $r->email,
         'profileurl'       => (new moodle_url('/user/profile.php', ['id' => $r->id]))->out(false),
         'progress_percent' => $progress,
-        'completion_status'=> $statuslbl,
+        'completion_status' => $statuslbl,
         'points_earned'    => (int)$r->points_earned,
         'max_points'       => (int)$r->max_points,
         'lastaccess_human' => $r->lastaccess ? userdate($r->lastaccess) : get_string('never')
@@ -177,9 +226,9 @@ foreach ($userrows as $r) {
 // Apply search filter (by name/email)
 if ($userq !== '') {
     $needle = core_text::strtolower($userq);
-    $rows = array_values(array_filter($rows, function($x) use ($needle) {
+    $rows = array_values(array_filter($rows, function ($x) use ($needle) {
         return (core_text::strpos(core_text::strtolower($x['fullname']), $needle) !== false) ||
-               (core_text::strpos(core_text::strtolower($x['email']), $needle) !== false);
+            (core_text::strpos(core_text::strtolower($x['email']), $needle) !== false);
     }));
 }
 
@@ -201,7 +250,7 @@ switch ($sortby) {
         break;
     case 'points':
         // sort by earned/max ratio then earned
-        $cmp = function($a, $b) {
+        $cmp = function ($a, $b) {
             $ra = $a['max_points'] ? ($a['points_earned'] / $a['max_points']) : 0;
             $rb = $b['max_points'] ? ($b['points_earned'] / $b['max_points']) : 0;
             if ($ra === $rb) return $a['points_earned'] <=> $b['points_earned'];
@@ -211,7 +260,7 @@ switch ($sortby) {
     default: // name
         $cmp = fn($a, $b) => strcmp($a['fullname'], $b['fullname']);
 }
-usort($rows, function($a, $b) use ($cmp, $dir) {
+usort($rows, function ($a, $b) use ($cmp, $dir) {
     $res = $cmp($a, $b);
     return ($dir === 'DESC') ? -$res : $res;
 });
@@ -221,7 +270,7 @@ $enrolled   = count($rows);
 $completed  = count(array_filter($rows, fn($x) => $x['completion_status'] === 'Completed'));
 $inprogress = count(array_filter($rows, fn($x) => $x['completion_status'] === 'In Progress'));
 $notstarted = count(array_filter($rows, fn($x) => $x['completion_status'] === 'Not Started'));
-$avgprogress= ($enrolled > 0) ? (int)round(array_sum(array_column($rows, 'progress_percent')) / $enrolled) : 0;
+$avgprogress = ($enrolled > 0) ? (int)round(array_sum(array_column($rows, 'progress_percent')) / $enrolled) : 0;
 
 // CSV export (keeps current filters)
 if ($download === 'csv') {
@@ -237,8 +286,15 @@ if ($download === 'csv') {
 
     // Header row
     $csv->add_data([
-        'Course','Category','User','Email','Status','Progress_%',
-        'Points_Earned','Max_Points','Last_Access'
+        'Course',
+        'Category',
+        'User',
+        'Email',
+        'Status',
+        'Progress_%',
+        'Points_Earned',
+        'Max_Points',
+        'Last_Access'
     ]);
 
     // Data rows
@@ -279,27 +335,27 @@ $data = [
         'avgprogress'  => $avgprogress,
         'totalmodules' => $totalmodules
     ],
-   'filters' => [
-    'userq'  => s($userq),
+    'filters' => [
+        'userq'  => s($userq),
 
-    // explicit booleans so mustache can mark the selected option cleanly
-    'status_is_all'        => ($status === 'all'),
-    'status_is_completed'  => ($status === 'completed'),
-    'status_is_inprogress' => ($status === 'inprogress'),
-    'status_is_notstarted' => ($status === 'notstarted'),
+        // explicit booleans so mustache can mark the selected option cleanly
+        'status_is_all'        => ($status === 'all'),
+        'status_is_completed'  => ($status === 'completed'),
+        'status_is_inprogress' => ($status === 'inprogress'),
+        'status_is_notstarted' => ($status === 'notstarted'),
 
-    'sortby' => [
-        'isname'     => ($sortby === 'name'),
-        'isprogress' => ($sortby === 'progress'),
-        'ispoints'   => ($sortby === 'points'),
+        'sortby' => [
+            'isname'     => ($sortby === 'name'),
+            'isprogress' => ($sortby === 'progress'),
+            'ispoints'   => ($sortby === 'points'),
+        ],
+        'dir' => [
+            'value'  => ($dir === 'DESC') ? 'desc' : 'asc',
+            'isdesc' => ($dir === 'DESC'),
+        ],
     ],
-    'dir' => [
-        'value'  => ($dir === 'DESC') ? 'desc' : 'asc',
-        'isdesc' => ($dir === 'DESC'),
-    ],
-],
 
-    'users' => array_map(function($r) {
+    'users' => array_map(function ($r) {
         // mustache-friendly fields
         return [
             'id'               => $r['id'],
@@ -307,7 +363,7 @@ $data = [
             'email'            => $r['email'],
             'profileurl'       => $r['profileurl'],
             'progress_percent' => $r['progress_percent'],
-            'completion_status'=> $r['completion_status'],
+            'completion_status' => $r['completion_status'],
             'badgeCompleted'   => ($r['completion_status'] === 'Completed'),
             'badgeInProgress'  => ($r['completion_status'] === 'In Progress'),
             'badgeNotStarted'  => ($r['completion_status'] === 'Not Started'),
