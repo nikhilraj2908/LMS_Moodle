@@ -41,7 +41,8 @@ $out = fopen('php://output', 'w');
  * @param array  $params  Params array to be filled.
  * @return string         SQL fragment "AND (...)" or empty string.
  */
-function cat_filter_sql(string $alias, int $catid, array &$params): string {
+function cat_filter_sql(string $alias, int $catid, array &$params): string
+{
     if ($catid <= 0) {
         return '';
     }
@@ -186,9 +187,9 @@ if ($mode === 'summary') {
         ]);
     }
 
-/* ====================================================================== */
-/*  COURSE SUMMARY EXPORT (mode = course_summary)                         */
-/* ====================================================================== */
+    /* ====================================================================== */
+    /*  COURSE SUMMARY EXPORT (mode = course_summary)                         */
+    /* ====================================================================== */
 } elseif ($mode === 'course_summary') {
 
     fputcsv($out, [
@@ -222,16 +223,19 @@ if ($mode === 'summary') {
             END) AS completed,
 
             -- enrolled, not completed, but >0% progress
-            COUNT(DISTINCT CASE
-                WHEN COALESCE(up.progress_pct, 0) > 0
-                 AND COALESCE(up.progress_pct, 0) < 99.9
-                THEN ue.userid
-            END) AS inprogress,
+          COUNT(DISTINCT CASE
+    WHEN COALESCE(up.progress_pct, 0) < 99.9
+     AND (
+            COALESCE(up.progress_pct, 0) > 0
+         OR COALESCE(ss.has_scorm_attempt, 0) = 1
+         )
+    THEN ue.userid
+END) AS inprogress,
 
             -- enrolled, 0% or NULL progress
             COUNT(DISTINCT CASE
-                WHEN up.progress_pct IS NULL
-                  OR COALESCE(up.progress_pct, 0) <= 0.0
+               WHEN COALESCE(up.progress_pct, 0) <= 0
+ AND COALESCE(ss.has_scorm_attempt, 0) = 0
                 THEN ue.userid
             END) AS notstarted,
 
@@ -256,7 +260,21 @@ if ($mode === 'summary') {
                ON e.courseid = c.id AND e.status = 0
         LEFT JOIN {user_enrolments} ue
                ON ue.enrolid = e.id AND ue.status = 0
-
+        LEFT JOIN (
+    SELECT DISTINCT
+        sa.userid,
+        s.course AS courseid,
+        1 AS has_scorm_attempt
+    FROM {scorm_attempt} sa
+    JOIN {scorm} s ON s.id = sa.scormid
+    JOIN {course_modules} cmsc ON cmsc.instance = s.id
+    JOIN {modules} msc ON msc.id = cmsc.module AND msc.name = 'scorm'
+    JOIN {course_sections} cssc ON cssc.id = cmsc.section
+    WHERE cmsc.visible = 1
+      AND cssc.section >= 1
+) ss
+ON ss.courseid = c.id
+AND ss.userid = ue.userid
         /* Per-user progress % (same denominator as course_report.php) */
         LEFT JOIN (
             SELECT
@@ -319,7 +337,6 @@ if ($mode === 'summary') {
         fputcsv($out, ['ERROR', preg_replace('/\s+/', ' ', $e->getMessage())]);
         error_log('export.php course_summary failed: ' . $e->getMessage());
     }
-
 } else {
     throw new moodle_exception('Invalid export type');
 }

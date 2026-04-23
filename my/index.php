@@ -1349,50 +1349,78 @@ $sql = "
         -- total enrolled (active) users
         COUNT(DISTINCT ue.userid) AS enrolled,
 
-        -- users with 100% progress
+        -- completed:
+        -- either course completion record exists OR progress is effectively 100%
         COUNT(DISTINCT CASE
-            WHEN COALESCE(up.progress_pct, 0) >= 99.9
+            WHEN cc.timecompleted IS NOT NULL
+              OR COALESCE(up.raw_progress_pct, 0) >= 99.9
             THEN ue.userid
         END) AS completed,
 
-        -- enrolled, not completed, but >0% progress
+        -- in progress:
+        -- not completed, but has module progress OR has a SCORM attempt
         COUNT(DISTINCT CASE
-            WHEN COALESCE(up.progress_pct, 0) > 0
-             AND COALESCE(up.progress_pct, 0) < 99.9
+            WHEN cc.timecompleted IS NULL
+             AND COALESCE(up.raw_progress_pct, 0) < 99.9
+             AND (
+                    COALESCE(up.raw_progress_pct, 0) > 0
+                 OR COALESCE(ss.has_scorm_attempt, 0) = 1
+                 )
             THEN ue.userid
         END) AS inprogress,
 
-        -- enrolled, 0% progress or NULL
+        -- not started:
+        -- not completed, no module progress, and no SCORM attempt
         COUNT(DISTINCT CASE
-            WHEN up.progress_pct IS NULL
-              OR COALESCE(up.progress_pct, 0) <= 0
+            WHEN cc.timecompleted IS NULL
+             AND COALESCE(up.raw_progress_pct, 0) <= 0
+             AND COALESCE(ss.has_scorm_attempt, 0) = 0
             THEN ue.userid
         END) AS notstarted,
 
-        -- average progress % across enrolled users
-        ROUND(AVG(COALESCE(up.progress_pct, 0))) AS avgprogress,
+        -- average progress:
+        -- if completed => 100
+        -- else if tracked module progress exists => use that
+        -- else if SCORM started => count as 1% so it is reflected as started
+        -- else 0
+        ROUND(AVG(
+            CASE
+                WHEN cc.timecompleted IS NOT NULL THEN 100
+                WHEN COALESCE(up.raw_progress_pct, 0) > 0 THEN up.raw_progress_pct
+                WHEN COALESCE(ss.has_scorm_attempt, 0) = 1 THEN 1
+                ELSE 0
+            END
+        )) AS avgprogress,
 
-        -- count of trackable modules in the course (visible, completion enabled, real sections)
+        -- count of trackable modules in the course
         (
             SELECT COUNT(1)
               FROM {course_modules} cm
               JOIN {course_sections} cs ON cs.id = cm.section
-             WHERE cm.course    = c.id
-               AND cm.visible   = 1
+             WHERE cm.course = c.id
+               AND cm.visible = 1
                AND cm.completion > 0
-               AND cs.section  >= 1
+               AND cs.section >= 1
         ) AS totalmodules
 
     FROM {course} c
-    JOIN {course_categories} cat ON cat.id = c.category
+    JOIN {course_categories} cat
+      ON cat.id = c.category
 
     LEFT JOIN {enrol} e
-           ON e.courseid = c.id AND e.status = 0
-    LEFT JOIN {user_enrolments} ue
-           ON ue.enrolid = e.id AND ue.status = 0
+      ON e.courseid = c.id
+     AND e.status = 0
 
-    /* Per-user progress % (only trackable & visible modules in real sections)
-       Denominator = ALL trackable modules in the course, just like course_report.php */
+    LEFT JOIN {user_enrolments} ue
+      ON ue.enrolid = e.id
+     AND ue.status = 0
+
+    -- official course completion per user/course
+    LEFT JOIN {course_completions} cc
+      ON cc.course = c.id
+     AND cc.userid = ue.userid
+
+    -- per-user tracked-module progress %
     LEFT JOIN (
         SELECT
             cmc.userid,
@@ -1406,27 +1434,49 @@ $sql = "
                 ) * 100.0
                 /
                 NULLIF((
-                    /* total trackable, visible modules in this course (sections >= 1) */
                     SELECT COUNT(*)
-                    FROM {course_modules} cm2
-                    JOIN {course_sections} cs2 ON cs2.id = cm2.section
-                    WHERE cm2.course     = cm.course
-                      AND cm2.completion > 0
-                      AND cm2.visible    = 1
-                      AND cs2.section   >= 1
+                      FROM {course_modules} cm2
+                      JOIN {course_sections} cs2 ON cs2.id = cm2.section
+                     WHERE cm2.course = cm.course
+                       AND cm2.completion > 0
+                       AND cm2.visible = 1
+                       AND cs2.section >= 1
                 ), 0)
-            , 0) AS progress_pct
+            , 0) AS raw_progress_pct
         FROM {course_modules} cm
-        JOIN {course_sections} cs ON cs.id = cm.section
+        JOIN {course_sections} cs
+          ON cs.id = cm.section
         LEFT JOIN {course_modules_completion} cmc
-               ON cmc.coursemoduleid = cm.id
+          ON cmc.coursemoduleid = cm.id
         WHERE cm.completion > 0
-          AND cm.visible    = 1
-          AND cs.section    >= 1
+          AND cm.visible = 1
+          AND cs.section >= 1
         GROUP BY cm.course, cmc.userid
     ) up
       ON up.courseid = c.id
-     AND up.userid   = ue.userid
+     AND up.userid = ue.userid
+
+    -- whether the user has started any SCORM in this course
+    LEFT JOIN (
+        SELECT DISTINCT
+            sa.userid,
+            s.course AS courseid,
+            1 AS has_scorm_attempt
+        FROM {scorm_attempt} sa
+        JOIN {scorm} s
+          ON s.id = sa.scormid
+        JOIN {course_modules} cmsc
+          ON cmsc.instance = s.id
+        JOIN {modules} msc
+          ON msc.id = cmsc.module
+         AND msc.name = 'scorm'
+        JOIN {course_sections} cssc
+          ON cssc.id = cmsc.section
+        WHERE cmsc.visible = 1
+          AND cssc.section >= 1
+    ) ss
+      ON ss.courseid = c.id
+     AND ss.userid = ue.userid
 
     $whereclause
     GROUP BY c.id, c.fullname, cat.name
